@@ -1,24 +1,44 @@
-set your username and e-mailadress
-$ git config --global user.name "John Doe"
-$ git config --global user.email johndoe@example.com
-$ git config --global core.editor /usr/bin/nano
+= Getting started with ADEM, git and github =
 
-Zie ook http://www.git-scm.com/book/en/v1/Git-Basics-Getting-a-Git-Repository
+Nice introduction on the use of git: http://www.git-scm.com/book/en/v1/Git-Basics 
 
-clone (download) the repository: dit maakt een kopie van de online repo naar jouw PC
-$ git clone https://github.com/lebeno/ADEM
+== Setup ==
 
-toon de status van jouw locale kopie:
+*Signup for a github account
+	https://github.com
+*Install git on your PC
+	for Debian/Ubuntu
+	$sudo apt-get install git
+*Set your github and e-mailadress
+	$ git config --global user.name "John Doe"
+	$ git config --global user.email johndoe@example.com
+*Clone the ADEM repository. This creates a local copy of the online repository on your pc
+	$ git clone https://github.com/lebeno/ADEM.git
+
+== Git daily use ==
+
+Show the status of your repository:
 $ git status
 
-een door jou nieuw aangemaakt bestand toevoegen aan de repository:
-$ git add newfile.txt
+Edit the files in you local copy with your editor of choice. After creating a new file or folder, add it so git can start tracking it:
+$ git add GITHUB
+
+Remove a file (also from the repository after commit!)
+$ git rm HITGUB
+
+Commit your changes to your local copy:
+$ git commit -m "Added new file with info on github use."
+
+Now upload it to the online repository:
+$ git push
+
+What has happenend:
+$ git log
+
+Get the changes from the online repository
+$ git fetch
+
+Get the changes from the online repository and merge them into local files
+$ git pull
 
 
-
-jouw locale wijzigingen uploaden naar de online repository:
-$ git commit -m ""
-
-
-een bestand verwijderen (bij commit ook in de repository!)
-$ git rm wrongfile.txt
