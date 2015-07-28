@@ -1,0 +1,24 @@
+set your username and e-mailadress
+$ git config --global user.name "John Doe"
+$ git config --global user.email johndoe@example.com
+$ git config --global core.editor /usr/bin/nano
+
+Zie ook http://www.git-scm.com/book/en/v1/Git-Basics-Getting-a-Git-Repository
+
+clone (download) the repository: dit maakt een kopie van de online repo naar jouw PC
+$ git clone https://github.com/lebeno/ADEM
+
+toon de status van jouw locale kopie:
+$ git status
+
+een door jou nieuw aangemaakt bestand toevoegen aan de repository:
+$ git add newfile.txt
+
+
+
+jouw locale wijzigingen uploaden naar de online repository:
+$ git commit -m ""
+
+
+een bestand verwijderen (bij commit ook in de repository!)
+$ git rm wrongfile.txt
