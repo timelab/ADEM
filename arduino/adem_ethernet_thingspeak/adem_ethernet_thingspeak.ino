@@ -35,21 +35,44 @@
  
 */
 
+/* 
+ Lieven Blancke, 2015-08-01    
+  - Do not put your writeAPIKey here, put it in /home/lieven/thingspeak_credentials.h
+    and do not check in this separate file 
+    #define TSWRITEAPIKEY  "ABCDEFHIJKLMNOP" // place your ThinkSpeak Write API Key here
+
+  - PPD60V analog output or TP 7 on the PCB of PPD42N connected to Analog PIN 0
+
+*/
+
 #include <SPI.h>
 #include <Ethernet.h>
+#include "/home/lieven/thingspeak_credentials.h"
 
 // Local Network Settings
-byte mac[] = { 0xD4, 0x28, 0xB2, 0xFF, 0xA0, 0xA1 }; // Must be unique on local network
+byte mac[] = { 0xD4, 0x28, 0xB2, 0xFF, 0xA0, 0xA2 }; // Must be unique on local network
 
 // ThingSpeak Settings
 char thingSpeakAddress[] = "api.thingspeak.com";
-String writeAPIKey = "XXXMX2WYYR0EVZZZ";
+String writeAPIKey = TSWRITEAPIKEY;
+
 const int updateThingSpeakInterval = 16 * 1000;      // Time interval in milliseconds to update ThingSpeak (number of seconds * 1000 = interval)
 
-// Variable Setup
+// Thingspeak Variable Setup
 long lastConnectionTime = 0; 
 boolean lastConnected = false;
 int failedCounter = 0;
+String analogValue0 = "";
+
+// PPD Variable Setup
+unsigned long analogcount;
+double analogtotal;
+unsigned long starttime = 0;
+unsigned long sampletime_ms = 1000;
+unsigned long analogvalue = 0;
+double LconAV = 0;
+double Lugm3_2 = 0;
+
 
 // Initialize Arduino Ethernet Client
 EthernetClient client;
@@ -61,13 +84,51 @@ void setup()
   
   // Start Ethernet on Arduino
   startEthernet();
+
+  starttime = millis();
 }
 
 void loop()
-{
-  // Read value from Analog Input Pin 0
-  String analogValue0 = String(analogRead(A0), DEC);
-  
+{ 
+  // Read PPD value from Analog Input Pin 0
+  analogvalue = analogvalue + analogRead(0);
+  analogcount++;
+  if ((millis()-starttime) > sampletime_ms) // every second
+  {
+    starttime = millis(); // moved to create more regular periods.
+    analogvalue = analogvalue/analogcount;
+    analogtotal = (analogvalue*5.0)/1024;
+    LconAV = (240.0*pow(analogtotal,6) - 2491.3*pow(analogtotal,5) + 9448.7*pow(analogtotal,4) - 14840.0*pow(analogtotal,3) + 10684.0*pow(analogtotal,2) + 2211.8*(analogtotal) + 7.9623);
+    Lugm3_2 = (0.0000000495*pow(LconAV,2) + 0.0015247767*(LconAV));//Cardboard
+    //y = 0.0000000495x2 + 0.0015247767x - 0.7700757363 //Cardboard
+    
+    //Lugm3 = (0.000000000000000000000000124084*pow(LconAV,6) - 0.000000000000000000021601485060*pow(LconAV,5) + 0.00000000000000143560109703371*pow(LconAV,4) - 0.0000000000441691662383661*pow(LconAV,3) + 0.000000633178466830333*pow(LconAV,2) - 0.00127531308452014*(LconAV) + 6.46046830008057); //-1E-16x4 + 1E-11x3 - 4E-07x2 + 0.0055x - 8.1472         
+    //0.000000000000000000000000124084x6 - 0.000000000000000000021601485060x5 + 0.000000000000001435601097033710x4 - 0.000000000044169166238366100000x3 + 0.000000633178466830333000000000x2 - 0.001275313084520140000000000000x + 6.460468300080570000000000000000
+    //0.000000000000000000000000107376x6 - 0.000000000000000000017973858956x5 + 0.000000000000001131107063421510x4 - 0.000000000031786851160857600000x3 + 0.000000383869228359063000000000x2 + 0.000966287521677600000000000000x
+
+    //if(LconAV < 0){
+    //  LconAV = 0;
+    //}
+    if(Lugm3_2 < 0){
+      Lugm3_2 = 0;
+    }
+ 
+    Serial.println();
+    Serial.print(F(" Analog Total: "));
+    Serial.print(analogtotal);
+    Serial.print(F(" Lower Concentration: "));
+    Serial.print(LconAV);
+    Serial.print(F(" Lower ugm3_2: "));
+    Serial.print(Lugm3_2);
+    Serial.println();
+    
+    analogValue0 = String(Lugm3_2, DEC);
+    //debugit("analogval=" + analogValue0 );
+    
+    analogvalue = 0;
+    analogcount = 0;
+  }
+
   // Print Update Response to Serial Monitor
   if (client.available())
   {
@@ -81,13 +142,15 @@ void loop()
     Serial.println("...disconnected");
     Serial.println();
     
+    //millis1=millis();
     client.stop();
+    debugit("client.stop");
   }
   
   // Update ThingSpeak
   if(!client.connected() && (millis() - lastConnectionTime > updateThingSpeakInterval))
   {
-    updateThingSpeak("field1="+analogValue0);
+    updateThingSpeak("field1="+analogValue0); // temporarily we only send the last measured value
   }
   
   // Check if Arduino Ethernet needs to be restarted
@@ -95,6 +158,14 @@ void loop()
   
   lastConnected = client.connected();
 }
+
+void debugit (String debugdata)
+{
+  Serial.print ("###DEBUG ");
+  Serial.print (millis()/100);
+  Serial.println (":" + debugdata);
+}
+
 
 void updateThingSpeak(String tsData)
 {
