@@ -65,8 +65,11 @@ int failedCounter = 0;
 String analogValue0 = "";
 
 // PPD Variable Setup
-unsigned long analogcount;
+unsigned long analogcount = 0;
 double analogtotal;
+double analogsend;
+unsigned long analogsendcount = 0;
+unsigned long DISCARTED_SAMPLES = 4;
 unsigned long starttime = 0;
 unsigned long sampletime_ms = 1000;
 unsigned long analogvalue = 0;
@@ -121,9 +124,15 @@ void loop()
     Serial.print(F(" Lower ugm3_2: "));
     Serial.print(Lugm3_2);
     Serial.println();
-    
-    analogValue0 = String(Lugm3_2, DEC);
-    //debugit("analogval=" + analogValue0 );
+
+    analogsendcount++;
+    // de eerste drie samples (seconden) na upload naar ThingSpeak lijken af te wijken, die tellen we niet mee
+    if (analogsendcount>DISCARTED_SAMPLES) {
+      analogsend+= Lugm3_2;
+    }
+    else {
+      Serial.println("...discarted sample!");
+    }
     
     analogvalue = 0;
     analogcount = 0;
@@ -150,6 +159,9 @@ void loop()
   // Update ThingSpeak
   if(!client.connected() && (millis() - lastConnectionTime > updateThingSpeakInterval))
   {
+    analogsend=analogsend/(analogsendcount - DISCARTED_SAMPLES);
+    analogsendcount=0;
+    analogValue0 = String(analogsend, DEC);
     updateThingSpeak("field1="+analogValue0); // temporarily we only send the last measured value
   }
   
