@@ -16,11 +16,7 @@
 /**********************************************/
 #include <ESP8266WiFi.h>                 
 #include <TinyGPS++.h>
-
-const char ssid[] = "timelab-wifi";
-const char pass[] = "timelab09";
-const char thingSpeakAddress[] = "api.thingspeak.com";
-const char thingSpeakAPIKey[] = "GT2EZDOCPERD8J40";
+#include <config.h>
 
 static const uint32_t GPSBaud = 9600;
 // The TinyGPS++ object
