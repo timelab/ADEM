@@ -55,7 +55,7 @@ void setup() {
   //connectWiFi();
   Serial1.begin(9600);
   Serial.begin(GPSBaud);
- Serial1.println(F("DeviceExample.ino + shadowandy"));
+  Serial1.println(F("DeviceExample.ino + shadowandy"));
 
   pinMode(pin[PM25], FUNCTION_3); //Set TX PIN to GPIO
   pinMode(pin[PM10], FUNCTION_3); //Set RX PIN to GPIO
@@ -106,12 +106,15 @@ void loop() {
     ESP.wdtFeed(); // Reset the WatchDog
 
       while (Serial.available() > 0)
-    if (gps.encode(Serial.read()))
-      returnGpsInfo();
+        if (gps.encode(Serial.read()))
+          returnGpsInfo();
 
     
     connectWiFi();
-    updateThingSpeak("1=" + String(concentration[PM10], DEC) + "&2=" + String(count[PM10], DEC) + "&3=" + String(concentration[PM25], DEC) + "&4=" + String(count[PM25], DEC) + "&5=" + String(latitude) + "&6=" + String(longitude) + "&7=" + String(seconds));
+    // Data die momenteel doorgestuurd wordt naar ThingSpeak.
+    updateThingSpeak("1=" + String(concentration[PM10], DEC) + "&2=" + String(count[PM10], DEC) + "&3=" + 
+      String(concentration[PM25], DEC) + "&4=" + String(count[PM25], DEC) + "&5=" + String(latitude) + 
+      "&6=" + String(longitude) + "&7=" + String(seconds));
     // Sleeping until the next sampling
     ESP.wdtDisable();
     //delay(sleeptime_ms);
