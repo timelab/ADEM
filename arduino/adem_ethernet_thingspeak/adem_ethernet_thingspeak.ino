@@ -103,20 +103,11 @@ void loop()
     analogtotal = (analogvalue*5.0)/1024;
     LconAV = (240.0*pow(analogtotal,6) - 2491.3*pow(analogtotal,5) + 9448.7*pow(analogtotal,4) - 14840.0*pow(analogtotal,3) + 10684.0*pow(analogtotal,2) + 2211.8*(analogtotal) + 7.9623);
     Lugm3_2 = (0.0000000495*pow(LconAV,2) + 0.0015247767*(LconAV));//Cardboard
-    //y = 0.0000000495x2 + 0.0015247767x - 0.7700757363 //Cardboard
-    
-    //Lugm3 = (0.000000000000000000000000124084*pow(LconAV,6) - 0.000000000000000000021601485060*pow(LconAV,5) + 0.00000000000000143560109703371*pow(LconAV,4) - 0.0000000000441691662383661*pow(LconAV,3) + 0.000000633178466830333*pow(LconAV,2) - 0.00127531308452014*(LconAV) + 6.46046830008057); //-1E-16x4 + 1E-11x3 - 4E-07x2 + 0.0055x - 8.1472         
-    //0.000000000000000000000000124084x6 - 0.000000000000000000021601485060x5 + 0.000000000000001435601097033710x4 - 0.000000000044169166238366100000x3 + 0.000000633178466830333000000000x2 - 0.001275313084520140000000000000x + 6.460468300080570000000000000000
-    //0.000000000000000000000000107376x6 - 0.000000000000000000017973858956x5 + 0.000000000000001131107063421510x4 - 0.000000000031786851160857600000x3 + 0.000000383869228359063000000000x2 + 0.000966287521677600000000000000x
-
-    //if(LconAV < 0){
-    //  LconAV = 0;
-    //}
     if(Lugm3_2 < 0){
       Lugm3_2 = 0;
     }
  
-    Serial.println();
+    //Serial.println();
     Serial.print(F(" Analog Total: "));
     Serial.print(analogtotal);
     Serial.print(F(" Lower Concentration: "));
@@ -133,7 +124,7 @@ void loop()
     else {
       Serial.println("...discarted sample!");
     }
-    
+    Serial.println ("analogcount=" + String(analogcount, DEC));    
     analogvalue = 0;
     analogcount = 0;
   }
