@@ -18,6 +18,11 @@
 #include <TinyGPS++.h>
 #include <config.h>
 
+const char ssid[] = WIFISSID;
+const char pass[] = WIFIPW;
+const char thingSpeakAddress[] = THINGADDR;
+const char thingSpeakAPIKey[] = THINGKEY;
+
 static const uint32_t GPSBaud = 9600;
 // The TinyGPS++ object
 TinyGPSPlus gps;
