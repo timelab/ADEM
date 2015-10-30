@@ -35,15 +35,15 @@ const char ssid[] = WIFISSID;
 const char pass[] = WIFIPW;
 const char thingSpeakAddress[] = THINGADDR;
 const char thingSpeakAPIKey[] = THINGKEY;
-
 static const uint32_t GPSBaud = 9600;
+
+
 // The TinyGPS++ object
 TinyGPSPlus gps;
 
-
 #define PM25 0
 #define PM10 1
-int pin[] = {12, 1};
+int pin[] = {12, 13};
 //int pin[] = {0, 3};
 unsigned long starttime;
 unsigned long sampletime_ms = 10000;
@@ -69,14 +69,12 @@ int chipId = 0;
 
 void setup() {
   //connectWiFi();
-  Serial1.begin(9600);
+  delay(2000);
   Serial.begin(GPSBaud);
-  chipId = ESP.getChipId();
-  Serial1.print(F("start "));
-  Serial1.println(chipId);
-
-  
-
+  chipId=ESP.getChipId();
+  Serial.print("start chipId:");
+  Serial.println(chipId);
+  delay(2000);
   pinMode(pin[PM25], FUNCTION_3); //Set TX PIN to GPIO
   pinMode(pin[PM10], FUNCTION_3); //Set RX PIN to GPIO
   pinMode(pin[PM25], INPUT_PULLUP); //Listen at the designated PIN
@@ -85,12 +83,12 @@ void setup() {
   attachInterrupt(pin[PM10], intrLOPM10, CHANGE); // Attaching interrupt to PIN
   //connectWiFi();
   starttime = millis(); //Fetching the current time
-  ESP.wdtEnable(WDTO_8S); // Enabling Watchdog
+  //ESP.wdtEnable(WDTO_8S); // Enabling Watchdog
 }
 
 void loop() {
   
-  ESP.wdtFeed(); // Reset the WatchDog
+  //ESP.wdtFeed(); // Reset the WatchDog
   
   if ((millis() - starttime) > sampletime_ms) //Checking if it is time to sample
   {
@@ -101,21 +99,21 @@ void loop() {
     count[PM10] = 1.1 * pow(ratio[PM10], 3) - 3.8 * pow(ratio[PM10], 2) + 520 * ratio[PM10] + 0.62;
     count[PM25] -= count[PM10];
     
-    ESP.wdtFeed(); // Reset the WatchDog
+    //ESP.wdtFeed(); // Reset the WatchDog
     // Begin mass concentration calculation
     float concentration[] = {0, 0};
     double pi = 3.14159;
     double density = 1.65 * pow(10, 12);
     double K = 3531.5;
     
-    ESP.wdtFeed(); // Reset the WatchDog
+    //ESP.wdtFeed(); // Reset the WatchDog
     // PM10
     double r10 = 2.6 * pow(10, -6);
     double vol10 = (4 / 3) * pi * pow(r10, 3);
     double mass10 = density * vol10;
     concentration[PM10] = (count[PM10]) * K * mass10;
     
-    ESP.wdtFeed(); // Reset the WatchDog
+    //ESP.wdtFeed(); // Reset the WatchDog
     // PM2.5
     double r25 = 0.44 * pow(10, -6);
     double vol25 = (4 / 3) * pi * pow(r25, 3);
@@ -123,35 +121,44 @@ void loop() {
     concentration[PM25] = (count[PM25]) * K * mass25;
     // End of mass concentration calculation
 
-    ESP.wdtFeed(); // Reset the WatchDog
+    //ESP.wdtFeed(); // Reset the WatchDog
 
       while (Serial.available() > 0)
         if (gps.encode(Serial.read()))
           returnGpsInfo();
 
-    
+   
     connectWiFi();
     // Data die momenteel doorgestuurd wordt naar ThingSpeak.
     updateThingSpeak("1=" + String(concentration[PM10], DEC) + "&2=" + String(count[PM10], DEC) + "&3=" + 
       String(concentration[PM25], DEC) + "&4=" + String(count[PM25], DEC) + "&5=" + String(latitude) + 
       "&6=" + String(longitude) + "&7=" + String(seconds));
+
+//todo : chipId meesturen naar data server
+      
     // Sleeping until the next sampling
-    ESP.wdtDisable();
+    //ESP.wdtDisable();
     //delay(sleeptime_ms);
-    ESP.wdtEnable(WDTO_8S);
+    //ESP.wdtEnable(WDTO_8S);
     lowpulseoccupancy[PM25] = 0;
     lowpulseoccupancy[PM10] = 0;
-    ESP.deepSleep(sleeptime_ms, WAKE_RF_DEFAULT);
+    //ESP.deepSleep(sleeptime_ms, WAKE_RF_DEFAULT);
     // Resetting for next sampling
     //lowpulseoccupancy[PM25] = 0;
     //lowpulseoccupancy[PM10] = 0;
-    //starttime = millis();
+    starttime = millis();
     //ESP.wdtFeed(); // Reset the WatchDog
+
+    
   }
+  
 }
+
+
 
 void connectWiFi() {
   if (WiFi.status() == WL_CONNECTED) {
+    Serial.println("wifi is connected");
     return;
   }
   WiFi.begin(ssid, pass);
@@ -171,7 +178,7 @@ void updateThingSpeak(String tsData) {
   client.print(tsData);
   client.print(F(" HTTP/1.1\r\nHost: api.thingspeak.com\r\n\r\n"));
   client.println();
-  Serial1.println(tsData);
+  Serial.println(tsData);
 }
 
 void intrLOPM25() {
@@ -240,3 +247,4 @@ void returnGpsInfo()
   }
 
 }
+
