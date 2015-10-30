@@ -119,7 +119,7 @@ void loop() {
     // Sleeping until the next sampling
     ESP.wdtDisable();
     //delay(sleeptime_ms);
-    //ESP.wdtEnable(WDTO_8S);
+    ESP.wdtEnable(WDTO_8S);
     lowpulseoccupancy[PM25] = 0;
     lowpulseoccupancy[PM10] = 0;
     ESP.deepSleep(sleeptime_ms, WAKE_RF_DEFAULT);
@@ -150,9 +150,9 @@ void updateThingSpeak(String tsData) {
   client.print(thingSpeakAPIKey);
   client.print(F("&"));
   client.print(tsData);
-  Serial1.println(tsData);
   client.print(F(" HTTP/1.1\r\nHost: api.thingspeak.com\r\n\r\n"));
   client.println();
+  Serial1.println(tsData);
 }
 
 void intrLOPM25() {
