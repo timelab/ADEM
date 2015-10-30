@@ -16,7 +16,7 @@
 /**********************************************/
 #include <ESP8266WiFi.h>                 
 #include <TinyGPS++.h>
-#include <config.h>
+#include "config.h"
 
 const char ssid[] = WIFISSID;
 const char pass[] = WIFIPW;
@@ -50,13 +50,19 @@ int seconds = 0;
 int year = 0;
 int month = 0;
 int day = 0;
+int chipId = 0;
+
 
 
 void setup() {
   //connectWiFi();
   Serial1.begin(9600);
   Serial.begin(GPSBaud);
-  Serial1.println(F("DeviceExample.ino + shadowandy"));
+  chipId = ESP.getChipId();
+  Serial1.print(F("start "));
+  Serial1.println(chipId);
+
+  
 
   pinMode(pin[PM25], FUNCTION_3); //Set TX PIN to GPIO
   pinMode(pin[PM10], FUNCTION_3); //Set RX PIN to GPIO
