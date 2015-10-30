@@ -14,9 +14,23 @@
 /*      - PPD42NS Pin 3 => 5V                 */
 /*      - PPD42NS Pin 4 => RX                 */
 /**********************************************/
+/* TinyGPS:                                   */
+/* https://github.com/mikalhart/TinyGPSPlus   */
+/**********************************************/
 #include <ESP8266WiFi.h>                 
 #include <TinyGPS++.h>
-#include <config.h>
+
+#include "config.h"
+// create a config.h file in the same folder with the following contents,
+// and fill in your WiFi and thingspeak credentials.
+/*
+
+#define WIFISSID "your wifi network name
+#define WIFIPW "your wifi network password"
+#define THINGADDR "api.thingspeak.com"
+#define THINGKEY "your thingspeak API key"
+
+*/
 
 const char ssid[] = WIFISSID;
 const char pass[] = WIFIPW;
