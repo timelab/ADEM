@@ -27,7 +27,7 @@ Remove a file (also from the repository after commit!)
 $ git rm HITGUB
 
 Commit your changes to your local copy:
-$ git commit -m "Added new file with info on github use."
+$ git commit --all --message "Added new file with info on github use."
 
 Now upload it to the online repository:
 $ git push
@@ -35,10 +35,7 @@ $ git push
 What has happenend:
 $ git log
 
-Get the changes from the online repository
-$ git fetch
-
 Get the changes from the online repository and merge them into local files
-$ git pull
+$ git pull rebase
 
 
