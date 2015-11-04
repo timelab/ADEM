@@ -33,7 +33,8 @@
 
 const char ssid[] = WIFISSID;
 const char pass[] = WIFIPW;
-const char thingSpeakAddress[] = THINGADDR;
+const char thingSpeakAddress[] = STIJNADDR;
+const char debugAddress[] = DEBUGADDR;
 const char thingSpeakAPIKey[] = THINGKEY;
 static const uint32_t GPSBaud = 9600;
 
@@ -64,6 +65,9 @@ int year = 0;
 int month = 0;
 int day = 0;
 int chipId = 0;
+String gpsDate ="";
+String gpsTime ="";
+String tsData ="";
 
 
 
@@ -129,10 +133,15 @@ void loop() {
 
    
     connectWiFi();
+
+    tsData = "conPM10=" + String(concentration[PM10], DEC) + "&countPM10=" + String(count[PM10], DEC) + "&conPM25=" + 
+      String(concentration[PM25], DEC) + "&countPM25=" + String(count[PM25], DEC) + "&latitude=" + String(latitude, DEC) + 
+      "&longitude=" + String(longitude, DEC) + "&gpsDate=" + gpsDate + "&gpsTime=" + gpsTime;
+      
     // Data die momenteel doorgestuurd wordt naar ThingSpeak.
-    updateThingSpeak("1=" + String(concentration[PM10], DEC) + "&2=" + String(count[PM10], DEC) + "&3=" + 
-      String(concentration[PM25], DEC) + "&4=" + String(count[PM25], DEC) + "&5=" + String(latitude) + 
-      "&6=" + String(longitude) + "&7=" + String(seconds));
+    updateThingSpeak(tsData);
+
+    updateDebug(tsData);
 
 //todo : chipId meesturen naar data server
       
@@ -172,13 +181,26 @@ void updateThingSpeak(String tsData) {
   if (!client.connect(thingSpeakAddress, 80)) {
     return;
   }
-  client.print(F("GET /update?key="));
-  client.print(thingSpeakAPIKey);
+  client.print(F("GET /adem?key="));
+  client.print(chipId);
   client.print(F("&"));
   client.print(tsData);
   client.print(F(" HTTP/1.1\r\nHost: api.thingspeak.com\r\n\r\n"));
   client.println();
   Serial.println(tsData);
+}
+
+void updateDebug(String tsData) {
+  WiFiClient client;
+  if (!client.connect(debugAddress, 3000)) {
+    return;
+  }
+  client.print(F("GET /adem?key="));
+  client.print(chipId);
+  client.print(F("&"));
+  client.print(tsData);
+  client.print(F(" HTTP/1.1\r\nHost: api.thingspeak.com\r\n\r\n"));
+  client.println();
 }
 
 void intrLOPM25() {
@@ -232,6 +254,7 @@ void returnGpsInfo()
     day = 0;
     year = 0;
   }
+    gpsDate = String(month)+"-"+String(day)+"-"+String(year);
 
   if (gps.time.isValid())
   {
@@ -245,6 +268,7 @@ void returnGpsInfo()
     minutes = 0;
     seconds = 3;
   }
+    gpsTime = String(hours)+":"+String(minutes)+":"+String(seconds);
 
 }
 
