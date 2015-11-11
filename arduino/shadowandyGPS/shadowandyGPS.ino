@@ -20,33 +20,32 @@
 #include <ESP8266WiFi.h>                 
 #include <TinyGPS++.h>
 #include "config.h"
+
+#define PPD_PM25_PIN 12
+#define PPD_PM10_PIN 13
+#define FSM_BUFFER_SIZE 128
+
 // create a config.h file in the same folder with the following contents,
 // and fill in your WiFi and thingspeak credentials.
 /*
 
-#define WIFISSID "your wifi network name
+#define WIFISSID "your wifi network name"
 #define WIFIPW "your wifi network password"
 #define THINGADDR "api.thingspeak.com"
 #define THINGKEY "your thingspeak API key"
-
+#define DEBUGADDR ""
 */
 
-const char ssid[] = WIFISSID;
-const char pass[] = WIFIPW;
-const char thingSpeakAddress[] = STIJNADDR;
+const char esp_ssid[] = WIFISSID;
+const char esp_pass[] = WIFIPW;
+int esp_ChipId = 0;
+
+const char thingSpeak_Address[] = THINGADDR;
 const char debugAddress[] = DEBUGADDR;
-const char thingSpeakAPIKey[] = THINGKEY;
-static const uint32_t GPSBaud = 9600;
+const char thingSpeak_APIKey[] = THINGKEY;
 
-
-// The TinyGPS++ object
+static const uint32_t gps_Baud = 115200; // 9600 default or 115200 for FGPMMOPA6C of Lieven
 TinyGPSPlus gps;
-
-#define PPD_PM25_PIN 12
-#define PPD_PM10_PIN 13
-#define PM10 1
-#define FSM_BUFFER_SIZE 128
-
 
 struct fsm_struct {
   float ppd_countPM10;
@@ -62,9 +61,12 @@ struct fsm_struct {
   uint8_t month;
   uint8_t day;
 };
-
 fsm_struct fsm_temp;
 fsm_struct fsm_arr[FSM_BUFFER_SIZE];
+String fsm_data =""; //string die uiteindelijk naar de api gestuurd zal worden.
+uint8_t fsm_next = 0;   //positie voor volgende data in buffer
+uint8_t fsm_current = FSM_BUFFER_SIZE;  //postitie laatst bewaarde data in buffer
+uint8_t fsm_last = 0; //laatst doorgestuurde waarde
 
 unsigned long ppd_starttime;
 unsigned long ppd_sampletime_ms = 10000;
@@ -79,24 +81,28 @@ float ppd_ratio_PM10 = 0;
 float ppd_ratio_PM25 = 0;
 float ppd_count_PM10 = 0;
 float ppd_count_PM25 = 0;
-
 boolean ppd_value_PM10 = HIGH;
 boolean ppd_value_PM25 = HIGH;
 boolean ppd_trigger_PM10 = false;
 boolean ppd_trigger_PM25 = false;
 
-int espChipId = 0;
-String fsm_data =""; //string die uiteindelijk naar de api gestuurd zal worden.
-uint8_t fsm_next = 0;   //positie voor volgende data in buffer
-uint8_t fsm_current = FSM_BUFFER_SIZE;  //postitie laatst bewaarde data in buffer
-uint8_t fsm_last = 0; //laatst doorgestuurde waarde
+boolean connectWiFi();
+void updateThingSpeak(String fsm_data);
+void updateDebug(String fsm_data);
+void intrLOPM25();
+void intrLOPM10();
+void returnGpsInfo();
+void storeBuffer(float ppd_con_PM10, float ppd_con_PM25, float ppd_count_PM10, float ppd_count_PM25);
+void sendBuffer();
+String formatDate(uint8_t year, uint8_t month, uint8_t day);
+String formatTime(uint8_t hours, uint8_t minutes, uint8_t seconds);
 
 void setup() {
   delay(3000);
-  Serial.begin(GPSBaud);
-  espChipId=ESP.getChipId();
-  Serial.print("start espChipId:");
-  Serial.println(espChipId);
+  Serial.begin(gps_Baud);
+  esp_ChipId=ESP.getChipId();
+  Serial.print("start esp_ChipId:");
+  Serial.println(esp_ChipId);
   delay(2000);
   pinMode(PPD_PM25_PIN, FUNCTION_3); //Set TX PIN to GPIO
   pinMode(PPD_PM10_PIN, FUNCTION_3); //Set RX PIN to GPIO
@@ -153,8 +159,7 @@ void loop() {
   }
   
 }
-
-
+/////////////////////////////////:
 
 boolean connectWiFi() {
   char attempts=0;
@@ -162,7 +167,7 @@ boolean connectWiFi() {
     Serial.println("wifi is connected");
     return true;
   }
-  WiFi.begin(ssid, pass);
+  WiFi.begin(esp_ssid, esp_pass);
   while (WiFi.status() != WL_CONNECTED) {
     delay(500);
     attempts++;
@@ -175,7 +180,7 @@ boolean connectWiFi() {
 
 void updateThingSpeak(String fsm_data) {
   WiFiClient client;
-  if (!client.connect(thingSpeakAddress, 80)) {
+  if (!client.connect(thingSpeak_Address, 80)) {
     return;
   }
   client.print(F("GET /adem?"));
@@ -261,46 +266,44 @@ void returnGpsInfo()
   }
 }
 
-
-
 void storeBuffer(float ppd_con_PM10, float ppd_con_PM25, float ppd_count_PM10, float ppd_count_PM25){
-fsm_arr[fsm_next].ppd_countPM10 = ppd_count_PM10;
-fsm_arr[fsm_next].ppd_countPM25 = ppd_count_PM25;
-fsm_arr[fsm_next].conPM10 = ppd_con_PM10;
-fsm_arr[fsm_next].conPM25 = ppd_con_PM25;
-fsm_arr[fsm_next].longitude = fsm_temp.longitude;
-fsm_arr[fsm_next].latitude = fsm_temp.latitude;
-fsm_arr[fsm_next].hours = fsm_temp.hours;
-fsm_arr[fsm_next].minutes = fsm_temp.minutes;
-fsm_arr[fsm_next].seconds = fsm_temp.seconds;
-fsm_arr[fsm_next].year = fsm_temp.year;
-fsm_arr[fsm_next].month = fsm_temp.month;
-fsm_arr[fsm_next].day = fsm_temp.day;
-Serial.println("----------------");  
-Serial.print("day:");
-Serial.print(fsm_temp.day);
-Serial.print(" month:");
-Serial.print(fsm_temp.month);
-Serial.print(" year:");
-Serial.print(fsm_temp.year);
-Serial.print(" hours:");
-Serial.print(fsm_temp.hours);
-Serial.print(" minutes:");
-Serial.print(fsm_temp.minutes);
-Serial.print(" seconds:");
-Serial.print(fsm_temp.seconds);
-Serial.print(" countPM10:");
-Serial.print(ppd_count_PM10);
-Serial.print(" countPM25:");
-Serial.print(ppd_count_PM25);
-Serial.print(" conPM10:");
-Serial.print(ppd_con_PM10);
-Serial.print(" conPM25:");
-Serial.print(ppd_con_PM25);
-Serial.print(" fsm_next:");
-Serial.println(fsm_next);
-fsm_current = fsm_next;
-fsm_next = (fsm_next+1) % FSM_BUFFER_SIZE;
+  fsm_arr[fsm_next].ppd_countPM10 = ppd_count_PM10;
+  fsm_arr[fsm_next].ppd_countPM25 = ppd_count_PM25;
+  fsm_arr[fsm_next].conPM10 = ppd_con_PM10;
+  fsm_arr[fsm_next].conPM25 = ppd_con_PM25;
+  fsm_arr[fsm_next].longitude = fsm_temp.longitude;
+  fsm_arr[fsm_next].latitude = fsm_temp.latitude;
+  fsm_arr[fsm_next].hours = fsm_temp.hours;
+  fsm_arr[fsm_next].minutes = fsm_temp.minutes;
+  fsm_arr[fsm_next].seconds = fsm_temp.seconds;
+  fsm_arr[fsm_next].year = fsm_temp.year;
+  fsm_arr[fsm_next].month = fsm_temp.month;
+  fsm_arr[fsm_next].day = fsm_temp.day;
+  Serial.println("----------------");  
+  Serial.print("day:");
+  Serial.print(fsm_temp.day);
+  Serial.print(" month:");
+  Serial.print(fsm_temp.month);
+  Serial.print(" year:");
+  Serial.print(fsm_temp.year);
+  Serial.print(" hours:");
+  Serial.print(fsm_temp.hours);
+  Serial.print(" minutes:");
+  Serial.print(fsm_temp.minutes);
+  Serial.print(" seconds:");
+  Serial.print(fsm_temp.seconds);
+  Serial.print(" countPM10:");
+  Serial.print(ppd_count_PM10);
+  Serial.print(" countPM25:");
+  Serial.print(ppd_count_PM25);
+  Serial.print(" conPM10:");
+  Serial.print(ppd_con_PM10);
+  Serial.print(" conPM25:");
+  Serial.print(ppd_con_PM25);
+  Serial.print(" fsm_next:");
+  Serial.println(fsm_next);
+  fsm_current = fsm_next;
+  fsm_next = (fsm_next+1) % FSM_BUFFER_SIZE;
 }
 
 void sendBuffer(){
@@ -312,7 +315,7 @@ Serial.println(fsm_current);
     if(connectWiFi()){
       int i = fsm_last;
       do{
-         fsm_data = "key="+String(espChipId)+"&conPM10=" + String(fsm_arr[i].conPM10, DEC) + "&ppd_countPM10=" + String(fsm_arr[i].ppd_countPM10, DEC) + "&conPM25=" + 
+         fsm_data = "key="+String(esp_ChipId)+"&conPM10=" + String(fsm_arr[i].conPM10, DEC) + "&ppd_countPM10=" + String(fsm_arr[i].ppd_countPM10, DEC) + "&conPM25=" + 
          String(fsm_arr[i].conPM25, DEC) + "&ppd_countPM25=" + String(fsm_arr[i].ppd_countPM25, DEC) + "&latitude=" + String(fsm_arr[i].latitude, DEC) + 
          "&longitude=" + String(fsm_arr[i].longitude, DEC) + "&gpsDate=" +formatDate(fsm_arr[i].year,fsm_arr[i].month,fsm_arr[i].day) + 
          "&gpsTime=" + formatTime(fsm_arr[i].hours,fsm_arr[i].minutes,fsm_arr[i].seconds);
@@ -326,15 +329,12 @@ Serial.println(fsm_current);
   }
 }
 
-//    updateThingSpeak(fsm_data);
-
-//    
-
 String formatDate(uint8_t year, uint8_t month, uint8_t day){
   char gpsDate[11];
   sprintf(gpsDate, "%04d-%02d-%02d", year, month, day);
   return gpsDate;
 }
+
 String formatTime(uint8_t hours, uint8_t minutes, uint8_t seconds){
   char gpsTime[9];
   sprintf(gpsTime, "%02d:%02d:%02d", hours, minutes, seconds);
