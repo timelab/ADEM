@@ -42,190 +42,183 @@ static const uint32_t GPSBaud = 9600;
 // The TinyGPS++ object
 TinyGPSPlus gps;
 
-#define PM25 0
+#define PPD_PM25_PIN 12
+#define PPD_PM10_PIN 13
 #define PM10 1
-int pin[] = {12, 13};
-//int pin[] = {0, 3};
-unsigned long starttime;
-unsigned long sampletime_ms = 10000;
-unsigned long sleeptime_ms = 255000000;
-unsigned long triggerOn[2];
-unsigned long triggerOff[2];
-unsigned long lowpulseoccupancy[] = {0, 0};
-float ratio[] = {0, 0};
-float count[] = {0, 0};
-boolean value[] = {HIGH, HIGH};
-boolean trigger[] = {false, false};
-float latitude = 0.0;
-float longitude = 0.0;
-int hours = 0;
-int minutes = 0;
-int seconds = 0;
-int year = 0;
-int month = 0;
-int day = 0;
-int chipId = 0;
-String gpsDate ="";
-String gpsTime ="";
-String tsData ="";
+#define FSM_BUFFER_SIZE 128
 
 
+struct fsm_struct {
+  float ppd_countPM10;
+  float ppd_countPM25;
+  float conPM10;
+  float conPM25;
+  float longitude;
+  float latitude;
+  uint8_t hours;
+  uint8_t minutes;
+  uint8_t seconds;
+  uint16_t year;
+  uint8_t month;
+  uint8_t day;
+};
+
+fsm_struct fsm_temp;
+fsm_struct fsm_arr[FSM_BUFFER_SIZE];
+
+unsigned long ppd_starttime;
+unsigned long ppd_sampletime_ms = 10000;
+unsigned long ppd_sleeptime_ms = 255000000;
+unsigned long ppd_trigger_on_PM10;
+unsigned long ppd_trigger_on_PM25;
+unsigned long ppd_trigger_off_PM10;
+unsigned long ppd_trigger_off_PM25;
+volatile unsigned long ppd_lowpulseoccupancy_PM10 = 0;
+volatile unsigned long ppd_lowpulseoccupancy_PM25 = 0;
+float ppd_ratio_PM10 = 0;
+float ppd_ratio_PM25 = 0;
+float ppd_count_PM10 = 0;
+float ppd_count_PM25 = 0;
+
+boolean ppd_value_PM10 = HIGH;
+boolean ppd_value_PM25 = HIGH;
+boolean ppd_trigger_PM10 = false;
+boolean ppd_trigger_PM25 = false;
+
+int espChipId = 0;
+String fsm_data =""; //string die uiteindelijk naar de api gestuurd zal worden.
+uint8_t fsm_next = 0;   //positie voor volgende data in buffer
+uint8_t fsm_current = FSM_BUFFER_SIZE;  //postitie laatst bewaarde data in buffer
+uint8_t fsm_last = 0; //laatst doorgestuurde waarde
 
 void setup() {
-  //connectWiFi();
-  delay(2000);
+  delay(3000);
   Serial.begin(GPSBaud);
-  chipId=ESP.getChipId();
-  Serial.print("start chipId:");
-  Serial.println(chipId);
+  espChipId=ESP.getChipId();
+  Serial.print("start espChipId:");
+  Serial.println(espChipId);
   delay(2000);
-  pinMode(pin[PM25], FUNCTION_3); //Set TX PIN to GPIO
-  pinMode(pin[PM10], FUNCTION_3); //Set RX PIN to GPIO
-  pinMode(pin[PM25], INPUT_PULLUP); //Listen at the designated PIN
-  attachInterrupt(pin[PM25], intrLOPM25, CHANGE); // Attaching interrupt to PIN
-  pinMode(pin[PM10], INPUT_PULLUP); //Listen at the designated PIN
-  attachInterrupt(pin[PM10], intrLOPM10, CHANGE); // Attaching interrupt to PIN
-  //connectWiFi();
-  starttime = millis(); //Fetching the current time
-  //ESP.wdtEnable(WDTO_8S); // Enabling Watchdog
+  pinMode(PPD_PM25_PIN, FUNCTION_3); //Set TX PIN to GPIO
+  pinMode(PPD_PM10_PIN, FUNCTION_3); //Set RX PIN to GPIO
+  pinMode(PPD_PM25_PIN, INPUT_PULLUP); //Listen at the designated PIN
+  attachInterrupt(PPD_PM25_PIN, intrLOPM25, CHANGE); // Attaching interrupt to PIN
+  pinMode(PPD_PM10_PIN, INPUT_PULLUP); //Listen at the designated PIN
+  attachInterrupt(PPD_PM10_PIN, intrLOPM10, CHANGE); // Attaching interrupt to PIN
+  ppd_starttime = millis(); //Fetching the current time
 }
 
 void loop() {
-  
-  //ESP.wdtFeed(); // Reset the WatchDog
-  
-  if ((millis() - starttime) > sampletime_ms) //Checking if it is time to sample
-  {
-    unsigned long sampledtime = millis() - starttime;
-    ratio[PM25] = lowpulseoccupancy[PM25] / (sampledtime * 10.0);
-    count[PM25] = 1.1 * pow(ratio[PM25], 3) - 3.8 * pow(ratio[PM25], 2) + 520 * ratio[PM25] + 0.62;
-    ratio[PM10] = lowpulseoccupancy[PM10] / (sampledtime * 10.0);
-    count[PM10] = 1.1 * pow(ratio[PM10], 3) - 3.8 * pow(ratio[PM10], 2) + 520 * ratio[PM10] + 0.62;
-    count[PM25] -= count[PM10];
     
-    //ESP.wdtFeed(); // Reset the WatchDog
-    // Begin mass concentration calculation
-    float concentration[] = {0, 0};
+  if ((millis() - ppd_starttime) > ppd_sampletime_ms) //Checking if it is time to sample
+  {
+    Serial.println("sample loop");
+    unsigned long sampledtime = millis() - ppd_starttime;
+    ppd_ratio_PM25 = ppd_lowpulseoccupancy_PM25 / (sampledtime * 10.0);
+    ppd_count_PM25 = 1.1 * pow(ppd_ratio_PM25, 3) - 3.8 * pow(ppd_ratio_PM25, 2) + 520 * ppd_ratio_PM25 + 0.62;
+    ppd_ratio_PM10 = ppd_lowpulseoccupancy_PM10 / (sampledtime * 10.0);
+    ppd_count_PM10 = 1.1 * pow(ppd_ratio_PM10, 3) - 3.8 * pow(ppd_ratio_PM10, 2) + 520 * ppd_ratio_PM10 + 0.62;
+    ppd_count_PM25 -= ppd_count_PM10;
+    
+    // Begin mass concentppd_ration calculation
+    float ppd_concentration_PM10 = 0;
+    float ppd_concentration_PM25 = 0;
     double pi = 3.14159;
     double density = 1.65 * pow(10, 12);
     double K = 3531.5;
     
-    //ESP.wdtFeed(); // Reset the WatchDog
     // PM10
     double r10 = 2.6 * pow(10, -6);
     double vol10 = (4 / 3) * pi * pow(r10, 3);
     double mass10 = density * vol10;
-    concentration[PM10] = (count[PM10]) * K * mass10;
+    ppd_concentration_PM10 = (ppd_count_PM10) * K * mass10;
     
-    //ESP.wdtFeed(); // Reset the WatchDog
     // PM2.5
     double r25 = 0.44 * pow(10, -6);
     double vol25 = (4 / 3) * pi * pow(r25, 3);
     double mass25 = density * vol25;
-    concentration[PM25] = (count[PM25]) * K * mass25;
+    ppd_concentration_PM25 = (ppd_count_PM25) * K * mass25;
     // End of mass concentration calculation
-
-    //ESP.wdtFeed(); // Reset the WatchDog
+   
+    ppd_lowpulseoccupancy_PM25 = 0;
+    ppd_lowpulseoccupancy_PM10 = 0;
+    ppd_starttime = millis();
 
       while (Serial.available() > 0)
-        if (gps.encode(Serial.read()))
+        if (gps.encode(Serial.read())){
           returnGpsInfo();
-
-   
-    connectWiFi();
-
-    tsData = "conPM10=" + String(concentration[PM10], DEC) + "&countPM10=" + String(count[PM10], DEC) + "&conPM25=" + 
-      String(concentration[PM25], DEC) + "&countPM25=" + String(count[PM25], DEC) + "&latitude=" + String(latitude, DEC) + 
-      "&longitude=" + String(longitude, DEC) + "&gpsDate=" + gpsDate + "&gpsTime=" + gpsTime;
-      
-    // Data die momenteel doorgestuurd wordt naar ThingSpeak.
-    updateThingSpeak(tsData);
-
-    updateDebug(tsData);
-
-//todo : chipId meesturen naar data server
-      
-    // Sleeping until the next sampling
-    //ESP.wdtDisable();
-    //delay(sleeptime_ms);
-    //ESP.wdtEnable(WDTO_8S);
-    lowpulseoccupancy[PM25] = 0;
-    lowpulseoccupancy[PM10] = 0;
-    //ESP.deepSleep(sleeptime_ms, WAKE_RF_DEFAULT);
-    // Resetting for next sampling
-    //lowpulseoccupancy[PM25] = 0;
-    //lowpulseoccupancy[PM10] = 0;
-    starttime = millis();
-    //ESP.wdtFeed(); // Reset the WatchDog
-
-    
+          Serial.println("storeBuffer");
+          storeBuffer(ppd_concentration_PM10, ppd_concentration_PM25, ppd_count_PM10, ppd_count_PM25);
+          sendBuffer();
+        }
   }
   
 }
 
 
 
-void connectWiFi() {
+boolean connectWiFi() {
+  char attempts=0;
   if (WiFi.status() == WL_CONNECTED) {
     Serial.println("wifi is connected");
-    return;
+    return true;
   }
   WiFi.begin(ssid, pass);
   while (WiFi.status() != WL_CONNECTED) {
     delay(500);
+    attempts++;
+    if(WiFi.status() == WL_CONNECTED)
+    return true;
+    if(attempts>10)
+    return false;
   }
 }
 
-void updateThingSpeak(String tsData) {
+void updateThingSpeak(String fsm_data) {
   WiFiClient client;
   if (!client.connect(thingSpeakAddress, 80)) {
     return;
   }
-  client.print(F("GET /adem?key="));
-  client.print(chipId);
-  client.print(F("&"));
-  client.print(tsData);
+  client.print(F("GET /adem?"));
+  client.print(fsm_data);
   client.print(F(" HTTP/1.1\r\nHost: api.thingspeak.com\r\n\r\n"));
   client.println();
-  Serial.println(tsData);
+  Serial.println(fsm_data);
 }
 
-void updateDebug(String tsData) {
+void updateDebug(String fsm_data) {
   WiFiClient client;
   if (!client.connect(debugAddress, 3000)) {
     return;
   }
-  client.print(F("GET /adem?key="));
-  client.print(chipId);
-  client.print(F("&"));
-  client.print(tsData);
+  client.print(F("GET /adem?"));
+  client.print(fsm_data);
   client.print(F(" HTTP/1.1\r\nHost: api.thingspeak.com\r\n\r\n"));
   client.println();
 }
 
 void intrLOPM25() {
-  value[PM25] = digitalRead(pin[PM25]);
-  if (value[PM25] == LOW && trigger[PM25] == false) {
-    trigger[PM25] = true;
-    triggerOn[PM25] = micros();
+  ppd_value_PM25 = digitalRead(PPD_PM25_PIN);
+  if (ppd_value_PM25 == LOW && ppd_trigger_PM25 == false) {
+    ppd_trigger_PM25 = true;
+    ppd_trigger_on_PM25 = micros();
   }
-  if (value[PM25] == HIGH && trigger[PM25] == true) {
-    triggerOff[PM25] = micros();
-    lowpulseoccupancy[PM25] += (triggerOff[PM25] - triggerOn[PM25]);
-    trigger[PM25] = false;
+  if (ppd_value_PM25 == HIGH && ppd_trigger_PM25 == true) {
+    ppd_trigger_off_PM25 = micros();
+    ppd_lowpulseoccupancy_PM25 += (ppd_trigger_off_PM25 - ppd_trigger_on_PM25);
+    ppd_trigger_PM25 = false;
   }
 }
 
 void intrLOPM10() {
-  value[PM10] = digitalRead(pin[PM10]);
-  if (value[PM10] == LOW && trigger[PM10] == false) {
-    trigger[PM10] = true;
-    triggerOn[PM10] = micros();
+  ppd_value_PM10 = digitalRead(PPD_PM10_PIN);
+  if (ppd_value_PM10 == LOW && ppd_trigger_PM10 == false) {
+    ppd_trigger_PM10 = true;
+    ppd_trigger_on_PM10 = micros();
   }
-  if (value[PM10] == HIGH && trigger[PM10] == true) {
-    triggerOff[PM10] = micros();
-    lowpulseoccupancy[PM10] += (triggerOff[PM10] - triggerOn[PM10]);
-    trigger[PM10] = false;
+  if (ppd_value_PM10 == HIGH && ppd_trigger_PM10 == true) {
+    ppd_trigger_off_PM10 = micros();
+    ppd_lowpulseoccupancy_PM10 += (ppd_trigger_off_PM10 - ppd_trigger_on_PM10);
+    ppd_trigger_PM10 = false;
   }
 }
 
@@ -233,42 +226,118 @@ void returnGpsInfo()
 {
   if (gps.location.isValid())
   {
-    latitude = gps.location.lat();
-    longitude = gps.location.lng();
+    fsm_temp.latitude = gps.location.lat();
+    fsm_temp.longitude = gps.location.lng();
   }
   else
   {
-    latitude = 1.0;
-    longitude = 2.0;
+    fsm_temp.latitude = 0.0;
+    fsm_temp.longitude = 0.0;
   }
 
   if (gps.date.isValid())
   {
-    month = gps.date.month();
-    day = gps.date.day();
-    year = gps.date.year();
+    fsm_temp.month = gps.date.month();
+    fsm_temp.day = gps.date.day();
+    fsm_temp.year = gps.date.year();
   }
   else
   {
-    month = 0;
-    day = 0;
-    year = 0;
+    fsm_temp.month = 0;
+    fsm_temp.day = 0;
+    fsm_temp.year = 0;
   }
-    gpsDate = String(month)+"-"+String(day)+"-"+String(year);
-
   if (gps.time.isValid())
   {
-    hours = gps.time.hour();
-    minutes = gps.time.minute();
-    seconds = gps.time.second();
+    fsm_temp.hours = gps.time.hour();
+    fsm_temp.minutes = gps.time.minute();
+    fsm_temp.seconds = gps.time.second();
   }
   else
   {
-    hours = 0;
-    minutes = 0;
-    seconds = 3;
+    fsm_temp.hours = 0;
+    fsm_temp.minutes = 0;
+    fsm_temp.seconds = 0;
   }
-    gpsTime = String(hours)+":"+String(minutes)+":"+String(seconds);
+}
 
+
+
+void storeBuffer(float ppd_con_PM10, float ppd_con_PM25, float ppd_count_PM10, float ppd_count_PM25){
+fsm_arr[fsm_next].ppd_countPM10 = ppd_count_PM10;
+fsm_arr[fsm_next].ppd_countPM25 = ppd_count_PM25;
+fsm_arr[fsm_next].conPM10 = ppd_con_PM10;
+fsm_arr[fsm_next].conPM25 = ppd_con_PM25;
+fsm_arr[fsm_next].longitude = fsm_temp.longitude;
+fsm_arr[fsm_next].latitude = fsm_temp.latitude;
+fsm_arr[fsm_next].hours = fsm_temp.hours;
+fsm_arr[fsm_next].minutes = fsm_temp.minutes;
+fsm_arr[fsm_next].seconds = fsm_temp.seconds;
+fsm_arr[fsm_next].year = fsm_temp.year;
+fsm_arr[fsm_next].month = fsm_temp.month;
+fsm_arr[fsm_next].day = fsm_temp.day;
+Serial.println("----------------");  
+Serial.print("day:");
+Serial.print(fsm_temp.day);
+Serial.print(" month:");
+Serial.print(fsm_temp.month);
+Serial.print(" year:");
+Serial.print(fsm_temp.year);
+Serial.print(" hours:");
+Serial.print(fsm_temp.hours);
+Serial.print(" minutes:");
+Serial.print(fsm_temp.minutes);
+Serial.print(" seconds:");
+Serial.print(fsm_temp.seconds);
+Serial.print(" countPM10:");
+Serial.print(ppd_count_PM10);
+Serial.print(" countPM25:");
+Serial.print(ppd_count_PM25);
+Serial.print(" conPM10:");
+Serial.print(ppd_con_PM10);
+Serial.print(" conPM25:");
+Serial.print(ppd_con_PM25);
+Serial.print(" fsm_next:");
+Serial.println(fsm_next);
+fsm_current = fsm_next;
+fsm_next = (fsm_next+1) % FSM_BUFFER_SIZE;
+}
+
+void sendBuffer(){
+Serial.print(" fsm_last:");
+Serial.println(fsm_last);
+Serial.print(" fsm_current:");
+Serial.println(fsm_current);
+  if(((fsm_current+FSM_BUFFER_SIZE)-fsm_last) > 3){
+    if(connectWiFi()){
+      int i = fsm_last;
+      do{
+         fsm_data = "key="+String(espChipId)+"&conPM10=" + String(fsm_arr[i].conPM10, DEC) + "&ppd_countPM10=" + String(fsm_arr[i].ppd_countPM10, DEC) + "&conPM25=" + 
+         String(fsm_arr[i].conPM25, DEC) + "&ppd_countPM25=" + String(fsm_arr[i].ppd_countPM25, DEC) + "&latitude=" + String(fsm_arr[i].latitude, DEC) + 
+         "&longitude=" + String(fsm_arr[i].longitude, DEC) + "&gpsDate=" +formatDate(fsm_arr[i].year,fsm_arr[i].month,fsm_arr[i].day) + 
+         "&gpsTime=" + formatTime(fsm_arr[i].hours,fsm_arr[i].minutes,fsm_arr[i].seconds);
+          updateDebug(fsm_data);
+          i = (i+1) + FSM_BUFFER_SIZE;
+          fsm_last = i;
+          Serial.println(fsm_data);
+      }while(i!=fsm_current);
+    }
+    return;
+  }
+}
+
+//    updateThingSpeak(fsm_data);
+
+//    
+
+String formatDate(uint8_t year, uint8_t month, uint8_t day){
+  char gpsDate[11];
+  sprintf(gpsDate, "%04d-%02d-%02d", year, month, day);
+  return gpsDate;
+}
+String formatTime(uint8_t hours, uint8_t minutes, uint8_t seconds){
+  char gpsTime[9];
+  sprintf(gpsTime, "%02d:%02d:%02d", hours, minutes, seconds);
+  return gpsTime;
 }
 
