@@ -44,7 +44,7 @@ const char thingSpeak_Address[] = THINGADDR;
 const char debugAddress[] = DEBUGADDR;
 const char thingSpeak_APIKey[] = THINGKEY;
 
-static const uint32_t gps_Baud = 115200; // 9600 default or 115200 for FGPMMOPA6C of Lieven
+static const uint32_t gps_Baud = 9600;
 TinyGPSPlus gps;
 
 struct fsm_struct {
