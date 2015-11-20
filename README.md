@@ -43,6 +43,8 @@ void loop()
 }
 ```
 
+To get faster upload speeds to the SparkFun ESP8266 thing: Tools > Upload Speed 460800 should work. You can even try 921600.
+
 ### Add GPS librarly for Arduino
 
 Download TinyGPS++ from https://github.com/mikalhart/TinyGPSPlus/archive/master.zip
