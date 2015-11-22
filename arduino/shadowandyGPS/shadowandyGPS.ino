@@ -21,8 +21,8 @@
 #include <TinyGPS++.h>
 #include "config.h"
 
-#define PPD_PM25_PIN 12
-#define PPD_PM10_PIN 13
+#define PPD_PM25_PIN 18
+#define PPD_PM10_PIN 17
 #define FSM_BUFFER_SIZE 128
 
 // create a config.h file in the same folder with the following contents,
@@ -45,7 +45,11 @@ const char debugAddress[] = DEBUGADDR;
 const char thingSpeak_APIKey[] = THINGKEY;
 
 static const uint32_t gps_Baud = 9600;
+#include <SoftwareSerial.h>
+SoftwareSerial gpsSerial(13,14); //RX,TX
+
 TinyGPSPlus gps;
+
 
 struct fsm_struct {
   float ppd_countPM10;
@@ -149,8 +153,8 @@ void loop() {
     ppd_lowpulseoccupancy_PM10 = 0;
     ppd_starttime = millis();
 
-      while (Serial.available() > 0)
-        if (gps.encode(Serial.read())){
+      while (gpsSerial.available() > 0)
+        if (gps.encode(gpsSerial.read())){
           returnGpsInfo();
           Serial.println("storeBuffer");
           storeBuffer(ppd_concentration_PM10, ppd_concentration_PM25, ppd_count_PM10, ppd_count_PM25);
