@@ -312,7 +312,7 @@ void sendBuffer(){
     uploadDebug(dataset_string);
     dataset_buffer_lastsent = i;
     DebugPrint("  ["+String(i)+"] "+ dataset_string, true);
-  } while (i!=dataset_buffer_last);
+  } while (i!= ((dataset_buffer_last+1) % dataset_buffer_size));
 }
 
 String formatDate(uint8_t year, uint8_t month, uint8_t day) {
