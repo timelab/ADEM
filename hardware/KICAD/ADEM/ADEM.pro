@@ -1,13 +1,23 @@
-update=Wed 25 Nov 2015 09:55:03 PM CET
+update=Sat 28 Nov 2015 06:03:18 PM CET
 last_client=kicad
 [general]
 version=1
+[schematic_editor]
+version=1
+PageLayoutDescrFile=
+PlotDirectoryName=
+SubpartIdSeparator=0
+SubpartFirstId=65
+NetFmtName=
+SpiceForceRefPrefix=0
+SpiceUseNetNumbers=0
+LabSize=60
 [cvpcb]
 version=1
 NetIExt=net
 [eeschema]
 version=1
-LibDir=libraries/ADEM;libraries/HC05;libraries/kicad-ESP8266
+LibDir=libraries/ADEM;libraries/HC05;libraries/kicad-ESP8266;/usr/local/share/kicad/kicad-library/library
 [eeschema/libraries]
 LibName1=power
 LibName2=device
@@ -38,15 +48,5 @@ LibName26=opto
 LibName27=atmel
 LibName28=contrib
 LibName29=valves
-LibName30=ESP8266
-LibName31=kicad/libraries/ADEM/Adem
-[schematic_editor]
-version=1
-PageLayoutDescrFile=
-PlotDirectoryName=
-SubpartIdSeparator=0
-SubpartFirstId=65
-NetFmtName=
-SpiceForceRefPrefix=0
-SpiceUseNetNumbers=0
-LabSize=60
+LibName30=libraries/ADEM/Adem
+LibName31=libraries/kicad-ESP8266/ESP8266
