@@ -20,7 +20,7 @@
 
 // hardware specific values
 #define PPD_PM25_PIN 12
-#define PPD_PM10_PIN 0 // not 13 because that is the ping where we receive serial GPS data when Serial.swap() is called.
+#define PPD_PM10_PIN 0 // not 13 because that is the pin where we receive serial GPS data when Serial.swap() is called.
 #define SparkFun_ESP8266_LED_PIN 5
 #define GPS_BAUD 9600
 //#define GPS_BAUD 115200
