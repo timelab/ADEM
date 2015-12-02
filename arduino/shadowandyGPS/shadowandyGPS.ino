@@ -17,11 +17,15 @@
 #include <ESP8266WiFi.h>                 
 #include <TinyGPS++.h>
 #include "config.h"
+#include <SoftwareSerial.h>
 
 // hardware specific values
 #define PPD_PM25_PIN 12
-#define PPD_PM10_PIN 0 // not 13 because that is the pin where we receive serial GPS data when Serial.swap() is called.
+#define PPD_PM10_PIN 0 // not 13 because that is the pin where we receive serial GPS data
 #define SparkFun_ESP8266_LED_PIN 5
+#define GPS_RX_PIN 13 // pin on the ESP where we receive serial GPS data
+#define GPS_TX_PIN 11 // pin on the ESP where we receive serial GPS data
+//                 TODO: select pin that is not being broken out on SparkFun ESP thing
 #define GPS_BAUD 9600
 //#define GPS_BAUD 115200
 
@@ -44,6 +48,7 @@ const char debugAddress[] = DEBUGADDR;
 const char thingSpeak_APIKey[] = THINGKEY;
 
 TinyGPSPlus gps;
+SoftwareSerial gps_Serial(GPS_RX_PIN, GPS_TX_PIN);
 
 // The dataset consists of dust particle data and location, date and time from GPS
 struct dataset_struct {
@@ -98,7 +103,7 @@ void intrLOPM10();
 void gpsInBuffer();
 void ppdInBuffer(float ppd_con_PM10, float ppd_con_PM25, float ppd_count_PM10, float ppd_count_PM25);
 void sendBuffer();
-String formatDate(uint8_t year, uint8_t month, uint8_t day);
+String formatDate(uint16_t year, uint8_t month, uint8_t day);
 String formatTime(uint8_t hours, uint8_t minutes, uint8_t seconds);
 // use DebugPrint() to output data to the serial port
 void DebugPrint(String DebugData, boolean linefeed = false);
@@ -112,9 +117,11 @@ void setup() {
   pinMode(SparkFun_ESP8266_LED_PIN, OUTPUT);
   LEDon();
 
+  // initialization for debug output
+  Serial.begin(9600);
+
   // initialization for the GPS
-  Serial.begin(GPS_BAUD);
-  Serial.swap(); // SWAP Serial to the GPIO connected to the GPS module. We will call Serial.swap just before and after debug logging
+  gps_Serial.begin(GPS_BAUD);
 
   // initialization for the ESP Wi-Fi
   DebugPrint("\r\n\r\n\r\nStartup", true);
@@ -138,8 +145,8 @@ void setup() {
 
 void loop() {
   // read all available serial data and decode the GPS information
-  while (Serial.available() > 0) {
-    gps.encode(Serial.read());
+  while (gps_Serial.available() > 0) {
+    gps.encode(gps_Serial.read());
   }
 
   // Dust sensor sample counting happens continuously via the interupt functions.
@@ -315,7 +322,7 @@ void sendBuffer(){
   } while (i!= ((dataset_buffer_last+1) % dataset_buffer_size));
 }
 
-String formatDate(uint8_t year, uint8_t month, uint8_t day) {
+String formatDate(uint16_t year, uint8_t month, uint8_t day) {
   char gpsDate[11];
   sprintf(gpsDate, "%04d-%02d-%02d", year, month, day);
   return gpsDate;
@@ -328,50 +335,38 @@ String formatTime(uint8_t hours, uint8_t minutes, uint8_t seconds) {
 }
 
 void DebugPrint(String DebugData, boolean linefeed) {
-  Serial.flush();
-  delay (10);Serial.swap();
   if (linefeed) {
-    Serial.println(DebugData);Serial.println("");
+    Serial.println(DebugData);
   }
   else
     Serial.print(DebugData);
   Serial.flush();
-  Serial.swap();
 }
 
 void DebugPrint(int DebugData, boolean linefeed) {
-  Serial.flush();
-  delay (10);Serial.swap();
   if (linefeed) {
-    Serial.println(DebugData);Serial.println("");
+    Serial.println(DebugData);
   }
   else
     Serial.print(DebugData);
   Serial.flush();
-  Serial.swap();
 }
 
 void DebugPrint(uint16_t DebugData, boolean linefeed) {
-  Serial.flush();
-  delay (10);Serial.swap();
   if (linefeed) {
-    Serial.println(DebugData);Serial.println("");
+    Serial.println(DebugData);
   }
   else
     Serial.print(DebugData);
   Serial.flush();
-  Serial.swap();
 }
 
 void DebugPrint(float DebugData, boolean linefeed) {
-  Serial.flush();
-  delay (10);Serial.swap();
   if (linefeed) {
-    Serial.println(DebugData);Serial.println("");
+    Serial.println(DebugData);
   }
   else
     Serial.print(DebugData);
   Serial.flush();
-  Serial.swap();
 }
 
