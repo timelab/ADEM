@@ -1,4 +1,4 @@
-/**********************************************/
+  /**********************************************/
 /* Mobile Arduino Dust Sensor                 */
 /*      - SparkFun ESP8266 Thing Wi-Fi        */
 /*      - Shinyei PPD42NS dust sensor         */
