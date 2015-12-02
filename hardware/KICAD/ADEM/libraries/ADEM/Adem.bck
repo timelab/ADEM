@@ -1,0 +1,18 @@
+EESchema-DOCLIB  Version 2.0
+#
+$CMP ESP8266_THING
+D ESP8266 12E THING from sparkfun
+F https://www.sparkfun.com/products/13231
+$ENDCMP
+#
+$CMP HTU21D
+D humidity sensor
+F http://www.banggood.com/HTU21D-Temperature-And-Humidity-Sensor-Module-p-971471.html
+$ENDCMP
+#
+$CMP MPU6050
+D 3 axis gyroscope and accelerometer
+F http://www.banggood.com/6DOF-MPU-6050-3-Axis-Gyro-With-Accelerometer-Sensor-Module-For-Arduino-p-80862.html
+$ENDCMP
+#
+#End Doc Library
