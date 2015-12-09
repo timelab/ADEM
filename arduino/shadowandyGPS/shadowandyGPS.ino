@@ -74,7 +74,7 @@ String dataset_string =""; //string that will be sent to the API
 
 // Variables needed for PPD dust sensor sample counting
 unsigned long ppd_starttime;
-unsigned long ppd_saveperiod_ms = 10000; // every 10 seconds
+unsigned long ppd_saveperiod_ms = 20000; // every 10 seconds
 //unsigned long ppd_sleeptime_ms = 255000000;
 unsigned long ppd_trigger_on_PM10;
 unsigned long ppd_trigger_on_PM25;
