@@ -142,7 +142,7 @@ void setup() {
   //pinMode(PPD_PM10_PIN, INPUT_PULLUP); //Listen at the designated PIN
   pinMode(PPD_PM10_PIN, INPUT);
   //attachInterrupt(PPD_PM10_PIN, intrLOPM10, CHANGE); // Attaching interrupt to PIN
-  attachInterrupt(PPD_PM10_PIN, intrLOPM10, FALLING); // Attaching interrupt to PIN, testing if FALLING edge works
+  attachInterrupt(PPD_PM10_PIN, intrLOPM10, CHANGE); // Attaching interrupt to PIN, testing if FALLING edge works
   ppd_starttime = millis(); //Fetching the current time
   
   DebugPrint("Startup done", true);
