@@ -1,18 +1,20 @@
-  /**********************************************/
-/* Mobile Arduino Dust Sensor                 */
-/*      - SparkFun ESP8266 Thing Wi-Fi        */
-/*      - Shinyei PPD42NS dust sensor         */
-/**********************************************/
-/* !!! THIS CODE IS STILL IN ALPHA STAGE !!!  */
-/**********************************************/
-/* Based on these open source projects:       */
-/* * Arduino Dust Sensor code by Shadowandy   */
-/*   www.shadowandy.net                       */
-/* * TinyGPS:                                 */
-/*   https://github.com/mikalhart/TinyGPSPlus */
-/* * Arduino core for ESP8266 WiFi chip:      */
-/*   https://github.com/esp8266/Arduino       */
-/**********************************************/
+/*************************************************/
+/* Mobile Arduino Dust Sensor                    */
+/*      - SparkFun ESP8266 Thing Wi-Fi           */
+/*      - Shinyei PPD42NS dust sensor            */
+/*************************************************/
+/* !!! THIS CODE IS STILL IN ALPHA STAGE !!!     */
+/*************************************************/
+/* Based on these open source projects:          */
+/* * Arduino Dust Sensor code by Shadowandy      */
+/*   www.shadowandy.net                          */
+/* * TinyGPS:                                    */
+/*   https://github.com/mikalhart/TinyGPSPlus    */
+/* * Arduino core for ESP8266 WiFi chip:         */
+/*   https://github.com/esp8266/Arduino          */
+/* * ESP softwareserial, Peter Lerup             */
+/*   https://github.com/plerup/espsoftwareserial */
+/*************************************************/
 
 #include <ESP8266WiFi.h>                 
 #include <TinyGPS++.h>
@@ -20,14 +22,14 @@
 #include <SoftwareSerial.h>
 
 // hardware specific values
-#define PPD_PM25_PIN 12
-#define PPD_PM10_PIN 0 // not 13 because that is the pin where we receive serial GPS data
-#define SparkFun_ESP8266_LED_PIN 5
-#define GPS_RX_PIN 13 // pin on the ESP where we receive serial GPS data
-#define GPS_TX_PIN 11 // pin on the ESP where we receive serial GPS data
-//                 TODO: select pin that is not being broken out on SparkFun ESP thing
-#define GPS_BAUD 9600
-//#define GPS_BAUD 115200
+#define SparkFun_ESP8266_LED_PIN 5      // We can later use GPIO5 for driving a buzzer
+bool LED_TOGGLE = false;
+#define PPD_PM10_PIN 12                 // to PPD42NS pin 4, do not use GPIO16, does not seem to work: 12
+#define PPD_PM25_PIN 13                 // to PPD42NS pin 2, do not use GPIO16
+#define GPS_RX_PIN 4                    // to GPS module RX pin. Does not work on GPIO 16 (XPD).
+#define GPS_TX_PIN SW_SERIAL_UNUSED_PIN // we send no data to the GPS module
+//#define GPS_BAUD 9600
+#define GPS_BAUD 115200
 
 // create a config.h file in the same folder with the following contents,
 // and fill in your WiFi and thingspeak credentials.
@@ -48,7 +50,7 @@ const char debugAddress[] = DEBUGADDR;
 const char thingSpeak_APIKey[] = THINGKEY;
 
 TinyGPSPlus gps;
-SoftwareSerial gps_Serial(GPS_RX_PIN, GPS_TX_PIN);
+SoftwareSerial gps_Serial(GPS_RX_PIN, GPS_TX_PIN, 128);
 
 // The dataset consists of dust particle data and location, date and time from GPS
 struct dataset_struct {
@@ -118,25 +120,29 @@ void setup() {
   LEDon();
 
   // initialization for debug output
+  delay(5000); // don't open serial yet, this makes reprogramming more likely to be successfull
+  LEDoff();delay(500);LEDon();delay(500);LEDoff();delay(500);LEDon();delay(500);LEDoff();delay(500);LEDon();
   Serial.begin(9600);
-
-  // initialization for the GPS
+  DebugPrint("\r\nStartup", true);
+  
+  // initialization of GPS serial
   gps_Serial.begin(GPS_BAUD);
-
+  
   // initialization for the ESP Wi-Fi
-  DebugPrint("\r\n\r\n\r\nStartup", true);
-  delay(3000);
   esp_ChipId=ESP.getChipId();
   DebugPrint("  esp_ChipId=" + String(esp_ChipId), true);
   delay(2000);
 
   // initialization for the dust sensor
-  pinMode(PPD_PM25_PIN, FUNCTION_3); //Set TX PIN to GPIO
-  pinMode(PPD_PM10_PIN, FUNCTION_3); //Set RX PIN to GPIO
-  pinMode(PPD_PM25_PIN, INPUT_PULLUP); //Listen at the designated PIN
+  //pinMode(PPD_PM25_PIN, FUNCTION_3); //Set TX PIN to GPIO
+  //pinMode(PPD_PM10_PIN, FUNCTION_3); //Set RX PIN to GPIO
+  //pinMode(PPD_PM25_PIN, INPUT_PULLUP); //Listen at the designated PIN
+  pinMode(PPD_PM25_PIN, INPUT);
   attachInterrupt(PPD_PM25_PIN, intrLOPM25, CHANGE); // Attaching interrupt to PIN
-  pinMode(PPD_PM10_PIN, INPUT_PULLUP); //Listen at the designated PIN
-  attachInterrupt(PPD_PM10_PIN, intrLOPM10, CHANGE); // Attaching interrupt to PIN
+  //pinMode(PPD_PM10_PIN, INPUT_PULLUP); //Listen at the designated PIN
+  pinMode(PPD_PM10_PIN, INPUT);
+  //attachInterrupt(PPD_PM10_PIN, intrLOPM10, CHANGE); // Attaching interrupt to PIN
+  attachInterrupt(PPD_PM10_PIN, intrLOPM10, FALLING); // Attaching interrupt to PIN, testing if FALLING edge works
   ppd_starttime = millis(); //Fetching the current time
   
   DebugPrint("Startup done", true);
@@ -153,9 +159,9 @@ void loop() {
   // Check if it is time to store the samples as a new data set...
   sampledtime = millis() - ppd_starttime;
   if (sampledtime > ppd_saveperiod_ms) {
-    LEDon(); // only for debugging
+    //LEDon(); // only for debugging
     
-    DebugPrint("GPS=" + formatDate(gps.date.year(), gps.date.month(), gps.date.day()) +" " + formatTime(gps.time.hour(), gps.time.minute(), gps.time.second()) +" "+ String(gps.location.lat())+","+String(gps.location.lng()) + " " + String(gps.satellites.value()) + " sattelites", true);
+    DebugPrint("GPS=" + formatDate(gps.date.year(), gps.date.month(), gps.date.day()) +" " + formatTime(gps.time.hour(), gps.time.minute(), gps.time.second()) +" "+ String(gps.location.lat())+","+String(gps.location.lng()), true);
     DebugPrint("Calculating sample data", true);
     
     ppd_ratio_PM25 = ppd_lowpulseoccupancy_PM25 / (sampledtime * 10.0);
@@ -204,7 +210,7 @@ void loop() {
       if (connectWiFi()) sendBuffer();
     }
 
-    LEDoff();
+    //LEDoff();
   }
 }
 
@@ -214,6 +220,11 @@ void LEDon() {
 
 void LEDoff() {
   digitalWrite(SparkFun_ESP8266_LED_PIN, LOW);
+}
+
+void LEDtoggle() {
+  LED_TOGGLE = !LED_TOGGLE ;
+  digitalWrite(SparkFun_ESP8266_LED_PIN, LED_TOGGLE);
 }
 
 boolean connectWiFi() {
@@ -262,6 +273,7 @@ void uploadDebug(String dataset_string) {
 void intrLOPM25() {
   ppd_value_PM25 = digitalRead(PPD_PM25_PIN);
   if (ppd_value_PM25 == LOW && ppd_trigger_PM25 == false) {
+    LEDtoggle();
     ppd_trigger_PM25 = true;
     ppd_trigger_on_PM25 = micros();
   }
@@ -275,6 +287,7 @@ void intrLOPM25() {
 void intrLOPM10() {
   ppd_value_PM10 = digitalRead(PPD_PM10_PIN);
   if (ppd_value_PM10 == LOW && ppd_trigger_PM10 == false) {
+    LEDtoggle();
     ppd_trigger_PM10 = true;
     ppd_trigger_on_PM10 = micros();
   }
@@ -323,13 +336,13 @@ void sendBuffer(){
 }
 
 String formatDate(uint16_t year, uint8_t month, uint8_t day) {
-  char gpsDate[11];
+  char gpsDate[11] = "";
   sprintf(gpsDate, "%04d-%02d-%02d", year, month, day);
   return gpsDate;
 }
 
 String formatTime(uint8_t hours, uint8_t minutes, uint8_t seconds) {
-  char gpsTime[9];
+  char gpsTime[9]= "";
   sprintf(gpsTime, "%02d:%02d:%02d", hours, minutes, seconds);
   return gpsTime;
 }
