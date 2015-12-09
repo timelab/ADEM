@@ -28,8 +28,8 @@ bool LED_TOGGLE = false;
 #define PPD_PM25_PIN 13                 // to PPD42NS pin 2, do not use GPIO16
 #define GPS_RX_PIN 4                    // to GPS module RX pin. Does not work on GPIO 16 (XPD).
 #define GPS_TX_PIN SW_SERIAL_UNUSED_PIN // we send no data to the GPS module
-//#define GPS_BAUD 9600
-#define GPS_BAUD 115200
+#define GPS_BAUD 9600
+//#define GPS_BAUD 115200
 
 // create a config.h file in the same folder with the following contents,
 // and fill in your WiFi and thingspeak credentials.
@@ -249,9 +249,9 @@ void uploadThingSpeak(String dataset_string) {
   if (!client.connect(thingSpeak_Address, 80)) {
     return;
   }
-  client.print(F("GET /adem?"));
+  client.print("GET /adem?");
   client.print(dataset_string);
-  client.print(F(" HTTP/1.1\r\nHost: api.thingspeak.com\r\n\r\n"));
+  client.print(" HTTP/1.1\r\nHost: api.thingspeak.com\r\n\r\n");
   client.println();
   DebugPrint("uploadThingSpeak:", true);
   DebugPrint("  " + dataset_string, true);
@@ -262,9 +262,9 @@ void uploadDebug(String dataset_string) {
   if (!client.connect(debugAddress, 3000)) {
     return;
   }
-  client.print(F("GET /adem?"));
+  client.print("GET /adem?");
   client.print(dataset_string);
-  client.print(F(" HTTP/1.1\r\nHost: api.thingspeak.com\r\n\r\n"));
+  client.print(" HTTP/1.1\r\nHost: api.thingspeak.com\r\n\r\n");
   client.println();
   DebugPrint("uploadDebug:", true);
   DebugPrint("  " + dataset_string, true);
@@ -332,7 +332,7 @@ void sendBuffer(){
     uploadDebug(dataset_string);
     dataset_buffer_lastsent = i;
     DebugPrint("  ["+String(i)+"] "+ dataset_string, true);
-  } while (i!= ((dataset_buffer_last+1) % dataset_buffer_size));
+  } while (i!= ((dataset_buffer_last) % dataset_buffer_size));
 }
 
 String formatDate(uint16_t year, uint8_t month, uint8_t day) {
