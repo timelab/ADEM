@@ -1,0 +1,3 @@
+[submodule "HC05"]
+	path = HC05
+	url = https://github.com/jdunmire/HC05.git
