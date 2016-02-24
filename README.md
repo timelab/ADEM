@@ -20,6 +20,7 @@ Setting up for ESP development in Arduino:
 * Get Arduino IDE 1.6.4 or higher from arduino.cc
 * File > Preferences (Bestand > Voorkeuren)
 * Additional Board Manager URLs (Additionele Bordenbeheer URLs): http://arduino.esp8266.com/stable/package_esp8266com_index.json
+* Restart the Arduino IDE
 * Tools (Hulpmiddelen) > Board > Boards Manager (Bordenbeheer)> esp8266 by ESP 8266 Community > install
 * Tools (Hulpmiddelen) > Board > SparkFun ESP8266 Thing
 * Tools > Port > /dev/ttyUSB0

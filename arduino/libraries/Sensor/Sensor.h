@@ -12,12 +12,11 @@
 //abstract class Sensor
 class Sensor {
   public:
+    //virtual function must be implemented
     virtual void begin();
     virtual void end();
     virtual void read();
     virtual void write();
-    virtual void interrupt();
-    //process function must be implemented
     virtual void process();
     virtual String report();
     //Sensor ();
