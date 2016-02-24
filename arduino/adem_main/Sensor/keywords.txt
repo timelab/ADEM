@@ -1,8 +1,0 @@
-Sensor		KEYWORD1
-begin		KEYWORD2
-end		KEYWORD2
-read		KEYWORD2
-write		KEYWORD2
-interrupt	KEYWORD2
-process		KEYWORD2
-report		KEYWORD2

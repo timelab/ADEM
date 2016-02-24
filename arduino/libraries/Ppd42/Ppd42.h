@@ -6,20 +6,22 @@
 #ifndef Ppd42_h
 #define Ppd42_h
 
-#include "Arduino.h"
-#include "../Sensor/Sensor.h"
+#include <Arduino.h>
+#include <Sensor.h>
 
-class Ppd42 : Sensor {
-public:
+class Ppd42 : public Sensor {
+  public:
     void begin();
     void end();
     void read();
     void write();
     void interrupt();
     void process();
+    Ppd42();
     String report(); // should report a JSON string
-private:
-    uint _size;
+
+  private:
+ //   uint _particleCount;
 };
 
 #endif
