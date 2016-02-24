@@ -1,6 +1,9 @@
 # Bill Of Materials
 
-Huidige selectie van componenten voor eerste print ontwerp. We kiezen op dit ogenblik voor het SparkFun bord omdat dit zowel ESP8266 als battery management heeft. Prijs is stukprijs zonder volumekorting.
+An updated list of components is available from Google Drive at the link below
+https://drive.google.com/drive/folders/0B5B2OKuFeGQfT0p0bUllNUdlb0k
+
+Current selection of components for the first design. We have chosen the SparkFun board because it includes both the ESP8266 and battery management. Listed prices are individual prices, not volume prices.
 
 Function		| Part Number			| Price indication	| URL
 ----------------------- | ----------------------------- | --------------------- | ---------------------------------------------------------------------------------------
