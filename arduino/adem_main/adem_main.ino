@@ -3,14 +3,12 @@
  *  ESP8266 mobile dust sensor
  */
 
+Ppd42 Ppd42Sensor;
 
 void setup() {
-  // read sensor configuration from eeprom and call setup for the configured sensors
-  Ppd42 test;
-  test.begin();
+  Ppd42Sensor.begin();
 }
 
 void loop() {
-  // put your main code here, to run repeatedly:
-
+  Ppd42Sensor.process();
 }
