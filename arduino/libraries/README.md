@@ -3,6 +3,8 @@ There is a <LibraryName> folder per library, containing:
 * <LibraryName>.cpp
 * <LibraryName>.h
 
+For tips coding the Library, see http://playground.arduino.cc/Code/Library
+
 To use the ADEM libraries, you can eiter:
 * On *nix, the Arduino Libraries reside in ~/Arduino/libraries/. If you create a symbolic link, it will keep your libaries up to date with your local github folder.
 ```
