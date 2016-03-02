@@ -16,7 +16,7 @@ void loop() {
   Ppd42Sensor.process();
   delay (5000);
   Serial.print("PM10 ppm=");
-  Serial.println(Ppd42Sensor.readPM10()*1000000);
+  Serial.println(Ppd42Sensor.readPM10Ppm());
   Serial.print("PM25 ppm=");
-  Serial.println(Ppd42Sensor.readPM25()*1000000);  
+  Serial.println(Ppd42Sensor.readPM25Ppm());
 }

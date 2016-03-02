@@ -1,30 +1,34 @@
 /*
-  Ppd42.cpp - Library for ADEM PPD42 sensor.
+  Ppd42.cpp - Library for ADEM PPD42 dust sensor.
   Created by Lieven Blancke.
 */
 
 #include <Arduino.h>
 #include <Ppd42.h>
-
-// instantiate and initialize the static variables that are used in the static interrupt functions that handle the hardware interrupts triggered by the PPD42 dust sensor
+/*
+	instantiate and initialize the static variables that are used in 
+	the static interrupt functions that handle the hardware interrupts 
+	triggered by the PPD42 dust sensor
+*/
 int Ppd42::PPD_PM10_PIN = 12;
 volatile boolean Ppd42::triggerStartedPM10 = false;
-volatile unsigned long Ppd42::triggerStartTimePM10 = 0;
-volatile unsigned long Ppd42::triggeredTotalTimePM10 = 0;
+volatile unsigned long Ppd42::triggerStartMicrosPM10 = 0;
+volatile unsigned long Ppd42::triggeredTotalMicrosPM10 = 0;
 int Ppd42::PPD_PM25_PIN = 13;
 volatile boolean Ppd42::triggerStartedPM25 = false;
-volatile unsigned long Ppd42::triggerStartTimePM25 = 0;
-volatile unsigned long Ppd42::triggeredTotalTimePM25 = 0;
+volatile unsigned long Ppd42::triggerStartMicrosPM25 = 0;
+volatile unsigned long Ppd42::triggeredTotalMicrosPM25 = 0;
 
 Ppd42::Ppd42(){
 
 }
-// eventueel overloading, bv met INPUT pins, OUTPUT pins...
 
 void Ppd42::begin() {
 	// initialization for the dust sensor
-	readTimePM10 = micros(); //Fetch the current time
-	readTimePM25 = micros(); //Fetch the current time
+	readMillisPM10 = millis(); //Fetch the current time
+	readMillisPM25 = millis(); //Fetch the current time
+	triggeredTotalMicrosPM10 = 0;
+	triggeredTotalMicrosPM25 = 0;
 	debug="";
 
 	pinMode(PPD_PM10_PIN, INPUT);
@@ -35,32 +39,36 @@ void Ppd42::begin() {
 }
 
 void Ppd42::end() {
+	activated = true;
+	// detach the interrupts
+	detachInterrupt(PPD_PM10_PIN);
+	detachInterrupt(PPD_PM25_PIN);	
 }
 
 void Ppd42::read() {
 }
 
-double Ppd42::readPM10() {
+unsigned long Ppd42::readPM10Ppm() {
 	if (activated) {
-		unsigned long currentTime=micros(); 
-		unsigned long sampledTime = currentTime - readTimePM10;
-		unsigned long triggeredTotalTime = triggeredTotalTimePM10;
-		readTimePM10 = currentTime;
-		triggeredTotalTimePM10 = 0;
-		return 1.0 * triggeredTotalTime / sampledTime;
+		unsigned long currentMillis=millis(); 
+		unsigned long sampledMillis = currentMillis - readMillisPM10;
+		unsigned long triggeredTotalMicros = triggeredTotalMicrosPM10;
+		readMillisPM10 = currentMillis;
+		triggeredTotalMicrosPM10 = 0;
+		return 1000 * triggeredTotalMicros / sampledMillis;
 	}
 	else
 		return 0;
 }
 
-double Ppd42::readPM25() {
+unsigned long Ppd42::readPM25Ppm() {
 	if (activated) {
-		unsigned long currentTime=micros(); 
-		unsigned long sampledTime = currentTime - readTimePM25;
-		unsigned long triggeredTotalTime = triggeredTotalTimePM25;
-		readTimePM25 = currentTime;
-		triggeredTotalTimePM25 = 0;
-		return 1.0 * triggeredTotalTime / sampledTime;
+		unsigned long currentMillis=millis(); 
+		unsigned long sampledMillis = currentMillis - readMillisPM25;
+		unsigned long triggeredTotalMicros = triggeredTotalMicrosPM25;
+		readMillisPM25 = currentMillis;
+		triggeredTotalMicrosPM25 = 0;
+		return 1000 * triggeredTotalMicros / sampledMillis;
 	}
 	else
 		return 0;
@@ -73,41 +81,35 @@ void Ppd42::interrupt() {
 }
 
 void Ppd42::handleInterruptPM10() {
-/*	boolean ppd_value_PM10 = digitalRead(PPD_PM10_PIN);
-	if (ppd_value_PM10 == LOW && triggerStartedPM10 == false) {
-		triggerStartedPM10 = true;
-		triggerStartTimePM10 = micros();
-	}
-	if (ppd_value_PM10 == HIGH && triggerStartedPM10 == true) {
-		triggeredTotalTimePM10 += (micros() - triggerStartTimePM10);
-		 triggerStartedPM10 = false;
-	}
-*/
 	if (digitalRead(PPD_PM10_PIN) == LOW)
 		// the sensor pulls the pin low to trigger
 		if (!triggerStartedPM10) {
+			triggerStartMicrosPM10 = micros();
 			triggerStartedPM10 = true;
-			triggerStartTimePM10 = micros();
 		}
 		else {
 		}
 	else	// not LOW, thus end of the trigger
 		if (triggerStartedPM10) {
-			triggeredTotalTimePM10 += (micros() - triggerStartTimePM10);
+			triggeredTotalMicrosPM10 += (micros() - triggerStartMicrosPM10);
 			triggerStartedPM10 = false;
 		}
 }
 
 void Ppd42::handleInterruptPM25() {
-	boolean ppd_value_PM25 = digitalRead(PPD_PM25_PIN);
-	if (ppd_value_PM25 == LOW && triggerStartedPM25 == false) {
-		triggerStartedPM25 = true;
-		triggerStartTimePM25 = micros();
-	}
-	if (ppd_value_PM25 == HIGH && triggerStartedPM25 == true) {
-		triggeredTotalTimePM25 += (micros() - triggerStartTimePM25);
-		 triggerStartedPM25 = false;
-	}
+	if (digitalRead(PPD_PM25_PIN) == LOW)
+		// the sensor pulls the pin low to trigger
+		if (!triggerStartedPM25) {
+			triggerStartMicrosPM25 = micros();
+			triggerStartedPM25 = true;
+		}
+		else {
+		}
+	else	// not LOW, thus end of the trigger
+		if (triggerStartedPM25) {
+			triggeredTotalMicrosPM25 += (micros() - triggerStartMicrosPM25);
+			triggerStartedPM25 = false;
+		}
 }
 
 void Ppd42::process() {
