@@ -29,7 +29,15 @@ delay	KEYWORD2
 trigger	KEYWORD2
 exec	KEYWORD2
 clear	KEYWORD2
+getNextTime	KEYWORD2
+setNextTime	KEYWORD2
+getDuration	KEYWORD2
+getLastTime	KEYWORD2
 #######################################
 # Constants (LITERAL1)
 #######################################
 
+NOOP	LITERAL1
+IDLE	LITERAL1
+ONCE	LITERAL1
+PERIODIC	LITERAL1
