@@ -1,0 +1,35 @@
+#######################################
+# Syntax Coloring Map For TickerSchedlr
+#######################################
+
+#######################################
+# Datatypes (KEYWORD1)
+#######################################
+
+TickerTask	KEYWORD1	TickerTask
+TickerSchedlr	KEYWORD1	TickerSchedlr
+
+#######################################
+# Methods and Functions (KEYWORD2)
+#######################################
+
+Instance	KEYWORD2
+getTickTime	KEYWORD2
+Add	KEYWORD2
+tick	KEYWORD2
+
+createPeriodic	KEYWORD2
+createIdle	KEYWORD2
+createDelayed	KEYWORD2
+tasktype	KEYWORD2
+kill	KEYWORD2
+replace	KEYWORD2
+replaceDelayed	KEYWORD2
+delay	KEYWORD2
+trigger	KEYWORD2
+exec	KEYWORD2
+clear	KEYWORD2
+#######################################
+# Constants (LITERAL1)
+#######################################
+
