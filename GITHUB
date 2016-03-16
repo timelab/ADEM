@@ -13,7 +13,7 @@ Nice introduction on the use of git: http://www.git-scm.com/book/en/v1/Git-Basic
 	$ git config --global user.name "John Doe"
 	$ git config --global user.email johndoe@example.com
 *Clone the ADEM repository. This creates a local copy of the online repository on your pc
-	$ git clone https://github.com/lebeno/ADEM.git
+	$ git clone https://github.com/timelab/ADEM.git
 
 == Git daily use ==
 
