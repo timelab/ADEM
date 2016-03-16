@@ -22,6 +22,7 @@
 class Ppd42 : public Sensor {
   public:
     void begin();
+    void begin(int PpdPM10Pin, int PpdPM25Pin);
     void end();
     void read();
     void write();
@@ -35,21 +36,20 @@ class Ppd42 : public Sensor {
     unsigned long readPM25Ppm();
 
   private:
-    boolean activated = false;
-    unsigned long readMillisPM10;
-    unsigned long readMillisPM25;
+    boolean _activated = false;
+    unsigned long _readMillisPM10;
+    unsigned long _readMillisPM25;
+
+    static int _PPD_PM10_PIN;
+    static int _PPD_PM25_PIN;
 
     // Static methods and variables for the interrupt functions
-    static void handleInterruptPM10();
-    static int PPD_PM10_PIN;
-    static volatile boolean triggerStartedPM10;
-    static volatile unsigned long triggerStartMicrosPM10;
-    static volatile unsigned long triggeredTotalMicrosPM10;
-    static void handleInterruptPM25();
-    static int PPD_PM25_PIN;
-    static volatile boolean triggerStartedPM25;
-    static volatile unsigned long triggerStartMicrosPM25;
-    static volatile unsigned long triggeredTotalMicrosPM25;
+    static void _handleInterruptPM10();
+    static volatile unsigned long _triggerStartMicrosPM10;
+    static volatile unsigned long _triggeredTotalMicrosPM10;
+    static void _handleInterruptPM25();
+    static volatile unsigned long _triggerStartMicrosPM25;
+    static volatile unsigned long _triggeredTotalMicrosPM25;
 };
 
 #endif
