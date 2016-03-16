@@ -22,7 +22,6 @@
 class Ppd42 : public Sensor {
   public:
     void begin();
-    void begin(int PpdPM10Pin, int PpdPM25Pin);
     void end();
     void read();
     void write();
@@ -31,7 +30,6 @@ class Ppd42 : public Sensor {
     Ppd42();
     String report(); // should report a JSON string
 
-    String debug = "";
     unsigned long readPM10Ppm(); // returns the time (in ppm) the sensor triggered
     unsigned long readPM25Ppm();
 

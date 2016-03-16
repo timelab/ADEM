@@ -1,39 +1,37 @@
 /*
   Ppd42.cpp - Library for ADEM PPD42 dust sensor.
   Created by Lieven Blancke.
+
+	Connect PPD42 PM10 pin to Arduino pin 12
+	Connect PPD42 PM25 pin to Arduino pin 13
 */
 
 #include <Arduino.h>
 #include <Ppd42.h>
+
 /*
 	instantiate and initialize the static variables that are used in 
 	the static interrupt functions that handle the hardware interrupts 
 	triggered by the PPD42 dust sensor
 */
 int Ppd42::_PPD_PM10_PIN = 12;
-volatile unsigned long Ppd42::_triggerStartMicrosPM10 = 0;
-volatile unsigned long Ppd42::_triggeredTotalMicrosPM10 = 0;
 int Ppd42::_PPD_PM25_PIN = 13;
+volatile unsigned long Ppd42::_triggerStartMicrosPM10 = 0;
 volatile unsigned long Ppd42::_triggerStartMicrosPM25 = 0;
 volatile unsigned long Ppd42::_triggeredTotalMicrosPM25 = 0;
+volatile unsigned long Ppd42::_triggeredTotalMicrosPM10 = 0;
 
 Ppd42::Ppd42(){
 
 }
 
 void Ppd42::begin() {
-}
-
-void Ppd42::begin(int PpdPM10Pin, int PpdPM25Pin) {
 	// initialization for the dust sensor
 	_readMillisPM10 = millis(); //Fetch the current time
 	_readMillisPM25 = millis(); //Fetch the current time
 	_triggeredTotalMicrosPM10 = 0;
 	_triggeredTotalMicrosPM25 = 0;
-	debug="";
 
-	//_PPD_PM10_PIN=PpdPM10Pin;
-	//_PPD_PM25_PIN=PpdPM25Pin;
 	pinMode(_PPD_PM10_PIN, INPUT);
 	pinMode(_PPD_PM25_PIN, INPUT);
 	_activated = true;
