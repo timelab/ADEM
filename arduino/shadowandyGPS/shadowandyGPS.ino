@@ -50,7 +50,7 @@ const char debugAddress[] = DEBUGADDR;
 const char thingSpeak_APIKey[] = THINGKEY;
 
 TinyGPSPlus gps;
-SoftwareSerial gps_Serial(GPS_RX_PIN, GPS_TX_PIN, 128);
+SoftwareSerial gps_Serial(GPS_RX_PIN, GPS_TX_PIN);
 
 // The dataset consists of dust particle data and location, date and time from GPS
 struct dataset_struct {
