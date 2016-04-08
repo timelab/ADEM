@@ -4,20 +4,28 @@
 Please update the below table with detailed sub-tasks, both those that are
 completed and still on-going.
 
-[options="header"]
+[options="header", width="100%"]
 |============================================================================================
-| Task                 | Status                | Owner
-| Hardware selection   | Completed             |
-| Breadboard prototype | Ongoing               | Dag
-| PCB design           | Ongoing               | Koen
-| Ping assignments     | Ongoing               | Koen
-| Testing sensors      | Completed ?           |
-| Sensor libraries     | Almost completed      |
-| Scheduler            | Needs integration     |
-| WIFI configuration   | Ongoing               |
-| Data buffering       | TBD                   |
-| Code integration     | TBD                   |
-| Documentation        | Ongoing               | Dag
+| Task                                               | Status                | Owner
+| Hardware selection                                 | Completed             |
+| Breadboard prototype                               | Ongoing               | Dag
+| PCB design                                         | Ongoing               | Koen
+| Ping assignments                                   | Ongoing               | Koen
+| Testing individual sensors                         | Completed ?           | Koen
+| Sensor libraries                                   |                       |
+| - GPS                                              |                       |
+| - PPD42                                            | Finished              | Lieven
+| - Temperature / Humidity                           |                       |
+| - Barometer                                        |                       |
+| - Neopixel                                         |                       |
+| - ...                                              |                       |
+| Scheduler                                          |                       |
+| - Testing                                          | Completed             | Koen
+| - Integration                                      | TBD                   |
+| WIFI configuration                                 | Ongoing               |
+| Data buffering                                     | TBD                   |
+| Filesystem                                         | TBD                   |
+| Code integration                                   | TBD                   |
+| Documentation                                      | Always evolving       | Dag
 |============================================================================================
-
 
