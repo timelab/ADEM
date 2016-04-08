@@ -38,8 +38,8 @@ High Density Neopixel 8x LED
 |=================================================================================================================
 | Function                  | Component / Chip          | Price indication  | Datasheet / Tutorial / Info
 | Accelerometer             | MPU6050                   | (2.83€ banggood)  |
-http://store.invensense.com/datasheets/invensense/MPU-6050_DataSheet_V3%204.pdf[datasheet]
 ITG/MPU
+http://store.invensense.com/datasheets/invensense/MPU-6050_DataSheet_V3%204.pdf[datasheet]
 
 | Barometer                 | BMP180                    | (2.04 € banggood) |
 https://www.adafruit.com/datasheets/BST-BMP180-DS000-09.pdf[datasheet]

@@ -1,5 +1,6 @@
 = Connecting to the SparkFun ESP8266 Thing
 
+== Original pin assignments
 [options="header"]
 |========================================================
 | ESP Thing | External connection
@@ -24,3 +25,50 @@
 |4              | Output P1
 |5              | Input (T1), threshold for P2
 |========================================================
+
+
+== Prototype Dag
+
+.I²C Header
+[options="header"]
+|==========================================================
+| Pin Name | GPIO   | Info / Assignment
+| GND      |        | Ground (0V)
+| 3V3      |        | 3.3V
+| SDA      | GPIO2  | --> I²C SDA (UART2 out: +Serial1+)
+| SCL      | GPIO14 | --> I²C SCL
+|==========================================================
+
+.UART1 Header
+[options="header"]
+|==========================================================
+| Pin Name | GPIO   | Info / Assignment
+| DTR      |        | Data Ready (Auto Reset / GPIO0 Buffer)
+| TXO      | GPIO7  | --> UART1 out (+Serial+)
+| RXI      | GPIO8  | --> UART1 in (+Serial+)
+| 3V3      |        | (No power)
+| NC       |        | (Not Connected)
+| GND      |        | Ground (0V)
+|==========================================================
+
+.General I/O
+[options="header"]
+|==========================================================
+| Pin Name | GPIO   | Info / Assignment
+| GND      |        | Ground (0V)
+| VIN      |        | USB 4.5V or LiPo 3.7V
+| 5        | GPIO5  | On-board LED --> Free
+| 0        | GPIO0  | --> NeoPixel
+| 4        | GPIO4  | --> GPS TX
+| 13       | GPIO13 | --> PPD42 +PM25_SENSOR+
+| 12       | GPIO12 | --> PPD42 +PM10_SENSOR+
+| XPD      | GPIO16 | (Deep Sleep) --> Free
+| ADC (A0) |        | --> PPD42 +A_SENSOR+ (10bit ADC)
+| EN       |        | Enable PIN
+|==========================================================
+
+.Unassigned
+ - BT_RX
+ - BT_TX
+ - INT
+ - BUZZ
