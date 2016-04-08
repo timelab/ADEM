@@ -4,7 +4,7 @@ The http://www.timelab.org/[Timelab] ADEM project enables cyclists to measure pa
 
 The aim of this project is to create a low-cost open-source DIY hardware and firmware kit that is modular and adjustable, can be locally reproduced and repaired.
 
-This git repository hosts the hardware designs, firmware and technical documentation for the ADEM device. You can find the documentation at: http://github.com/timelab/ADEM/docs/[]
+This git repository hosts the hardware designs, firmware and technical documentation for the ADEM device. You can find the documentation at: https://github.com/timelab/ADEM/tree/master/docs[]
 
 More information related to this project is available from the project's wiki at: http://wiki.timelab.org/wiki/A.D.E.M[]
 
