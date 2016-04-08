@@ -1,31 +1,46 @@
 = TODO
-
-== Status
 Please update the below table with detailed sub-tasks, both those that are
 completed and still on-going.
+
+== Hardware status
+[options="header", width="100%"]
+|============================================================================================
+| Task                                               | Status                | Owner
+| Hardware selection                                 | Completed             | Koen ?
+| Breadboard prototype                               | Ongoing               | Dag
+| PCB design                                         | Ongoing               | Koen
+| Pin assignments                                    | Ongoing               | Koen
+|============================================================================================
+
+
+== Firmware status
 
 [options="header", width="100%"]
 |============================================================================================
 | Task                                               | Status                | Owner
-| Hardware selection                                 | Completed             |
-| Breadboard prototype                               | Ongoing               | Dag
-| PCB design                                         | Ongoing               | Koen
-| Ping assignments                                   | Ongoing               | Koen
 | Testing individual sensors                         | Completed ?           | Koen
 | Sensor libraries                                   |                       |
 | - GPS                                              |                       |
-| - PPD42                                            | Finished              | Lieven
-| - Temperature / Humidity                           |                       |
-| - Barometer                                        |                       |
-| - Neopixel                                         |                       |
-| - ...                                              |                       |
-| Scheduler                                          |                       |
-| - Testing                                          | Completed             | Koen
-| - Integration                                      | TBD                   |
-| WIFI configuration                                 | Ongoing               |
+| - Dust meter (PPD42)                               | Finished              | Lieven
+| - Temperature / Humidity (HTU21D)                  | Finished              | Koen
+| - Barometer (BMP180)                               | Finished              | Koen
+| - NeoPixel                                         |                       |
+| - Bluetooth                                        |                       |
+| - Buzzer                                           |                       |
+| - Scheduler                                        | Completed             | Koen
+| Code integration                                   | TBD                   |
+| WIFI configuration                                 | Ongoing               | Marco ?
 | Data buffering                                     | TBD                   |
 | Filesystem                                         | TBD                   |
-| Code integration                                   | TBD                   |
+| OTA Firmware updating                              | TBD                   |
 | Documentation                                      | Always evolving       | Dag
 |============================================================================================
 
+== Backend status
+
+
+[options="header", width="100%"]
+|============================================================================================
+| Task                                               | Status                | Owner
+| Architecture                                       | TBD                   |
+|============================================================================================
