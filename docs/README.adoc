@@ -1,0 +1,27 @@
+= ADEM project documentation
+:author: The Timelab ADEM project team
+:version: 0.1 draft
+:data-uri:
+:doctype: book
+:encoding: UTF-8
+:toc:
+:toclevels: 2
+
+Welcome to the ADEM project documentation. This is a work in progress
+so feel free to ask for clarification through GitHub's
+/timelab/ADEM/issues[issue interface] or even better, send us updates
+through GitHub's /timelab/ADEM/pulls[pull request interface].
+
+:numbered:
+:leveloffset: 1
+include::01-getting-started.adoc[]
+
+include::02-arduino-setup.adoc[]
+
+include::03-hardware.adoc[]
+
+include::04-pin-assignments.adoc[]
+
+:numbered!:
+[appendix]
+include::TODO.adoc[]

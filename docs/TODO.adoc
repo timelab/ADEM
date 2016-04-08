@@ -1,0 +1,23 @@
+= TODO
+
+== Tasks
+- Hardware selection
+- Testing sensors
+- Scheduler code
+- WIFI configuration
+- Data buffering
+- Code integration
+
+== Status
+
+[options="header"]
+|============================================================================================
+| Task               | Status                | Owner
+| Hardware selection | Completed             |
+| Testing sensors    | Completed ?           |
+| Sensor libraries   | Almost completed      |
+| Scheduler          | Needs integration     |
+| WIFI configuration | Ongoing               |
+| Data buffering     | TBD                   |
+| Code integration   | TBD                   |
+|============================================================================================
