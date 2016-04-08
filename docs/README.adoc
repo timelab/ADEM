@@ -9,19 +9,20 @@
 
 Welcome to the ADEM project documentation. This is a work in progress
 so feel free to ask for clarification through GitHub's
-/timelab/ADEM/issues[issue interface] or even better, send us updates
-through GitHub's /timelab/ADEM/pulls[pull request interface].
+https://github.com/timelab/ADEM/issues[issue interface] or even better,
+send us updates through GitHub's
+https://github.com/timelab/ADEM/pulls[pull request interface].
 
 :numbered:
 :leveloffset: 1
-include::01-getting-started.adoc[]
+include::01-getting-started.adoc[1. Getting started]
 
-include::02-arduino-setup.adoc[]
+include::02-arduino-setup.adoc[2. Arduino setup]
 
-include::03-hardware.adoc[]
+include::03-hardware.adoc[3. Hardware]
 
-include::04-pin-assignments.adoc[]
+include::04-pin-assignments.adoc[4. Pin assignments]
 
 :numbered!:
 [appendix]
-include::TODO.adoc[]
+include::TODO.adoc[TODO list]
