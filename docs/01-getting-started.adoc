@@ -1,40 +1,57 @@
-= Getting started with ADEM, git and github =
+= Getting started with ADEM, git and GitHub =
 
 Nice introduction on the use of git: http://www.git-scm.com/book/en/v1/Git-Basics 
 
-== Setup ==
+== Git setup ==
 
-*Signup for a github account
-	https://github.com
-*Install git on your PC
-	for Debian/Ubuntu
-	$sudo apt-get install git
-*Set your github and e-mailadress
-	$ git config --global user.name "John Doe"
-	$ git config --global user.email johndoe@example.com
-*Clone the ADEM repository. This creates a local copy of the online repository on your pc
-	$ git clone https://github.com/timelab/ADEM.git
+- Sign-up for a GitHub account at https://github.com/[]
+
+- Install git on your PC
+
+    - for Debian/Ubuntu:
+
+    $ sudo apt-get install git
+
+    - for Fedora/RHEL/CentOS:
+
+    $ sudo yum install git
+
+- Set your GitHub and e-mailadress
+
+    $ git config --global user.name "John Doe"
+    $ git config --global user.email johndoe@example.com
+
+- Clone the ADEM repository. This creates a local copy of the online repository on your pc
+
+    $ git clone https://github.com/timelab/ADEM.git
 
 == Git daily use ==
 
 Show the status of your repository:
-$ git status
+
+    $ git status
 
 Edit the files in you local copy with your editor of choice. After creating a new file or folder, add it so git can start tracking it:
-$ git add GITHUB
+
+    $ git add GITHUB
 
 Remove a file (also from the repository after commit!)
-$ git rm HITGUB
+
+    $ git rm HITGUB
 
 Commit your changes to your local copy:
-$ git commit --all --message "Added new file with info on github use."
+
+    $ git commit --all --message "Added new file with info on GitHub use."
 
 Now upload it to the online repository:
-$ git push
+
+    $ git push
 
 What has happenend:
-$ git log
+
+    $ git log
 
 Get the changes from the online repository and merge them into local files
-$ git pull rebase
+
+    $ git pull --rebase
 
