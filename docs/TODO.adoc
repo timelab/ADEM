@@ -1,23 +1,23 @@
 = TODO
 
-== Tasks
-- Hardware selection
-- Testing sensors
-- Scheduler code
-- WIFI configuration
-- Data buffering
-- Code integration
-
 == Status
+Please update the below table with detailed sub-tasks, both those that are
+completed and still on-going.
 
 [options="header"]
 |============================================================================================
-| Task               | Status                | Owner
-| Hardware selection | Completed             |
-| Testing sensors    | Completed ?           |
-| Sensor libraries   | Almost completed      |
-| Scheduler          | Needs integration     |
-| WIFI configuration | Ongoing               |
-| Data buffering     | TBD                   |
-| Code integration   | TBD                   |
+| Task                 | Status                | Owner
+| Hardware selection   | Completed             |
+| Breadboard prototype | Ongoing               | Dag
+| PCB design           | Ongoing               | Koen
+| Ping assignments     | Ongoing               | Koen
+| Testing sensors      | Completed ?           |
+| Sensor libraries     | Almost completed      |
+| Scheduler            | Needs integration     |
+| WIFI configuration   | Ongoing               |
+| Data buffering       | TBD                   |
+| Code integration     | TBD                   |
+| Documentation        | Ongoing               | Dag
 |============================================================================================
+
+

@@ -15,14 +15,14 @@ https://github.com/timelab/ADEM/pulls[pull request interface].
 
 :numbered:
 :leveloffset: 1
-include::01-getting-started.adoc[1. Getting started]
+include::01-getting-started.adoc[]
 
-include::02-arduino-setup.adoc[2. Arduino setup]
+include::02-arduino-setup.adoc[]
 
-include::03-hardware.adoc[3. Hardware]
+include::03-hardware.adoc[]
 
-include::04-pin-assignments.adoc[4. Pin assignments]
+include::04-pin-assignments.adoc[]
 
 :numbered!:
 [appendix]
-include::TODO.adoc[TODO list]
+include::TODO.adoc[]
