@@ -1,5 +1,6 @@
 = Timelab ADEM project
-The http://www.timelab.org/[Timelab] ADEM project enables cyclists to measure fine dust particulates (PM~10~ and PM~25~). The quality based on these measurements are displayed on the device, temporarily stored and sent via WiFi to a central data collection service.
+
+The http://www.timelab.org/[Timelab] ADEM project enables cyclists to measure particulate matter (PM~10~ and PM~25~). The quality based on these measurements are displayed on the device, temporarily stored and sent via WiFi to a central data collection service.
 
 The aim of this project is to create a low-cost open-source DIY hardware and firmware kit that is modular and adjustable, can be locally reproduced and repaired.
 
