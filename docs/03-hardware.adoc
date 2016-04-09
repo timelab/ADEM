@@ -15,6 +15,7 @@ Current selection of components for the first design. We have chosen the SparkFu
 | Function                  | Component / Chip          | Price indication  | Datasheet / Tutorial / Info
 
 | Microcontroller           | SparkFun ESP8266 Thing    | (15.95€ sparkfun) |
+https://cdn.sparkfun.com/datasheets/Wireless/WiFi/ESP8266ThingV1.pdf[datasheet]
 https://www.sparkfun.com/products/13231[link] /
 https://learn.sparkfun.com/tutorials/esp8266-thing-hookup-guide/all[tutorial]
 
@@ -37,9 +38,9 @@ High Density Neopixel 8x LED
 [options="header"]
 |=================================================================================================================
 | Function                  | Component / Chip          | Price indication  | Datasheet / Tutorial / Info
-| Accelerometer             | MPU6050                   | (2.83€ banggood)  |
-ITG/MPU
+| Accelerometer             | GY-521 / MPU6050          | (2.83€ banggood)  |
 http://store.invensense.com/datasheets/invensense/MPU-6050_DataSheet_V3%204.pdf[datasheet]
+http://playground.arduino.cc/Main/MPU-6050[arduino]
 
 | Barometer                 | BMP180                    | (2.04 € banggood) |
 https://www.adafruit.com/datasheets/BST-BMP180-DS000-09.pdf[datasheet]

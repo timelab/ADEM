@@ -1,70 +1,45 @@
-= Connecting to the SparkFun ESP8266 Thing
+= ESP8266 pin assignments
 
-== Original pin assignments
-[options="header"]
-|========================================================
-| ESP Thing | External connection
-| GND       | PPD42NS pin 1
-| GND       | GPS GND
-| GND       | FTDI GND (only for programming and debugging)
-| 3V3       | PPD42NS Pin 3 => 5V
-| 3V3       | GPS VCC
-| 12        | PPD42NS pin 2
-| 13        | PPD42NS pin 2
-| RXI       | GPS TX (no need to disconnect while programming)
-| RXI       | FTDI TXO (only for programming and debugging)
-| TXO       | FTDI RXI (only for programming and debugging)
-|========================================================
+== Breadboard prototype Dag
 
-[options="header"]
-|========================================================
-|PPD42NS Pin    | Description
-|1              | GND
-|2              | Output P2
-|3              | Vcc (5V, 90mA)
-|4              | Output P1
-|5              | Input (T1), threshold for P2
-|========================================================
+Below pins are based on the SparkFun ESP8266 Thing.
 
-
-== Prototype Dag
-
-.I²C Header
+.ESP8266 I²C Header
 [options="header"]
 |==========================================================
-| Pin Name | GPIO   | Info / Assignment
-| GND      |        | Ground (0V)
-| 3V3      |        | 3.3V
-| SDA      | GPIO2  | --> I²C SDA (UART2 out: +Serial1+)
-| SCL      | GPIO14 | --> I²C SCL
+| Pin Name | GPIO | Info / Assignment
+| GND      |      | Ground (0V)
+| 3V3      |      | 3.3V
+| SDA      | D2   | -> I²C SDA (UART2 out: +Serial1+)
+| SCL      | D14  | -> I²C SCL
 |==========================================================
 
-.UART1 Header
+.ESP8266 UART1 Header
 [options="header"]
 |==========================================================
-| Pin Name | GPIO   | Info / Assignment
-| DTR      |        | Data Ready (Auto Reset / GPIO0 Buffer)
-| TXO      | GPIO7  | --> UART1 out (+Serial+)
-| RXI      | GPIO8  | --> UART1 in (+Serial+)
-| 3V3      |        | (No power)
-| NC       |        | (Not Connected)
-| GND      |        | Ground (0V)
+| Pin Name | GPIO | Info / Assignment
+| DTR      |      | Data Ready (Auto Reset / D0 Buffer)
+| TXO      | D7   | ->UART1 out (+Serial+)
+| RXI      | D8   | ->UART1 in (+Serial+)
+| 3V3      |      | (Not Connected)
+| NC       |      | (Not Connected)
+| GND      |      | Ground (0V)
 |==========================================================
 
-.General I/O
+.ESP8266 I/O Pins
 [options="header"]
 |==========================================================
-| Pin Name | GPIO   | Info / Assignment
-| GND      |        | Ground (0V)
-| VIN      |        | USB 4.5V or LiPo 3.7V
-| 5        | GPIO5  | On-board LED --> Free
-| 0        | GPIO0  | --> NeoPixel
-| 4        | GPIO4  | --> GPS TX
-| 13       | GPIO13 | --> PPD42 +PM25_SENSOR+
-| 12       | GPIO12 | --> PPD42 +PM10_SENSOR+
-| XPD      | GPIO16 | (Deep Sleep) --> Free
-| ADC (A0) |        | --> PPD42 +A_SENSOR+ (10bit ADC)
-| EN       |        | Enable PIN
+| Pin Name | GPIO | Info / Assignment
+| GND      |      | Ground (0V)
+| VIN      |      | USB 4.5V or LiPo 3.7V
+| 5        | D5   | On-board LED ->Free
+| 0        | D0   | ->NeoPixel
+| 4        | D4   | ->GPS TX
+| 13       | D13  | ->PPD42 +PM25_SENSOR+
+| 12       | D12  | ->PPD42 +PM10_SENSOR+
+| XPD      | D16  | (Deep Sleep) -> Free
+| ADC      | A0   | ->PPD42 +A_SENSOR+ (10-bit 1V)
+| EN       |      | Enable PIN
 |==========================================================
 
 .Unassigned
@@ -72,3 +47,70 @@
  - BT_TX
  - INT
  - BUZZ
+
+== Components
+
+.PPD42NS (Fine dust meter)
+[options="header"]
+|========================================================
+| Pin Name | Assigned | Description
+| 1        | ->GND    | Ground
+| 2        | ->GPIO13 | Output P2 +PM25_SENSOR+
+| 3        | ->3V3    | Vcc (5V, 90mA)
+| 4        | ->GPIO12 | Output P1 +PM10_SENSOR+
+| 5        | ->ADC    | Input (T1) +A_SENSOR+, threshold for P2
+|========================================================
+
+.GY-NEO6MV2 (GPS)
+[options="header"]
+|========================================================
+| Pin Name | Assigned | Description
+| VCC      | ->3V3    |
+| RX       |          |
+| TX       | ->GPIO4  |
+| GND      | ->GND    | Ground (0V)
+|========================================================
+
+.NeoPixel (LED)
+[options="header"]
+|========================================================
+| Pin Name | Assigned | Description
+| GND      | ->GND    | Ground (0V)
+| Din      | ->GPIO0  | Input signal
+| 5V       | ->3V3    | Vcc (5V, ?mA)
+|========================================================
+
+.BMP180 (Barometer)
+[options="header"]
+|========================================================
+| Pin Name | Assigned | Description
+| VIN      | ->3V3    |
+| GND      | ->GND    |
+| SCL      | ->SCL    |
+| SDA      | ->SDA    |
+|========================================================
+
+.HTU21D (Humidity/Temperature meter)
+[options="header"]
+|========================================================
+| Pin Name | Assigned | Description
+| CL       | ->SCL    |
+| DA       | ->SDA    |
+| -        | ->GND    |
+| +        | ->3V3    |
+|========================================================
+
+.IGT/MPU (Accelerometer)
+[options="header"]
+|========================================================
+| Pin Name | Assigned | Description
+| INT      |          |
+| AD0      |          |
+| XCL      |          |
+| XDA      |          |
+| SDA      | ->SDA    |
+| SCL      | ->SCL    |
+| GND      | ->GND    |
+| VCC      | ->3V3    |
+|========================================================
+
