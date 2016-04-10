@@ -8,8 +8,8 @@ before_install:
   - sudo mv arduino-1.6.8 /usr/local/share/arduino
   - sudo ln -s /usr/local/share/arduino/arduino /usr/local/bin/arduino
 install:
+  - wget http://arduino.esp8266.com/versions/2.1.0/package_esp8266com_index.json -O /usr/local/share/arduino/package_esp8266com_index.json
   - ln -sf $PWD/adem/libraries/* /usr/local/share/arduino/libraries/
-  - arduino --install-library "ESP8266,ESP8266Wifi"
-  - arduino --install-library "Adafruit_NeoPixel,TinyGPSPlus"
+  - arduino --install-boards "esp8266:esp8266"
 script:
-  - arduino --verify --board esp8226:esp8226:uno $PWD/adem/adem.ino
+  - arduino --verify --board esp8266:esp8266:thing $PWD/adem/adem.ino
