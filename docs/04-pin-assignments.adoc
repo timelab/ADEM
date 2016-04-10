@@ -6,41 +6,41 @@ Below pins are based on the SparkFun ESP8266 Thing.
 
 .ESP8266 I²C Header
 [options="header"]
-|==========================================================
-| Pin Name  | ->Assignment | Info
-| GND       | ->GND line   | Ground (0V)
-| 3V3       | ->3V3 line   | 3.3V
-| SDA (D2)  | ->SDA bus    | I²C SDA (UART2 out: +Serial1+)
-| SCL (D14) | ->SCL bus    | I²C SCL
-|==========================================================
+|==============================================================================
+| Pin Name  | Description                             | ->Assignment
+| GND       | Ground (0V)                             | ->GND line
+| 3V3       | 3.3V                                    | ->3V3 line
+| SDA (D2)  | I²C SDA (UART2 out: +Serial1+)          | ->SDA bus
+| SCL (D14) | I²C SCL                                 | ->SCL bus
+|==============================================================================
 
 .ESP8266 UART1 Header
 [options="header"]
-|==========================================================
-| Pin Name  | ->Assignment | Info
-| DTR       |              | Data Ready (Auto Reset / D0 Buffer)
-| TXO (D7)  | ->UART1 out  | UART transmit (+Serial+)
-| RXI (D8)  | ->UART1 in   | UART receive (+Serial+)
-| 3V3       |              | (Not Connected)
-| NC        |              | (Not Connected)
-| GND       | ->UART GND   | Ground (0V)
-|==========================================================
+|==============================================================================
+| Pin Name  | Description                             | ->Assignment
+| DTR       | Data Ready (Auto Reset / D0 Buffer)     |
+| TXO (D7)  | UART transmit (+Serial+)                | ->UART1 out
+| RXI (D8)  | UART receive (+Serial+)                 | ->UART1 in
+| 3V3       | (Not Connected)                         |
+| NC        | (Not Connected)                         |
+| GND       | Ground (0V)                             | ->UART GND
+|==============================================================================
 
 .ESP8266 I/O Pins
 [options="header"]
-|==========================================================
-| Pin Name  | ->Assignment | Info
-| GND       |              | Ground (0V)
-| VIN       |              | USB 4.5V or LiPo 3.7V
-| 5 (D5)    |              | On-board LED ->Free
-| 0 (D0)    | ->NeoPixel   |
-| 4 (D4)    | ->GPS TX     |
-| 13 (D13)  | ->PPD42 +PM25_SENSOR+ |
-| 12 (D12)  | ->PPD42 +PM10_SENSOR+ |
-| XPD (D16) |              | (Deep Sleep)
-| ADC (A0)  | ->PPD42 +A_SENSOR+ | (10-bit 1V)
-| EN        |              | Enable PIN
-|==========================================================
+|==============================================================================
+| Pin Name  | Description                             | ->Assignment
+| GND       | Ground (0V)                             |
+| VIN       | USB 4.5V or LiPo 3.7V                   |
+| 5 (D5)    | On-board LED ->Free                     |
+| 0 (D0)    |                                         | ->NeoPixel
+| 4 (D4)    |                                         | ->GPS TX
+| 13 (D13)  |                                         | ->PPD42 +PM25_SENSOR+
+| 12 (D12)  |                                         | ->PPD42 +PM10_SENSOR+
+| XPD (D16) | (Deep Sleep)                            |
+| ADC (A0)  | (10-bit 1V)                             | ->PPD42 +A_SENSOR+
+| EN        | Enable PIN                              |
+|==============================================================================
 
 .Unassigned
  - BT_RX
@@ -52,65 +52,65 @@ Below pins are based on the SparkFun ESP8266 Thing.
 
 .PPD42NS (Fine dust meter)
 [options="header"]
-|========================================================
-| Pin Name  | ->Assignment | Description
-| 1         | ->GND line   | Ground
-| 2         | ->GPIO13     | Output P2 +PM25_SENSOR+
-| 3         | ->3V3 line   | Vcc (5V, 90mA)
-| 4         | ->GPIO12     | Output P1 +PM10_SENSOR+
-| 5         | ->ADC        | Input (T1) +A_SENSOR+, threshold for P2
-|========================================================
+|==============================================================================
+| Pin Name  | Description                             | ->Assignment
+| 1         | Ground                                  | ->GND line
+| 2         | Output P2 +PM25_SENSOR+                 | ->D13
+| 3         | Vcc (5V, 90mA)                          | ->3V3 line
+| 4         | Output P1 +PM10_SENSOR+                 | ->D12
+| 5         | Input (T1) +A_SENSOR+, threshold for P2 | ->ADC
+|==============================================================================
 
 .GY-NEO6MV2 (GPS)
 [options="header"]
-|========================================================
-| Pin Name  | ->Assignment | Description
-| VCC       | ->3V3 line   |
-| RX        |              |
-| TX        | ->GPIO4      |
-| GND       | ->GND line   | Ground (0V)
-|========================================================
+|==============================================================================
+| Pin Name  | Description                             | ->Assignment
+| VCC       |                                         | ->3V3 line
+| RX        |                                         |
+| TX        |                                         | ->GPIO4
+| GND       | Ground (0V)                             | ->GND line
+|==============================================================================
 
 .NeoPixel (LED)
 [options="header"]
-|========================================================
-| Pin Name  | ->Assignment | Description
-| GND       | ->GND line   | Ground (0V)
-| Din       | ->GPIO0      | Input signal
-| 5V        | ->3V3 line   | Vcc (5V, ?mA)
-|========================================================
+|==============================================================================
+| Pin Name  | Description                             | ->Assignment
+| GND       | Ground (0V)                             | ->GND line
+| Din       | Input signal                            | ->D0
+| 5V        | Vcc (5V, ?mA)                           | ->3V3 line
+|==============================================================================
 
 .BMP180 (Barometer)
 [options="header"]
-|========================================================
-| Pin Name  | ->Assignment | Description
-| VIN       | ->3V3 line   |
-| GND       | ->GND line   |
-| SCL       | ->SCL bus    |
-| SDA       | ->SDA bus    |
-|========================================================
+|==============================================================================
+| Pin Name  | Description                             | ->Assignment
+| VIN       |                                         | ->3V3 line
+| GND       |                                         | ->GND line
+| SCL       |                                         | ->SCL bus
+| SDA       |                                         | ->SDA bus
+|==============================================================================
 
 .HTU21D (Humidity/Temperature meter)
 [options="header"]
-|========================================================
-| Pin Name  | ->Assignment | Description
-| CL        | ->SCL bus    |
-| DA        | ->SDA bus    |
-| -         | ->GND line   |
-| +         | ->3V3 line   |
-|========================================================
+|==============================================================================
+| Pin Name  | Description                             | ->Assignment
+| CL        |                                         | ->SCL bus
+| DA        |                                         | ->SDA bus
+| -         |                                         | ->GND line
+| +         |                                         | ->3V3 line
+|==============================================================================
 
 .IGT/MPU (Accelerometer)
 [options="header"]
-|========================================================
-| Pin Name  | ->Assignment | Description
-| INT       |              |
-| AD0       |              |
-| XCL       |              |
-| XDA       |              |
-| SDA       | ->SDA bus    |
-| SCL       | ->SCL bus    |
-| GND       | ->GND line   |
-| VCC       | ->3V3 line   |
-|========================================================
+|==============================================================================
+| Pin Name  | Description                             | ->Assignment
+| INT       |                                         |
+| AD0       |                                         |
+| XCL       |                                         |
+| XDA       |                                         |
+| SDA       |                                         | ->SDA bus
+| SCL       |                                         | ->SCL bus
+| GND       |                                         | ->GND line
+| VCC       |                                         | ->3V3 line
+|==============================================================================
 
