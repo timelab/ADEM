@@ -1,22 +1,31 @@
 language: c
+env:
+  - ARDUINO_VERSION="1.6.8"
 before_install:
   # Ensure we have a DISPLAY for the Arduino IDE
   - "/sbin/start-stop-daemon --start --quiet --pidfile /tmp/custom_xvfb_1.pid --make-pidfile --background --exec /usr/bin/Xvfb -- :1 -ac -screen 0 1280x1024x16"
   - sleep 3
   - export DISPLAY=:1.0
   # Download and install Arduino
-  - wget http://downloads.arduino.cc/arduino-1.6.8-linux64.tar.xz
-  - tar -xJf arduino-1.6.8-linux64.tar.xz
-  - sudo mv arduino-1.6.8 /usr/local/share/arduino
+  - echo "Installing Arduino version $ARDUINO_VERSION"
+  - wget http://downloads.arduino.cc/arduino-$ARDUINO_VERSION-linux64.tar.xz
+  - tar -xJf arduino-$ARDUINO_VERSION-linux64.tar.xz
+  - sudo mv arduino-$ARDUINO_VERSION /usr/local/share/arduino
   - sudo ln -s /usr/local/share/arduino/arduino /usr/local/bin/arduino
-#  - sudo ln -sf $PWD/arduino-1.6.8/arduino /usr/local/bin/arduino
+#  - export PATH="$PWD/arduino-$ARDUINO_VERSION:$PATH"
 install:
   # Avoid having the hardware directory being picked up by Arduino
+  # TODO: Rename this directory in git
   - rm -rf hardware/
+  # Add the ESP8266 board to the Board Manager (boards manager does not working on 1.6.6 - 1.6.8)
+#  - arduino --pref boardsmanager.additional.urls=http://arduino.esp8266.com/stable/package_esp8266com_index.json --save-prefs
   # Put Arduino configuration in place (with our own Board Manager URL)
   - mkdir -p ~/.arduino15/
   - cp -av .travis_arduino_preferences.txt ~/.arduino15/preferences.txt
   # Install our ESP8266 board
-  - arduino --install-boards "esp8266:esp8266"
+  - arduino --install-boards esp8266:esp8266
+  - arduino --board esp8266:esp8266:generic --save-prefs
+  # Enable maximum warning level
+#  - arduino --pref compiler.warning_level=all --save-prefs
 script:
   - arduino --verify --board esp8266:esp8266:thing $PWD/adem/adem.ino
