@@ -27,8 +27,6 @@ Written by Limor Fried/Ladyada for Adafruit Industries.
 BSD license, all text above must be included in any redistribution
 ****************************************************/
 
-#include "Wire.h"
-
 #define HTU21DF_I2CADDR       0x40
 #define HTU21DF_READTEMP      0xE3
 #define HTU21DF_READHUM       0xE5
