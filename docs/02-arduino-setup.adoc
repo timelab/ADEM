@@ -9,12 +9,89 @@ Follow the SparkFun tutorial on how to install the ESP8266 to your Arduino IDE:
 https://learn.sparkfun.com/tutorials/esp8266-thing-hookup-guide/installing-the-esp8266-arduino-addon
 
 
-== Included Arduino libraries
+== Cloning the ADEM GitHub repository
+
+
+=== Installing Git
+
+- Sign-up for a GitHub account at https://github.com/[]
+
+- Install git on your PC
+
+    - for Debian/Ubuntu:
+
+    $ sudo apt-get install git
+
+    - for Fedora/RHEL/CentOS:
+
+    $ sudo yum install git
+
+- Set your GitHub and e-mailadress
+
+    $ git config --global user.name "John Doe"
+    $ git config --global user.email johndoe@example.com
+
+
+=== Cloning the repository
+
+You can make a local copy of the ADEM project code by running the following git command:
+
+    $ git clone git@github.com:timelab/ADEM.git
+
+If you have a login, you can fork the project to your GitHub profile, and add it as a separate remote in _.git/config_.
+This way you can create pull-requests by modifying your local copy and pushing it to your personal GitHub profile.
+The GitHub web-interface than proposes to create a pull-request. It helps if you use different branches for pushing changes.
+
+More information regarding the use of Git is available from: http://www.git-scm.com/book/en/v1/Git-Basics
+
+More information regarding the use of GitHub is available from: https://guides.github.com/activities/hello-world/A
+
+=== Git daily use
+
+Show the status of your repository:
+
+    $ git status
+
+Edit the files in you local copy with your editor of choice. After creating a new file or folder, add it so git can start tracking it:
+
+    $ git add GITHUB
+
+Remove a file (also from the repository after commit!)
+
+    $ git rm HITGUB
+
+Commit your changes to your local copy:
+
+    $ git commit --all --message "Added new file with info on GitHub use."
+
+Now upload it to the online repository:
+
+    $ git push
+
+What has happenend:
+
+    $ git log
+
+Get the changes from the online repository and merge them into local files
+
+    $ git pull --rebase
+
+
+== Installing required libraries in Arduino
+
+In order to build project code, you need to ensure that Arduino can find the libraries we use.
+
+On Linux you can do this with the following command:
+
+   $ ln -sf libraries/* ~/Arduino/libraries/
+
+
+=== External libraries
 
 All external libraries we depend upon for the firmware are included in the repository.
-This to ensure that we have reproducible builds.
+This to ensure that we have reproducible builds. Hence there is no need to download them separately.
 
-The following libraries are being used:
+The following external libraries are being used:
 
 Adafruit NeoPixel::
   - Version: 1.0.4
