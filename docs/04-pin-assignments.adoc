@@ -7,7 +7,7 @@ Below pins are based on the SparkFun ESP8266 Thing.
 .ESP8266 I²C Header
 [options="header"]
 |==============================================================================
-| Pin Name  | Description                             | ->Assignment
+| Pin Name  | Description                             | Assignment
 | GND       | Ground (0V)                             | ->GND line
 | 3V3       | 3.3V                                    | ->3V3 line
 | SDA (D2)  | I²C SDA (UART2 out: +Serial1+)          | ->SDA bus
@@ -17,7 +17,7 @@ Below pins are based on the SparkFun ESP8266 Thing.
 .ESP8266 UART1 Header
 [options="header"]
 |==============================================================================
-| Pin Name  | Description                             | ->Assignment
+| Pin Name  | Description                             | Assignment
 | DTR       | Data Ready (Auto Reset / D0 Buffer)     |
 | TXO (D7)  | UART transmit (+Serial+)                | ->UART1 out
 | RXI (D8)  | UART receive (+Serial+)                 | ->UART1 in
@@ -29,7 +29,7 @@ Below pins are based on the SparkFun ESP8266 Thing.
 .ESP8266 I/O Pins
 [options="header"]
 |==============================================================================
-| Pin Name  | Description                             | ->Assignment
+| Pin Name  | Description                             | Assignment
 | GND       | Ground (0V)                             |
 | VIN       | USB 4.5V or LiPo 3.7V                   |
 | 5 (D5)    | On-board LED ->Free                     |
@@ -53,7 +53,7 @@ Below pins are based on the SparkFun ESP8266 Thing.
 .PPD42NS (Fine dust meter)
 [options="header"]
 |==============================================================================
-| Pin Name  | Description                             | ->Assignment
+| Pin Name  | Description                             | Assignment
 | 1         | Ground                                  | ->GND line
 | 2         | Output P2 +PM25_SENSOR+                 | ->D13
 | 3         | Vcc (5V, 90mA)                          | ->3V3 line
@@ -64,7 +64,7 @@ Below pins are based on the SparkFun ESP8266 Thing.
 .GY-NEO6MV2 (GPS)
 [options="header"]
 |==============================================================================
-| Pin Name  | Description                             | ->Assignment
+| Pin Name  | Description                             | Assignment
 | VCC       |                                         | ->3V3 line
 | RX        |                                         |
 | TX        |                                         | ->GPIO4
@@ -74,7 +74,7 @@ Below pins are based on the SparkFun ESP8266 Thing.
 .NeoPixel (LED)
 [options="header"]
 |==============================================================================
-| Pin Name  | Description                             | ->Assignment
+| Pin Name  | Description                             | Assignment
 | GND       | Ground (0V)                             | ->GND line
 | Din       | Input signal                            | ->D0
 | 5V        | Vcc (5V, ?mA)                           | ->3V3 line
@@ -83,7 +83,7 @@ Below pins are based on the SparkFun ESP8266 Thing.
 .BMP180 (Barometer)
 [options="header"]
 |==============================================================================
-| Pin Name  | Description                             | ->Assignment
+| Pin Name  | Description                             | Assignment
 | VIN       |                                         | ->3V3 line
 | GND       |                                         | ->GND line
 | SCL       |                                         | ->SCL bus
@@ -93,7 +93,7 @@ Below pins are based on the SparkFun ESP8266 Thing.
 .HTU21D (Humidity/Temperature meter)
 [options="header"]
 |==============================================================================
-| Pin Name  | Description                             | ->Assignment
+| Pin Name  | Description                             | Assignment
 | CL        |                                         | ->SCL bus
 | DA        |                                         | ->SDA bus
 | -         |                                         | ->GND line
@@ -103,7 +103,7 @@ Below pins are based on the SparkFun ESP8266 Thing.
 .IGT/MPU (Accelerometer)
 [options="header"]
 |==============================================================================
-| Pin Name  | Description                             | ->Assignment
+| Pin Name  | Description                             | Assignment
 | INT       |                                         |
 | AD0       |                                         |
 | XCL       |                                         |
