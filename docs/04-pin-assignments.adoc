@@ -67,7 +67,7 @@ Below pins are based on the SparkFun ESP8266 Thing.
 | Pin Name  | Description                             | Assignment
 | VCC       |                                         | ->3V3 line
 | RX        |                                         |
-| TX        |                                         | ->GPIO4
+| TX        |                                         | ->D4
 | GND       | Ground (0V)                             | ->GND line
 |==============================================================================
 
