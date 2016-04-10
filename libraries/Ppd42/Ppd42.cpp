@@ -103,6 +103,12 @@ void Ppd42::process() {
 }
 
 String Ppd42::report()  {
-	// should report a JSON string
-	return "";
+    StaticJsonBuffer<200> jsonBuffer;
+    JsonObject& root = jsonBuffer.createObject();
+    char response[200];
+    root["Sensor"] = "PPD42";
+    root["PM25"] = readPM25Ppm();
+    root["PM10"] = readPM10Ppm();
+    root.prettyPrintTo(response,sizeof(response));
+    return response;
 }

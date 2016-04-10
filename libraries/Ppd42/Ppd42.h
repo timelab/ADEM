@@ -16,8 +16,14 @@
 #ifndef Ppd42_h
 #define Ppd42_h
 
+#include <Sensor.h> // - Skeleton Library for ADEM sensors.
+#include <ArduinoJson.h>
+
+#if defined(ARDUINO) && ARDUINO >= 100
 #include <Arduino.h>
-#include <Sensor.h>
+#else
+#include "WProgram.h"
+#endif
 
 class Ppd42 : public Sensor {
   public:
