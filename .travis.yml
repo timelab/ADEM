@@ -8,7 +8,7 @@ before_install:
   - sudo mv arduino-1.6.8 /usr/local/share/arduino
   - sudo ln -s /usr/local/share/arduino/arduino /usr/local/bin/arduino
 install:
-#  - wget http://arduino.esp8266.com/versions/2.1.0/package_esp8266com_index.json -O /usr/local/share/arduino/package_esp8266com_index.json
+  - rm -rf hardware/
   - mkdir -p ~/.arduino15/
   - cp -av .travis_arduino_preferences.txt ~/.arduino15/preferences.txt
   - ln -sf $PWD/adem/libraries/* /usr/local/share/arduino/libraries/

@@ -1,65 +1,37 @@
-= Firmware
+= Arduino setup
 
 The firmware is written in Arduino.
 
-== Development
 
-=== Add ESP Development to Arduino
-Setting up for ESP development in Arduino:
+== Installing the ESP8266 Arduino Addon
 
-English interface::
-1. Get Arduino IDE 1.6.4 or higher from: https://www.arduino.cc/
-2. **File > Preferences**
-3. **Additional Board Manager URLs > http://arduino.esp8266.com/stable/package_esp8266com_index.json**
-4. Restart the Arduino IDE
-5. **Tools > Board > Boards Manager > esp8266 by ESP 8266 Community > install**
-6. **Tools > Board > SparkFun ESP8266 Thing**
-7. **Tools > Port > /dev/ttyUSB0**
+Follow the SparkFun tutorial on how to install the ESP8266 to your Arduino IDE:
+https://learn.sparkfun.com/tutorials/esp8266-thing-hookup-guide/installing-the-esp8266-arduino-addon
 
-Nederlandstalige omgeving::
-1. Download Arduino IDE 1.6.4 of hoger van: https://www.arduino.cc/
-2. **Bestand > Voorkeuren**
-3. **Additionele Bordenbeheer URLs > http://arduino.esp8266.com/stable/package_esp8266com_index.json**
-4. Herstart de Arduino IDE
-5. **Hulpmiddelen > Board > Bordenbeheer > esp8266 by ESP 8266 Community > install**
-6. **Hulpmiddelen > Board > SparkFun ESP8266 Thing**
-7. **Hulpmiddelen > Port > /dev/ttyUSB0**
 
-Upload Blink to test:
+== Included Arduino libraries
 
-```arduino
-#define ESP8266_LED 5
+All external libraries we depend upon for the firmware are included in the repository.
+This to ensure that we have reproducible builds.
 
-void setup() 
-{
-  pinMode(ESP8266_LED, OUTPUT);
-}
+The following libraries are being used:
 
-void loop() 
-{
-  digitalWrite(ESP8266_LED, HIGH);
-  delay(500);
-  digitalWrite(ESP8266_LED, LOW);
-  delay(500);
-}
-```
+Adafruit NeoPixel::
+  - Version: 1.0.4
+  - License: LGPL v3
+  - URL: https://github.com/adafruit/Adafruit_NeoPixel
 
-To get faster upload speeds to the SparkFun ESP8266 thing: *Tools > Upload Speed*, a value of 460800 should work. You can even try 921600.
+ArduinoJson::
+  - Version: 5.1.1
+  - License: MIT
+  - URL: https://github.com/bblanchon/ArduinoJson
 
-=== Add GPS library for Arduino
+espsoftwareserial::
+  - Version: 1.0
+  - License: LGPL v2.1
+  - URL: https://github.com/plerup/espsoftwareserial
 
-Download TinyGPS++ from: https://github.com/mikalhart/TinyGPSPlus/archive/master.zip
-In the Arduino IDE: **Sketch > Include Library > Add .ZIP Library... > master.zip**
-
-=== Configuration file
-
-Create a `config.h` file in the same folder with the following contents, and fill in your Wi-Fi and ThingSpeak credentials.
-```arduino
-#define WIFISSID "your wifi network name"
-#define WIFIPW "your wifi network password"
-#define THINGADDR "api.thingspeak.com"
-#define THINGKEY "your thingspeak API key"
-#define DEBUGADDR ""
-```
-
-Restart the Arduino IDE, you will see that `config.h` is opened in a second tab in the Arduino IDE
+TinyGPS++::
+  - Version: 0.94b
+  - License: LGPL v2.1
+  - URL: https://github.com/mikalhart/TinyGPSPlus
