@@ -21,7 +21,7 @@ int count3 = 0;
 TickerTask * T1 = NULL;
 TickerTask * T2 = NULL;
 TickerTask * T3 = NULL;
-int pin1 = 12;
+int pin1 = 0;
 int pin2 = 14;
 int pin3 = 13;
 BMP085Sensor druksensor;
@@ -71,7 +71,7 @@ void flip3(void *)
 }
 
 void setup() {
-	Serial.begin(115200);
+	Serial.begin(74880);
 	//pinMode(12, OUTPUT);
 	//digitalWrite(12, LOW);
 	strip.begin();
