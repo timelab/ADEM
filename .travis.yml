@@ -9,7 +9,7 @@ before_install:
   - sudo ln -s /usr/local/share/arduino/arduino /usr/local/bin/arduino
 install:
   - ln -sf $PWD/adem/libraries/* /usr/local/share/arduino/libraries/
-  - arduino --install-library "ESP8226,ESP8226Wifi"
+  - arduino --install-library "ESP8266,ESP8266Wifi"
   - arduino --install-library "Adafruit_NeoPixel,TinyGPSPlus"
 script:
   - arduino --verify --board esp8226:esp8226:uno $PWD/adem/adem.ino
