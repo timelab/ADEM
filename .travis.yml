@@ -11,8 +11,7 @@ install:
   - rm -rf hardware/
   - mkdir -p ~/.arduino15/
   - cp -av .travis_arduino_preferences.txt ~/.arduino15/preferences.txt
-  - ln -sf $PWD/adem/libraries/* /usr/local/share/arduino/libraries/
+  - ln -sf $PWD/libraries/* /usr/local/share/arduino/libraries/
   - arduino --install-boards "esp8266:esp8266"
 script:
-  - arduino --verify --board esp8266:esp8266:thing $PWD/people/kavers1/MyAdem/MyAdem.ino
   - arduino --verify --board esp8266:esp8266:thing $PWD/adem/adem.ino
