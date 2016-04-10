@@ -1,13 +1,12 @@
 = Hardware
 
-The project uses the SparkFun Thing. This ESP8266 based WiFi controller development board runs the A.D.E.M. firmware and conveniently hosts a LiPo battery management system that is key in the mobility aspect of this project. Apart from the headers for the SparkFun Thing, the project's printed circuit board has room for a GPS module, temperature and pressure sensors and connections to external parts like the PPD40NS dust sensor.
+The project uses the SparkFun ESP8266 Thing.
+
+This ESP8266 based WiFi controller development board runs the ADEM firmware and conveniently hosts a LiPo battery management system that is key in the mobility aspect of this project. Apart from the headers for the SparkFun Thing, the project's printed circuit board has room for a GPS module, temperature and pressure sensors and connections to external parts like the PPD40NS dust sensor.
 
 == Bill Of Materials
 
-An updated list of components is available from Google Drive at the link below
-https://drive.google.com/drive/folders/0B5B2OKuFeGQfT0p0bUllNUdlb0k[]
-
-Current selection of components for the first design. We have chosen the SparkFun board because it includes both the ESP8266 and battery management. Listed prices are individual prices, not volume prices.
+Listed prices are individual prices, not volume prices.
 
 === Mandatory components
 [options="header"]
@@ -23,7 +22,7 @@ https://learn.sparkfun.com/tutorials/esp8266-thing-hookup-guide/all[tutorial]
 http://sca-shinyei.com/pdf/PPD42NS.pdf[datasheet]
 http://www.howmuchsnow.com/arduino/airquality/grovedust/[tutorial]
 
-| GPS                       | GY-NEO6MV2                | (11.66€ banggood) |
+| GPS                       | XM37-1612 / GY-NEO6MV2    | (11.66€ banggood) |
 https://www.iprototype.nl/docs/gps-LS20031-datasheet-gyneo6mv2.pdf[datasheet]
 
 | Battery                   |                           |                   |
@@ -45,7 +44,7 @@ http://playground.arduino.cc/Main/MPU-6050[arduino]
 | Barometer                 | BMP180                    | (2.04 € banggood) |
 https://www.adafruit.com/datasheets/BST-BMP180-DS000-09.pdf[datasheet]
 
-| Bluethooth                | HC05                      | (4.91€ banggood)  |
+| Bluethooth                | HC05 / BC417              | (4.91€ banggood)  |
 https://www.olimex.com/Products/Components/RF/BLUETOOTH-SERIAL-HC-06/resources/hc06.pdf[datasheet]
 
 | Buzzer                    | KY-006                    | (1.44€ banggood)  |
