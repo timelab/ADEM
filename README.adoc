@@ -12,4 +12,5 @@ This git repository hosts the hardware designs, firmware and technical documenta
 More information related to this project is available from the project's wiki at: http://wiki.timelab.org/wiki/A.D.E.M[]
 
 We welcome feedback and contributions.
+
 image::http://ik-adem.be/wp-content/themes/adem/assets/images/adem_logo.svg[alt="ADEM logo", link="http://ik-adem.be/", align="right", float]
