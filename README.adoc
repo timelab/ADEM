@@ -2,7 +2,6 @@
 = Timelab ADEM project
 
 image::https://travis-ci.org/rear/rear.svg?branch=master[alt="Build Status", link="https://travis-ci.org/timelab/ADEM", align="left", float]
-image::http://ik-adem.be/wp-content/themes/adem/assets/images/adem_logo.svg[alt="ADEM logo", link="http://ik-adem.be/", align="right", float]
 
 The http://www.timelab.org/[Timelab] ADEM project enables cyclists to measure particulate matter (PM~10~ and PM~25~). The quality based on these measurements are displayed on the device, temporarily stored and sent via WiFi to a central data collection service.
 
@@ -13,3 +12,4 @@ This git repository hosts the hardware designs, firmware and technical documenta
 More information related to this project is available from the project's wiki at: http://wiki.timelab.org/wiki/A.D.E.M[]
 
 We welcome feedback and contributions.
+image::http://ik-adem.be/wp-content/themes/adem/assets/images/adem_logo.svg[alt="ADEM logo", link="http://ik-adem.be/", align="right", float]
