@@ -1,8 +1,38 @@
-= ESP8266 pin assignments
+= Prototype design
 
-== Breadboard prototype Dag
+== Serial baudrate
+
+- For the UART0 serial output, we use the default boot mode baudrate of *74880*.
+  This helps to use a single setup for debugging boot mode and firmware.
+- For the SoftwareSerial interface to the GPS module, we use the default baudrate of *9600*.
+  (Up for debate)
+
+
+== Pin assignments
 
 Below pins are based on the SparkFun ESP8266 Thing.
+
+NOTE: TODO: Add a frizzing schema of the prototype design (Dag)
+
+
+=== Summary
+
+- Pin D0: NeoPixel LED
+- Pin D4: GPS TX
+- Pin D5: (Onboard LED) -> Free
+- Pin D12: PPD42 +PM10_SENSOR+
+- Pin D13: PPD42 +PM25_SENSOR+
+- Pin D16: (Deep Sleep) -> Usable ?
+- Pin A0: PPD42 +A_SENSOR+
+
+
+=== Unasigned
+
+- Buzzer
+- GPS RX
+
+
+=== Detailed ESP8266
 
 .ESP8266 I²C Header
 [options="header"]
@@ -10,17 +40,17 @@ Below pins are based on the SparkFun ESP8266 Thing.
 | Pin Name  | Description                             | Assignment
 | GND       | Ground (0V)                             | ->GND line
 | 3V3       | 3.3V                                    | ->3V3 line
-| SDA (D2)  | I²C SDA (UART2 out: +Serial1+)          | ->SDA bus
+| SDA (D2)  | I²C SDA (UART1 out: +Serial1+)          | ->SDA bus
 | SCL (D14) | I²C SCL                                 | ->SCL bus
 |==============================================================================
 
-.ESP8266 UART1 Header
+.ESP8266 UART0 Header
 [options="header"]
 |==============================================================================
 | Pin Name  | Description                             | Assignment
-| DTR       | Data Ready (Auto Reset / D0 Buffer)     |
-| TXO (D7)  | UART transmit (+Serial+)                | ->UART1 out
-| RXI (D8)  | UART receive (+Serial+)                 | ->UART1 in
+| DTR (D0b) | Data Ready (Auto Reset / D0 Buffer)     |
+| TXO (D7)  | UART transmit (+Serial+)                | ->UART0 out
+| RXI (D8)  | UART receive (+Serial+)                 | ->UART0 in
 | 3V3       | (Not Connected)                         |
 | NC        | (Not Connected)                         |
 | GND       | Ground (0V)                             | ->UART GND
@@ -32,7 +62,7 @@ Below pins are based on the SparkFun ESP8266 Thing.
 | Pin Name  | Description                             | Assignment
 | GND       | Ground (0V)                             |
 | VIN       | USB 4.5V or LiPo 3.7V                   |
-| 5 (D5)    | On-board LED ->Free                     |
+| 5 (D5)    | On-board LED                            |
 | 0 (D0)    |                                         | ->NeoPixel
 | 4 (D4)    |                                         | ->GPS TX
 | 13 (D13)  |                                         | ->PPD42 +PM25_SENSOR+
@@ -42,13 +72,8 @@ Below pins are based on the SparkFun ESP8266 Thing.
 | EN        | Enable PIN                              |
 |==============================================================================
 
-.Unassigned
- - BT_RX
- - BT_TX
- - INT
- - BUZZ
 
-== Components
+=== Detailed Components
 
 .PPD42NS (Fine dust meter)
 [options="header"]
@@ -113,4 +138,13 @@ Below pins are based on the SparkFun ESP8266 Thing.
 | GND       |                                         | ->GND line
 | VCC       |                                         | ->3V3 line
 |==============================================================================
+
+
+=== Constraints
+
+During testing we discovered some constraints to used pins.
+
+NOTE: TODO: Describe the known issues here ? (Lieven)
+
+image::http://ik-adem.be/wp-content/themes/adem/assets/images/adem_logo.svg[alt="ADEM logo", link="http://ik-adem.be/", align="right"]
 
