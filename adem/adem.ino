@@ -8,8 +8,8 @@
 #define NEOPIXEL_PIN 5
 #define I2C_SDA_PIN 2
 #define I2C_SCL_PIN 14
-#define SERIAL_RX_PIN 0
-#define SERIAL_TX_PIN 4
+#define SERIAL_RX_PIN 8
+#define SERIAL_TX_PIN 7
 
 #define SERIAL_BAUD 74880
 
