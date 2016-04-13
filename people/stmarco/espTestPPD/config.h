@@ -1,6 +1,5 @@
 #define WIFISSID "timelab-wifi"
 #define WIFIPW "timelab09"
 #define THINGADDR "api.thingspeak.com"
-#define STIJNADDR "146.185.141.84"
 #define DEBUGADDR "192.168.88.133"
-#define THINGKEY "GHE6KHAWBU6BDFLU"
+#define THINGKEY "xxxxxxxxxxxxxxx"
