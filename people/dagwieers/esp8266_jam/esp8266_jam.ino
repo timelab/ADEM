@@ -3,7 +3,7 @@
 
 #include <Adafruit_NeoPixel.h>
 #include <ESP8266WiFi.h>
-#include <Ppd42.h>
+#include <particulate_PPD42.h>
 #include <TinyGPS++.h>
 
 #ifdef DEBUGSERIAL
@@ -17,11 +17,11 @@
 #define WIFI_SSID "timelab-wifi"
 #define WIFI_WPA2 "timelab09"
 
-#define NEOPIXEL_PIN 0
-#define I2C_SDA_PIN 4
+#define NEOPIXEL_PIN 5
+#define I2C_SDA_PIN 2
 #define I2C_SCL_PIN 14
-#define GPS_RX_PIN 8                    // to GPS module RX pin. Does not work on GPIO 16 (XPD).
-#define GPS_TX_PIN SW_SERIAL_UNUSED_PIN // we send no data to the GPS module
+#define GPS_RX_PIN 0                    // to GPS module RX pin. Does not work on GPIO 16 (XPD).
+#define GPS_TX_PIN 4                    // we send no data to the GPS module
 #define SERIAL_RX_PIN 8
 #define SERIAL_TX_PIN 7
 
@@ -39,7 +39,7 @@
 
 // Neopixel needs to be outside of setup()
 Adafruit_NeoPixel neopixel = Adafruit_NeoPixel(1, NEOPIXEL_PIN, NEO_GRB + NEO_KHZ800);
-Ppd42 Ppd42Sensor;
+PPD42Sensor particulate;
 #ifdef DEBUGSERIAL
 SoftwareSerial gps_Serial(GPS_RX_PIN, GPS_TX_PIN);
 #endif
@@ -97,7 +97,7 @@ void setup() {
 */
 
   __LOG("Initializing PPD42...");
-  Ppd42Sensor.begin();
+  particulate.begin();
   __LOGLN(" done");
 
 /*
@@ -194,8 +194,8 @@ void loop() {
 
   delay(20);
 
-  unsigned long PM10 = Ppd42Sensor.readPM10Ppm();
-  unsigned long PM25 = Ppd42Sensor.readPM25Ppm();
+  unsigned long PM10 = particulate.readPM10Ppm();
+  unsigned long PM25 = particulate.readPM25Ppm();
 
   if (PM10 > 0 || PM25 > 0) {
     if (PM10 > 0) {

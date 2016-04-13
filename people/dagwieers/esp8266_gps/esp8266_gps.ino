@@ -17,7 +17,7 @@
 /*************************************************/
 
 #include <Adafruit_NeoPixel.h>
-#include <Ppd42.h>
+#include <particulate_PPD42.h>
 #include <SoftwareSerial.h>
 #include <TinyGPS++.h>
 
@@ -37,9 +37,9 @@
 #define GPS_BAUD 9600
 
 int esp_ChipId = 0;
-// Adafruit_NeoPixel pixels = Adafruit_NeoPixel(1, NEOPIXEL_PIN, NEO_GRB + NEO_KHZ800);
+Adafruit_NeoPixel pixels = Adafruit_NeoPixel(1, NEOPIXEL_PIN, NEO_GRB + NEO_KHZ800);
 
-Ppd42 Ppd42Sensor;
+PPD42Sensor particulate;
 SoftwareSerial gps_Serial(GPS_RX_PIN, GPS_TX_PIN);
 TinyGPSPlus gps;
 
@@ -51,8 +51,6 @@ void setup() {
 
   pixels.begin();
   pixels.setBrightness(64);
-  pixel.
-  NEOblue();
   
   // We can use the LED on the SparkFun board for debugging
   // and turn it on during setup and when we store the sampled data
@@ -67,7 +65,7 @@ void setup() {
   Serial.println("Initializing serial communication... done");
 
   Serial.print("Initializing PPD42...");
-  Ppd42Sensor.begin();
+  particulate.begin();
   Serial.println(" done");
   
   // initialization of GPS serial
@@ -113,8 +111,8 @@ void loop() {
       Serial.println("Satellites: " + String(gps.satellites.value()));
     }
 
-    unsigned long PM10 = Ppd42Sensor.readPM10Ppm();
-    unsigned long PM25 = Ppd42Sensor.readPM25Ppm();
+    unsigned long PM10 = particulate.readPM10Ppm();
+    unsigned long PM25 = particulate.readPM25Ppm();
         
     Serial.print("PM10 ppm: ");
     Serial.println(PM10);
