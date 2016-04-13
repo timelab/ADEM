@@ -12,16 +12,18 @@
 
 Below pins are based on the SparkFun ESP8266 Thing.
 
-NOTE: TODO: Add a frizzing schema of the prototype design (Dag)
+NOTE: TODO: Add a fritzing schema of the prototype design (Dag)
 
 
 === Summary
 
-- Pin D0: NeoPixel LED
+- Pin D0: GPS RX
+- Pin D2: I2C SDA
 - Pin D4: GPS TX
-- Pin D5: (Onboard LED) -> Free
+- Pin D5: NeoPixel (Onboard LED)
 - Pin D12: PPD42 +PM10_SENSOR+
 - Pin D13: PPD42 +PM25_SENSOR+
+- Pin D14: I2C SCL
 - Pin D16: (Deep Sleep) -> Usable ?
 - Pin A0: PPD42 +A_SENSOR+
 
