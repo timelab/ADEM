@@ -83,7 +83,7 @@ In order to build project code, you need to ensure that Arduino can find the lib
 
 On Linux you can do this with the following command:
 
-   $ ln -sf libraries/* ~/Arduino/libraries/
+   $ ln -sf "$PWD/libraries/"* ~/Arduino/libraries/
 
 
 === External libraries
@@ -112,3 +112,5 @@ TinyGPS++::
   - Version: 0.94b
   - License: LGPL v2.1
   - URL: https://github.com/mikalhart/TinyGPSPlus
+
+image::http://ik-adem.be/wp-content/themes/adem/assets/images/adem_logo.svg[alt="ADEM logo", link="http://ik-adem.be/", align="right"]
