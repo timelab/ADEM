@@ -4,13 +4,13 @@
 
 
 #include <Adafruit_NeoPixel.h>
-#include <Ppd42.h>
 #include <Wire.h>
 #include <Sensor.h>
 #include <ArduinoJson.h>
 #include <TickerSchedlr.h>
-#include <BMP085Sensor.h>
-#include <HTU21DFSensor.h>
+#include <barometer_BMP085.h>
+#include <humidity_HTU21D.h>
+#include <particulate_PPD42.h>
 
 TickerSchedlr *schedule = 0; //TickerSchedlr::Instance(200);
 
