@@ -1,12 +1,13 @@
 = Getting started with ADEM
 
+
 == Project information
 
-Project website::
+Project website (in Dutch)::
     http://ik-adem.be/
 
-Wiki website::
-    http://wiki.timelab.org/wiki/A.D.E.M (a lot of information, some outdated)
+Wiki website (in Dutch)::
+    http://wiki.timelab.org/wiki/A.D.E.M
 
 Project contact::
 
@@ -17,6 +18,7 @@ Brusselsepoortstraat 97
 Telephone: +32 9 391 96 10
 Email: ja@ik-adem.be
 ....
+
 
 == Technical information
 
