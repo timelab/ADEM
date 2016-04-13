@@ -1,22 +1,22 @@
-#include <Adafruit_NeoPixel.h>
-#include <Ppd42.h>
 #include <TickerSchedlr.h>
-#include <BMP085Sensor.h>
-#include <HTU21DFSensor.h>
-//#include <GPSSensor.h>
+#include <Adafruit_NeoPixel.h>
+#include <particulate_PPD42.h>
+#include <barometer_BMP085.h>
+#include <humidity_HTU21D.h>
+//#include <gps_SoftwareSerial.h>
 
-#define NEOPIXEL_PIN 0
+#define NEOPIXEL_PIN 5
 #define I2C_SDA_PIN 2
 #define I2C_SCL_PIN 14
-#define SERIAL_RX_PIN 8
-#define SERIAL_TX_PIN 7
+#define SERIAL_RX_PIN 0
+#define SERIAL_TX_PIN 4
 
 #define SERIAL_BAUD 74880
 
-BMP085Sensor druksensor;
-HTU21DFSensor vochtsensor;
+BMP085Sensor barometer;
+HTU21DFSensor humidity;
 Adafruit_NeoPixel neopixel = Adafruit_NeoPixel(1, NEOPIXEL_PIN, NEO_GRB + NEO_KHZ800);
-Ppd42 Ppd42Sensor;
+PPD42Sensor particulate;
 TickerSchedlr *schedule = 0; //TickerSchedlr::Instance(200);
 
 int count = 0;
@@ -37,9 +37,9 @@ void flip(void *)
   __LOG(" :flip1: ");
   __LOGLN(state);
   ++count;
-  Serial.println(vochtsensor.report());
-  Serial.println(druksensor.report());
-  Serial.println(Ppd42Sensor.report());
+  Serial.println(humidity.report());
+  Serial.println(barometer.report());
+  Serial.println(particulate.report());
 }
 
 void flip2(void *ptr)
@@ -66,16 +66,16 @@ void flip3(void *)
   __LOG("last "); __LOG(T3->getLastTime()); __LOG(" next ");    __LOG(T3->getNextTime()); __LOG("  period "); __LOGLN(T3->getNextTime() - T3->getLastTime());
   ++count3;
 
-  vochtsensor.read();
-  druksensor.read();
-  Ppd42Sensor.read();
+  barometer.read();
+  humidity.read();
+  particulate.read();
 }
 
 void setup() {
   Serial.begin(SERIAL_BAUD);
   Serial.println("Setup started.");
   Serial.println("Serial communication initialized...");
-  
+
   neopixel.begin();
   neopixel.setBrightness(63);
   neopixel.setPixelColor(0, 63, 0, 63);
@@ -86,7 +86,7 @@ void setup() {
 //  Serial.println("GPS initialized...");
 
   Serial.print("Initializing PPD42...");
-  Ppd42Sensor.begin();
+  particulate.begin();
   Serial.println(" done");
 
   pinMode(pin2, OUTPUT);
@@ -116,13 +116,13 @@ void setup() {
 
   __LOGLN("schedule added");
   Serial.println("Tasks created...");
-  
-  vochtsensor.begin();
+
+  humidity.begin();
   Serial.println("Humidity sensor initialized...");
-  
-  druksensor.begin();
-  Serial.println("Pressure sensor initialized...");
-  
+
+  barometer.begin();
+  Serial.println("Barometer sensor initialized...");
+
   Serial.println("Setup finished.");
 }
 

@@ -2,7 +2,7 @@
 // 
 // 
 
-#include "HTU21DFSensor.h"
+#include "humidity_HTU21D.h"
 
 /***************************************************
 This is a library for the HTU21DF Humidity & Temp Sensor

@@ -7,25 +7,25 @@
 */
 
 #include <Arduino.h>
-#include <Ppd42.h>
+#include <particulate_PPD42.h>
 
 /*
 	instantiate and initialize the static variables that are used in 
 	the static interrupt functions that handle the hardware interrupts 
 	triggered by the PPD42 dust sensor
 */
-int Ppd42::_PPD_PM10_PIN = 12;
-int Ppd42::_PPD_PM25_PIN = 13;
-volatile unsigned long Ppd42::_triggerStartMicrosPM10 = 0;
-volatile unsigned long Ppd42::_triggerStartMicrosPM25 = 0;
-volatile unsigned long Ppd42::_triggeredTotalMicrosPM25 = 0;
-volatile unsigned long Ppd42::_triggeredTotalMicrosPM10 = 0;
+int PPD42Sensor::_PPD_PM10_PIN = 12;
+int PPD42Sensor::_PPD_PM25_PIN = 13;
+volatile unsigned long PPD42Sensor::_triggerStartMicrosPM10 = 0;
+volatile unsigned long PPD42Sensor::_triggerStartMicrosPM25 = 0;
+volatile unsigned long PPD42Sensor::_triggeredTotalMicrosPM25 = 0;
+volatile unsigned long PPD42Sensor::_triggeredTotalMicrosPM10 = 0;
 
-Ppd42::Ppd42(){
+PPD42Sensor::PPD42Sensor(){
 
 }
 
-void Ppd42::begin() {
+void PPD42Sensor::begin() {
 	// initialization for the dust sensor
 	_readMillisPM10 = millis(); //Fetch the current time
 	_readMillisPM25 = millis(); //Fetch the current time
@@ -41,17 +41,17 @@ void Ppd42::begin() {
 	attachInterrupt(digitalPinToInterrupt(_PPD_PM25_PIN), _handleInterruptPM25, CHANGE);
 }
 
-void Ppd42::end() {
+void PPD42Sensor::end() {
 	_activated = true;
 	// detach the interrupts
 	detachInterrupt(_PPD_PM10_PIN);
 	detachInterrupt(_PPD_PM25_PIN);	
 }
 
-void Ppd42::read() {
+void PPD42Sensor::read() {
 }
 
-unsigned long Ppd42::readPM10Ppm() {
+unsigned long PPD42Sensor::readPM10Ppm() {
 	if (_activated) {
 		unsigned long _currentMillis=millis(); 
 		unsigned long _sampledMillis = _currentMillis - _readMillisPM10;
@@ -64,7 +64,7 @@ unsigned long Ppd42::readPM10Ppm() {
 		return 0;
 }
 
-unsigned long Ppd42::readPM25Ppm() {
+unsigned long PPD42Sensor::readPM25Ppm() {
 	if (_activated) {
 		unsigned long _currentMillis=millis(); 
 		unsigned long _sampledMillis = _currentMillis - _readMillisPM25;
@@ -77,13 +77,13 @@ unsigned long Ppd42::readPM25Ppm() {
 		return 0;
 }
 
-void Ppd42::write() {
+void PPD42Sensor::write() {
 }
 
-void Ppd42::interrupt() {
+void PPD42Sensor::interrupt() {
 }
 
-void Ppd42::_handleInterruptPM10() {
+void PPD42Sensor::_handleInterruptPM10() {
 	if (digitalRead(_PPD_PM10_PIN) == LOW)
 		// the sensor pulls the pin low to trigger
 		_triggerStartMicrosPM10 = micros();
@@ -91,7 +91,7 @@ void Ppd42::_handleInterruptPM10() {
 		_triggeredTotalMicrosPM10 += (micros() - _triggerStartMicrosPM10);
 }
 
-void Ppd42::_handleInterruptPM25() {
+void PPD42Sensor::_handleInterruptPM25() {
 	if (digitalRead(_PPD_PM25_PIN) == LOW)
 		// the sensor pulls the pin low to trigger
 		_triggerStartMicrosPM25 = micros();
@@ -99,10 +99,10 @@ void Ppd42::_handleInterruptPM25() {
 		_triggeredTotalMicrosPM25 += (micros() - _triggerStartMicrosPM25);
 }
 
-void Ppd42::process() {
+void PPD42Sensor::process() {
 }
 
-String Ppd42::report()  {
+String PPD42Sensor::report()  {
     StaticJsonBuffer<200> jsonBuffer;
     JsonObject& root = jsonBuffer.createObject();
     char response[200];

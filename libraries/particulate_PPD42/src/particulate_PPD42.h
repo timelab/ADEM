@@ -25,7 +25,7 @@
 #include "WProgram.h"
 #endif
 
-class Ppd42 : public Sensor {
+class PPD42Sensor : public Sensor {
   public:
     void begin();
     void end();
@@ -33,7 +33,7 @@ class Ppd42 : public Sensor {
     void write();
     static void interrupt(); // interrupt functions must be static
     void process();
-    Ppd42();
+    PPD42Sensor();
     String report(); // should report a JSON string
 
     unsigned long readPM10Ppm(); // returns the time (in ppm) the sensor triggered

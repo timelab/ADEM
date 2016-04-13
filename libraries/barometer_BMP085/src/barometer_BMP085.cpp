@@ -2,7 +2,7 @@
 // 
 // 
 
-#include "BMP085Sensor.h"
+#include "barometer_BMP085.h"
 /*
 BMP085Sensor.cpp - Skeleton library for ADEM sensors.
 Created by Lieven Blancke, Koen Verstringe.

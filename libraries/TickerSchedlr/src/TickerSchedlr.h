@@ -51,7 +51,7 @@
 #define __LOG(msg) (Serial.print(msg))
 #define __LOGLN(msg) (Serial.println(msg))
 #else
-#define __LOG(msg) 
+#define __LOG(msg)
 #define __LOGLN(msg)
 #endif
 
