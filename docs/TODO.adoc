@@ -54,3 +54,5 @@ completed and still on-going.
 5. What are the essential tasks for an alpha release ?
 6. What are the essential tasks for a beta release ?
 7. Can we already define the (JSON) interface to the back-end service ?
+
+image::http://ik-adem.be/wp-content/themes/adem/assets/images/adem_logo.svg[alt="ADEM logo", link="http://ik-adem.be/", align="right"]
