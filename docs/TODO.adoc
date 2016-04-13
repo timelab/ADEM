@@ -14,45 +14,43 @@ completed and still on-going.
 
 
 == Firmware status
-
 [options="header", width="100%"]
 |============================================================================================
 | Task                                               | Status                | Owner
 | Testing individual sensors                         | Completed ?           | Koen
 | Sensor libraries                                   |                       |
-| - GPS                                              |                       |
+| - Scheduler                                        | Completed             | Koen
+| - GPS library                                      | TBD                   | Dag
 | - Dust meter (PPD42)                               | Finished              | Lieven
 | - Temperature / Humidity (HTU21D)                  | Finished              | Koen
 | - Barometer (BMP180)                               | Finished              | Koen
-| - NeoPixel                                         |                       |
-| - Bluetooth                                        |                       |
-| - Buzzer                                           |                       |
-| - Scheduler                                        | Completed             | Koen
-| Code integration                                   | TBD                   |
+| - Accelerometer (MPU6050)                          | TBD                   | Koen
+| - NeoPixel                                         | TBD                   | Stijn
+| - Buzzer                                           | Optional              |
+| Code integration                                   | Ongoing               |
 | WIFI configuration                                 | Ongoing               | Marco ?
-| Data buffering                                     | TBD                   |
-| Filesystem                                         | TBD                   |
-| OTA Firmware updating                              | TBD                   |
+| Data buffering                                     | TBD (beta)            |
+| Filesystem                                         | TBD (beta)            |
+| OTA Firmware updating                              | TBD (beta)            |
 | Documentation                                      | Always evolving       | Dag
 |============================================================================================
 
 
-== Backend status
+== Documentation status
+[options="header", width="100%"]
+|============================================================================================
+| Add prototype fritzing design                      | TBD                   | Dag
+| Document pseudo-code                               | TBD                   | Dag
+| Create state diagram and conditions                | TBD                   | Dag
+| Add technical questions and answers                | TBD                   |
+|============================================================================================
 
+
+== Backend status
 [options="header", width="100%"]
 |============================================================================================
 | Task                                               | Status                | Owner
 | Architecture                                       | TBD                   |
 |============================================================================================
-
-
-== Open questions
-1. At what frequency do we measure ?
-2. Will we use the physical on/off switch of the ESP8266 Thing ?
-3. How will the temperature, humidity and pressure sensors get outside information ?
-4. Can we still make changes to the PCB design ?
-5. What are the essential tasks for an alpha release ?
-6. What are the essential tasks for a beta release ?
-7. Can we already define the (JSON) interface to the back-end service ?
 
 image::http://ik-adem.be/wp-content/themes/adem/assets/images/adem_logo.svg[alt="ADEM logo", link="http://ik-adem.be/", align="right"]

@@ -28,6 +28,9 @@ https://www.adafruit.com/datasheets/BST-BMP180-DS000-09.pdf[datasheet]
 | Battery                   |                           |                   |
 EACHINE 3.7V 500mAh 25C
 
+| Buzzer                    | KY-006                    | (1.44€ banggood)  |
+Xinda
+
 | Fine Dust Meter           | PPD42                     |                   |
 http://sca-shinyei.com/pdf/PPD42NS.pdf[datasheet]
 http://www.howmuchsnow.com/arduino/airquality/grovedust/[tutorial]
@@ -49,9 +52,6 @@ High Density Neopixel 8x LED
 | Function                  | Component / Chip          | Price indication  | Datasheet / Tutorial / Info
 | Bluethooth                | HC05 / BC417              | (4.91€ banggood)  |
 https://www.olimex.com/Products/Components/RF/BLUETOOTH-SERIAL-HC-06/resources/hc06.pdf[datasheet]
-
-| Buzzer                    | KY-006                    | (1.44€ banggood)  |
-Xinda
 
 | Memory I2C                | AT24C512C                 | (0.8€ digikey)    |
 http://www.atmel.com/devices/AT24C512C.aspx[link]

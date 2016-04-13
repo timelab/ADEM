@@ -1,0 +1,66 @@
+= Questions and Answers
+
+* At what frequency do we measure ?
+
+[options="header", width="100%"]
+|============================================================================================
+| Information                                        | Sensor                | Frequency
+| Movement (?)                                       | Accelerometer         | 1 sec
+| Harlem shake (?)                                   | Accelerometer         | 1 sec
+| Time                                               | GPS                   | 1 sec
+| Location (longitude/lattitude)                     | GPS                   | 1 sec
+| Particulate matter PM10                            | Particulate           | 30 secs
+| Particulate matter PM24                            | Particulate           | 20 secs
+| Humidity                                           | Humidity              | 1 min
+| Temperature                                        | Humidity              | 1 min
+| Pressure                                           | Barometer             | 1 min
+| Temperature                                        | Barometer             | 1 min
+|============================================================================================
+| Altitude                                           | GPS                   | 1 sec
+| Speed                                              | GPS                   | 1 sec
+|============================================================================================
+
+
+* Will we use the physical on/off switch of the ESP8266 Thing ?
+
+This is unclear yet. We might add this, but it will not be part of the Minimal Viable Product.
+
+
+* How will the temperature, humidity and pressure sensors get outside information ?
+
+The casing cannot be completely sealed to get usable humidity and pressure readings. However, we would like to have a water-resistant device to avoid internal condensation and/or rust. It definitely has to sustain all weather conditions.
+
+
+* Can we still make changes to the PCB design ?
+
+At the moment changes to the PCB design are possible. Once we order the first badge of PCB printers, we have to be careful in making new changes.
+
+
+* What are the essential parts for a release ?
+
+The Minimal Viable Product would consist of the following sensors and compontents:
+
+ - Accelerometer sensor
+ - GPS
+ - Humidity sensor
+ - Barometer sensor
+ - Particulate matter sensor
+
+In future revisions (betas) we expect the following additional components:
+
+ - I2C memory
+ - Battery
+ - Buzzer
+ - Bluetooth (unlikely, WIFI and serial should be sufficient)
+ - Casing
+
+
+* Is the JSON interface to the back-end service already defined ?
+
+Not in detail.
+
+We already established that sensor-records will be stored in memory in binary form in a ring-buffer. When the device is not moving, a WIFI fix is obtained and records are being uploaded (and buffer emptied). These records will store sensor id information, timing and sensor data. Since the GPS frequency is intermitted with sensor data the records can be properly timestamped.
+
+This ensures efficient use of scarce memory, while retaining detailed information to the back-end.
+
+image::http://ik-adem.be/wp-content/themes/adem/assets/images/adem_logo.svg[alt="ADEM logo", link="http://ik-adem.be/", align="right"]
