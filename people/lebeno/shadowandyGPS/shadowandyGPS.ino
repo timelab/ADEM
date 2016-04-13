@@ -16,7 +16,7 @@
 /*   https://github.com/plerup/espsoftwareserial */
 /*************************************************/
 
-#include <ESP8266WiFi.h>                 
+#include <ESP8266WiFi.h>
 #include <TinyGPS++.h>
 #include "config.h"
 #include <SoftwareSerial.h>
@@ -30,6 +30,7 @@ bool LED_TOGGLE = false;
 #define GPS_TX_PIN SW_SERIAL_UNUSED_PIN // we send no data to the GPS module
 #define GPS_BAUD 9600
 //#define GPS_BAUD 115200
+#define SERIAL_BAUD 74880
 
 // create a config.h file in the same folder with the following contents,
 // and fill in your WiFi and thingspeak credentials.
@@ -122,7 +123,7 @@ void setup() {
   // initialization for debug output
   delay(5000); // don't open serial yet, this makes reprogramming more likely to be successfull
   LEDoff();delay(500);LEDon();delay(500);LEDoff();delay(500);LEDon();delay(500);LEDoff();delay(500);LEDon();
-  Serial.begin(9600);
+  Serial.begin(SERIAL_BAUD);
   DebugPrint("\r\nStartup", true);
   
   // initialization of GPS serial
