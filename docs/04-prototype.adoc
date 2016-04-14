@@ -4,15 +4,19 @@
 
 - For the UART0 serial output, we use the default boot mode baudrate of *74880*.
   This helps to use a single setup for debugging boot mode and firmware.
+
 - For the SoftwareSerial interface to the GPS module, we use the default baudrate of *9600*.
   (Up for debate)
+
+NOTE: For uploading new firmware, the baudrate can go up to 460800. The baudrate can be selected from the Arduino IDE (Sketch).
 
 
 == Pin assignments
 
 Below pins are based on the SparkFun ESP8266 Thing.
 
-NOTE: TODO: Add a fritzing schema of the prototype design (Dag)
+.Unfinished Fritzing diagram
+image::https://drive.google.com/file/d/0B5B2OKuFeGQfWjY5S21PNXlLc1k/view?usp=sharing[alt="Fritzing diagram", link="https://drive.google.com/file/d/0B5B2OKuFeGQfUVlVLWI4eS1ITm8/view?usp=sharing"]
 
 
 === Summary
