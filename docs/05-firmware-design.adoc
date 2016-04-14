@@ -2,7 +2,7 @@
 
 == Diagram
 
-image::https://github.com/timelab/ADEM/blob/master/code-diagram.svg[alt="Code Diagram", link="https://github.com/timelab/ADEM/", align="center"]
+image::https://github.com/timelab/ADEM/blob/master/docs/code-diagram.svg[alt="Code Diagram", link="https://github.com/timelab/ADEM/", align="center"]
 
 
 == States
