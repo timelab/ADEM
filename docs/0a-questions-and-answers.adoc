@@ -1,6 +1,6 @@
 = Questions and Answers
 
-* At what frequency do we measure ?
+== Q: At what frequency will we measure ?
 
 [options="header", width="100%"]
 |============================================================================================
@@ -21,22 +21,22 @@
 |============================================================================================
 
 
-* Will we use the physical on/off switch of the ESP8266 Thing ?
+== Q: Will we use the physical on/off switch of the ESP8266 Thing ?
 
 This is unclear yet. We might add this, but it will not be part of the Minimal Viable Product.
 
 
-* How will the temperature, humidity and pressure sensors get outside information ?
+== Q: How will the temperature, humidity and pressure sensors get outside information ?
 
 The casing cannot be completely sealed to get usable humidity and pressure readings. However, we would like to have a water-resistant device to avoid internal condensation and/or rust. It definitely has to sustain all weather conditions.
 
 
-* Can we still make changes to the PCB design ?
+== Q: Can we still make changes to the PCB design ?
 
 At the moment changes to the PCB design are possible. Once we order the first badge of PCB printers, we have to be careful in making new changes.
 
 
-* What are the essential parts for a release ?
+== Q: What are the essential parts for a release ?
 
 The Minimal Viable Product would consist of the following sensors and compontents:
 
@@ -55,7 +55,7 @@ In future revisions (betas) we expect the following additional components:
  - Casing
 
 
-* Is the JSON interface to the back-end service already defined ?
+== Q: Is the JSON interface to the back-end service already defined ?
 
 Not in detail.
 
