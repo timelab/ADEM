@@ -11,7 +11,7 @@ Listed prices are individual prices, not volume prices.
 === Mandatory components
 [options="header"]
 |=================================================================================================================
-| Function                  | Component / Chip          | Price indication  | Datasheet / Tutorial / Info
+| Function                  | Component / Chip          | Price indication  | Datasheet / Tutorial / Info / Example
 
 | Microcontroller           | SparkFun ESP8266 Thing    | (15.95€ sparkfun) |
 https://cdn.sparkfun.com/datasheets/Wireless/WiFi/ESP8266ThingV1.pdf[datasheet]
@@ -29,7 +29,11 @@ https://www.adafruit.com/datasheets/BST-BMP180-DS000-09.pdf[datasheet]
 EACHINE 3.7V 500mAh 25C
 
 | Buzzer                    | KY-006                    | (1.44€ banggood)  |
-Xinda
+Xinda active (?) buzzer
+https://tkkrlab.nl/wiki/Arduino_KY-006_Small_passive_buzzer_module[info]
+http://learn.linksprite.com/arduino/sensors-kit-for-arduino/ky006-buzzer-module/[tutorial]
+https://s3.amazonaws.com/linksprite/Arduino_kits/advanced_sensors_kit/KY006+code.pdf[example]
+
 
 | Fine Dust Meter           | PPD42                     |                   |
 http://sca-shinyei.com/pdf/PPD42NS.pdf[datasheet]
