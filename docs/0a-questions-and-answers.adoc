@@ -15,9 +15,8 @@
 | Temperature                                        | Humidity              | 1 min
 | Pressure                                           | Barometer             | 1 min
 | Temperature                                        | Barometer             | 1 min
-|============================================================================================
-| Altitude                                           | GPS                   | 1 sec
-| Speed                                              | GPS                   | 1 sec
+| Altitude (optional)                                | GPS                   | 1 sec
+| Speed (optional)                                   | GPS                   | 1 sec
 |============================================================================================
 
 
@@ -28,7 +27,7 @@ This is unclear yet. We might add this, but it will not be part of the Minimal V
 
 == Q: How will the temperature, humidity and pressure sensors get outside information ?
 
-The casing cannot be completely sealed to get usable humidity and pressure readings. However, we would like to have a water-resistant device to avoid internal condensation and/or rust. It definitely has to sustain all weather conditions.
+The casing cannot be completely sealed to get usable humidity and pressure readings. However, we would like to have a water-resistant device to avoid internal condensation and/or rust. It definitely has to sustain all weather conditions. *TBD*
 
 
 == Q: Can we still make changes to the PCB design ?
