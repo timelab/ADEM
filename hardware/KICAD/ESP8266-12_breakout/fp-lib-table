@@ -1,4 +1,0 @@
-(fp_lib_table
-  (lib (name ESP8266)(type KiCad)(uri /home/koen/kicad/libraries/kicad-ESP8266/ESP8266.pretty)(options "")(descr ""))
-  (lib (name sot)(type KiCad)(uri "$(KIPRJMOD)/kicad-lib/footprints/sot.pretty")(options "")(descr ""))
-)
