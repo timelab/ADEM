@@ -2,7 +2,7 @@
 
 == Diagram
 
-image::https://raw.githubusercontent.com/timelab/ADEM/master/docs/code-diagram.svg[alt="Code Diagram", link="https://github.com/timelab/ADEM/blob/master/docs/code-diagram.svg", align="center"]
+image::https://drive.google.com/file/d/0B5B2OKuFeGQfT3dDRE5RanM3cXM/view?usp=sharing[alt="Code Diagram", link="https://drive.google.com/file/d/0B5B2OKuFeGQfZ0psVGdaODZTZ28/view?usp=sharing", align="center"]
 
 
 == States
@@ -10,32 +10,39 @@ image::https://raw.githubusercontent.com/timelab/ADEM/master/docs/code-diagram.s
 These are the states the main loop controls.
 
 START::
+  - LED Red
   - Activate accelerometer
   - Set up serial
   - Sets up tasks
   - -> SLEEP
 
 SLEEP::
+  - LED off
   - Move to CONFIG
   - Activate gps -> GPS_TEST
   - Acticate wifi -> WIFI_TEST
 
 CONFIG::
+  - LED Yellow
   - Configure wifi-client, wifi-ap, back-end, etc. -> SLEEP
 
 GPS_TEST::
+  - LED Orange
   - -> COLLECT
   - Suspend gps -> SLEEP
 
 COLLECT::
+  - LED Green
   - Collect data
   - -> GPS_TEST
 
 WIFI_TEST::
+  - LED Purple
   - -> UPLOAD
   - Suspend wifi -> SLEEP
 
 UPLOAD::
+  - LED Blue
   - Upload data
   - Empty datastore
   - -> WIFI_TEST
@@ -65,6 +72,7 @@ Create gps sensor object
 Create humidity sensor object
 Create led object
 Create particulate sensor object
+Create scheduler
 ----
 
 
@@ -80,6 +88,8 @@ Create suspended barometer task (1m)
 Create suspended gps task (1s)
 Create suspended humidity task (1m)
 Create suspended particulate task (30s)
+Create suspended wifiap task
+Create suspended wificlient task
 
 Set STATE to SLEEP
 ----
@@ -91,6 +101,7 @@ if STATE == SLEEP:
 
     if accelerometer.moving:
         Set STATE to GPS_START
+        Run gps.begin
         Activate gps task
 
         Set STATE to GPS_TEST
@@ -99,13 +110,16 @@ if STATE == SLEEP:
 
         if NOT buffer.empty:
             Set STATE to WIFI_START
-            Start wifi-client task
+            Run wificlient.begin
+            Activate wificlient task
 
             Set STATE to WIFI_TEST
 
         elif accelerometer.shaking:
             Set STATE to AP_START
-            Start wifi-ap task
+            Run wifiap.begin
+            Activate wifiap task
+
 
             Set STATE to CONFIG
 
@@ -113,7 +127,8 @@ elif STATE == CONFIG:
 
     if finished or timeout or canceled:
         Set STATE to AP_STOP
-        Suspend wifi-ap task
+        Suspend wifiap task
+        Run wifiap.end
 
         Set STATE to SLEEP
 
@@ -122,8 +137,11 @@ elif STATE == GPS_TEST:
     if accelerometer.moving:
         if gps.ready:
             Set STATE to COLLECT_START
+            Run barometer.begin
             Activate barometer task
+            Run humidity.begin
             Activate humidity task
+            Run particulate.begin
             Activate particulate task
 
             Set STATE to COLLECT
@@ -131,9 +149,13 @@ elif STATE == GPS_TEST:
     else:
         Set STATE to GPS_STOP
         Suspend barometer task
+        Run barometer.end
         Suspend humidity task
+        Run humidity.end
         Suspend particulate task
+        Run particulate.end
         Suspend gps task
+        Run gps.end
 
         Set STATE to SLEEP
 
@@ -149,9 +171,10 @@ elif STATE == WIFI_TEST:
     if wifi.fix:
         Set STATE to UPLOAD
 
-    if buffer.empty or wifi.timeout:
+    if accelerometer.moving OR buffer.empty or wifi.timeout:
         Set STATE to WIFI_STOP
-        Stop Wifi task
+        Suspend wificlient task
+        Run wificlient.end
 
         Set STATE to SLEEP
 
@@ -164,6 +187,7 @@ elif STATE == UPLOAD:
 
     Set STATE to WIFI_TEST
 
+// LED remembers previous state and acts on state-changes
 led.update()
 
 scheduler.tick()
