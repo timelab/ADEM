@@ -45,6 +45,8 @@ UPLOAD::
 
 Additionally we have a few transition state. These are pseudo-states used for performing tasks and moving to the next state.
 
+- AP_START
+- AP_STOP
 - GPS_START
 - GPS_STOP
 - WIFI_START
@@ -87,7 +89,7 @@ Set STATE to SLEEP
 ----
 if STATE == SLEEP:
 
-    if accelerometer.move == True:
+    if accelerometer.moving:
         Set STATE to GPS_START
         Activate gps task
 
@@ -95,19 +97,30 @@ if STATE == SLEEP:
 
     else:
 
-        if buffer.empty == False:
+        if NOT buffer.empty:
             Set STATE to WIFI_START
-            Start Wifi task
+            Start wifi-client task
 
             Set STATE to WIFI_TEST
 
+        elif accelerometer.shaking:
+            Set STATE to AP_START
+            Start wifi-ap task
+
+            Set STATE to CONFIG
+
 elif STATE == CONFIG:
 
+    if finished or timeout or canceled:
+        Set STATE to AP_STOP
+        Suspend wifi-ap task
+
+        Set STATE to SLEEP
 
 elif STATE == GPS_TEST:
 
-    if accelerometer.move == True:
-        if gps.ready == True:
+    if accelerometer.moving:
+        if gps.ready:
             Set STATE to COLLECT_START
             Activate barometer task
             Activate humidity task
@@ -128,15 +141,15 @@ elif STATE == COLLECT:
 
     Write sensor data to datastore
 
-    if accelerometer.move == False or gps.ready == False:
+    if NOT accelerometer.moving or NOT gps.ready:
         Set STATE to GPS_TEST
 
 elif STATE == WIFI_TEST:
 
-    if wifi.fix == True:
+    if wifi.fix:
         Set STATE to UPLOAD
 
-    if buffer.empty == True or wifi.timeout = True:
+    if buffer.empty or wifi.timeout:
         Set STATE to WIFI_STOP
         Stop Wifi task
 
