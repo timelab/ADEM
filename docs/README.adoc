@@ -16,15 +16,13 @@ https://github.com/timelab/ADEM/pulls[pull request interface].
 :numbered:
 :leveloffset: 1
 include::01-getting-started.adoc[]
-
 include::02-arduino-setup.adoc[]
-
 include::03-hardware.adoc[]
-
-include::04-pin-assignments.adoc[]
+include::04-prototype.adoc[]
 
 :numbered!:
 [appendix]
+include::0a-questions-and-answers.adoc[]
 include::TODO.adoc[]
 
 image::http://ik-adem.be/wp-content/themes/adem/assets/images/adem_logo.svg[alt="ADEM logo", link="http://ik-adem.be/", align="right"]
