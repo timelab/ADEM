@@ -19,7 +19,7 @@ completed and still on-going.
 | Task                                     | Release | Status                | Owner
 | Component / libraries                    |         |                       |
 | - Scheduler                              | alpha   | Completed             | Koen
-| - Datastore                              | alpha   | TBD                   |
+| - Datastore                              | alpha   | TBD                   | Lieven
 | - GPS library                            | alpha   | TBD                   | Dag
 | - Dust meter (PPD42)                     | alpha   | Completed             | Lieven
 | - Temperature / Humidity (HTU21D)        | alpha   | Completed             | Koen
@@ -36,8 +36,9 @@ completed and still on-going.
 | - WiFi Client (upload)                   | alpha   | Ongoing               | Marco
 | - Wifi AP (setup)                        | beta?   | TBD                   | Marco
 | - OTA firmware updates                   | beta    | TBD                   |
+| Shake detection                          | beta    | TBD                   |
 | Datastore                                |         |                       |
-| - Internal memory                        | alpha   | TBD                   |
+| - Internal memory                        | alpha   | TBD                   | Lieven
 | - I2C memory                             | beta    | TBD                   |
 | - Filesystem                             | beta    | TBD                   |
 |============================================================================================
