@@ -13,63 +13,74 @@
 
 #define SERIAL_BAUD 74880
 
+// Different states of the program
+enum state_t {START, SLEEP, CONFIG, GPS_TEST, COLLECT, WIFI_TEST, UPLOAD, GPS_START, GPS_STOP, WIFI_START, WIFI_STOP};
+state_t state = START;
+
+// Objects for all the sensor libraries
+//MPU6050Sensor accelerometer;
 BMP085Sensor barometer;
+//PassiveBuzzer buzzer;
+//GPSSensor gps;
 HTU21DFSensor humidity;
 Adafruit_NeoPixel neopixel = Adafruit_NeoPixel(1, NEOPIXEL_PIN, NEO_GRB + NEO_KHZ800);
+//LEDSensor led;
 PPD42Sensor particulate;
-TickerSchedlr *schedule = 0; //TickerSchedlr::Instance(200);
+//WIFIap wifiap;
+//WIFIcl wificl;
 
-int count = 0;
-int count2 = 0;
-int count3 = 0;
-TickerTask * T1 = NULL;
-TickerTask * T2 = NULL;
-TickerTask * T3 = NULL;
-int pin1 = 0;
-int pin2 = 14;
-int pin3 = 13;
+// Scheduler
+TickerSchedlr *schedule = 0; //TickerSchedlr::Instance(200); HERE OR IN SETUP?
 
-void flip(void *)
-{
-//  int state = digitalRead(12);  // get the current state of GPIO1 pin
-//  digitalWrite(12, !state);     // set pin to the opposite state
-  __LOG(count);
-  __LOG(" :flip1: ");
-  __LOGLN(state);
-  ++count;
-  Serial.println(humidity.report());
-  Serial.println(barometer.report());
-  Serial.println(particulate.report());
+// Tasks
+TickerTask *accelerometer_task = NULL;
+TickerTask *barometer_task = NULL;
+TickerTask *buzzer_task = NULL;
+TickerTask *gps_task = NULL;
+TickerTask *humidity_task = NULL;
+TickerTask *led_task = NULL;
+TickerTask *particulate_task = NULL;
+//TickerTask *wifiap_task = NULL;
+//TickerTask *wificl_task = NULL;
+
+// Task code blocks
+
+void accelerometer_block(void *) {
+  __LOG(" :accelerometer_block: ");
+  __LOGLN("  ");
 }
 
-void flip2(void *ptr)
-{
-  int pin = 14;
-  //int *iptr = (int *)ptr;
-  //int state = digitalRead(*iptr);  // get the current state of GPIO1 pin
-  int state = digitalRead(pin);  // get the current state of GPIO1 pin
-  digitalWrite(pin, !state);     // set pin to the opposite state
-  __LOG(count2);
-  __LOG(" :flip2: ");
-  __LOGLN(state);
-  ++count2;
-
+void barometer_block(void *) {
+  __LOGLN("  ");
 }
 
-void flip3(void *)
-{
-  int state = digitalRead(13);  // get the current state of GPIO1 pin
-  digitalWrite(13, !state);     // set pin to the opposite state
-  __LOG(count3);
-  __LOG(" :flip3: ");
-  __LOGLN(state);
-  __LOG("last "); __LOG(T3->getLastTime()); __LOG(" next ");    __LOG(T3->getNextTime()); __LOG("  period "); __LOGLN(T3->getNextTime() - T3->getLastTime());
-  ++count3;
-
-  barometer.read();
-  humidity.read();
-  particulate.read();
+void buzzer_block(void *) {
+  __LOGLN("  ");
 }
+
+void gps_block(void *) {
+  __LOGLN("  ");
+}
+
+void humidity_block(void *) {
+  __LOGLN("  ");
+}
+
+void led_block(void *) {
+  __LOGLN("  ");
+}
+
+void particulate_block(void *) {
+  __LOGLN("  ");
+}
+
+//void wifiap_block(void *) {
+//  __LOGLN("  ");
+//}
+
+//void wificl_block(void *) {
+//  __LOGLN("  ");
+//}
 
 void setup() {
   Serial.begin(SERIAL_BAUD);
@@ -85,34 +96,36 @@ void setup() {
 //  gps_Serial.begin(GPS_BAUD);  
 //  Serial.println("GPS initialized...");
 
-  Serial.print("Initializing PPD42...");
-  particulate.begin();
-  Serial.println(" done");
+//  Serial.print("Initializing PPD42...");
+//  particulate.begin();
+//  Serial.println(" done");
 
-  pinMode(pin2, OUTPUT);
-  digitalWrite(pin2, LOW);
-  pinMode(pin3, OUTPUT);
-  digitalWrite(pin3, LOW);
+  schedule = TickerSchedlr::Instance(200); // HERE OR IN SETUP?
+  accelerometer_task = TickerTask::createPeriodic(&accelerometer_block, 5000);
+  accelerometer_task->name = "accelerometer";
+  barometer_task = TickerTask::createPeriodic(&barometer_block, 5000);
+  barometer_task->name = "barometer";
+  buzzer_task = TickerTask::createPeriodic(&buzzer_block, 5000);
+  buzzer_task->name = "buzzer";
+  gps_task = TickerTask::createPeriodic(&gps_block, 5000);
+  gps_task->name = "gps";
+  humidity_task = TickerTask::createPeriodic(&humidity_block, 5000);
+  humidity_task->name = "humidity";
+  led_task = TickerTask::createPeriodic(&led_block, 5000);
+  led_task->name = "led";
+  particulate_task = TickerTask::createPeriodic(&particulate_block, 5000);
+  particulate_task->name = "particulate";
+  //wifiap_task = TickerTask::createPeriodic(&wifiap_block, 5000);
+  //wifiap_task->name = "wifiap";
+  //wificl_task = TickerTask::createPeriodic(&wificl_block, 5000);
+  //wificl_task->name = "wificl";
 
-  schedule = TickerSchedlr::Instance(200);
-  T1 = TickerTask::createPeriodic(&flip, 5000);
-  T2 = TickerTask::createIdle(&flip2);
-  T3 = TickerTask::createPeriodic(&flip3, 1000);
-  T1->name = "Task 0";
-  T2->name = "Task 1";
-  T3->name = "Task 2";
-  schedule = TickerSchedlr::Instance();
-  __LOG("Task 0 next time is "); __LOGLN(T1->getNextTime());
-  __LOG("Task 0 period is "); __LOGLN(T1->interval);
-  __LOG("Task 0 type is "); __LOGLN(T1->tasktype);
+  schedule = TickerSchedlr::Instance();  // HERE OR IN SETUP? OR IS THIS DOUBLE
+  __LOG("Task accelerometer next time is "); __LOGLN(accelerometer_task->getNextTime());
+  __LOG("Task accelerometer period is "); __LOGLN(accelerometer_task->interval);
+  __LOG("Task accelerometer type is "); __LOGLN(accelerometer_task->tasktype);
   __LOG("Schedule time "); __LOGLN(schedule->getTickTime());
-  __LOG("Task 1 next time is "); __LOGLN(T2->getNextTime());
-  __LOG("Task 1 period is "); __LOGLN(T2->interval);
-  __LOG("Task 1 type is "); __LOGLN(T2->tasktype);
-  //__LOG("Schedule time "); __LOGLN(schedule->getTickTime());
-  __LOG("Task 2 next time is "); __LOGLN(T3->getNextTime());
-  __LOG("Task 2 period is "); __LOGLN(T3->interval);
-  __LOG("Schedule time "); __LOGLN(schedule->getTickTime());
+
 
   __LOGLN("schedule added");
   Serial.println("Tasks created...");
