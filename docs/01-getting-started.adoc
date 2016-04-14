@@ -3,10 +3,10 @@
 
 == Project information
 
-Project website (in Dutch)::
+Project website (Dutch)::
     http://ik-adem.be/
 
-Wiki website (in Dutch)::
+Wiki website (Dutch)::
     http://wiki.timelab.org/wiki/A.D.E.M
 
 Project contact::
@@ -29,4 +29,4 @@ ESP8266 book::
     http://neilkolban.com/tech/esp8266/
 
 
-image::http://ik-adem.be/wp-content/themes/adem/assets/images/adem_logo.svg[alt="ADEM logo", link="http://ik-adem.be/", align="right"]
+image::images/adem_logo.svg[alt="ADEM logo", link="http://ik-adem.be/", align="right"]
