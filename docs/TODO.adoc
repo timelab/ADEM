@@ -30,7 +30,7 @@ completed and still on-going.
 | Code integration                         |         |                       |
 | - Modularity                             | alpha   | Completed             | Koen / Lieven
 | - Pseudo-code                            | alpha   | Ongoing               | Lieven / Dag
-| - Cleanuo                                | alpha   | Completed             | Dag
+| - Cleanup                                | alpha   | Completed             | Dag
 | - Code conformity                        | beta    | Ongoing               | Dag
 | WiFi integration                         |         |                       |
 | - WiFi Client (upload)                   | alpha   | Ongoing               | Marco
