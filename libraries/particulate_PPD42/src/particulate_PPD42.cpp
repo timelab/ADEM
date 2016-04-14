@@ -42,7 +42,7 @@ void PPD42Sensor::begin() {
 }
 
 void PPD42Sensor::end() {
-	_activated = true;
+	_activated = false;
 	// detach the interrupts
 	detachInterrupt(_PPD_PM10_PIN);
 	detachInterrupt(_PPD_PM25_PIN);	
