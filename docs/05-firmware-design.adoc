@@ -2,12 +2,54 @@
 
 == Diagram
 
-image::code-diagram.svg[alt="Code Diagram", link="https://github.com/timelab/ADEM/", align="center"]
+image::https://github.com/timelab/ADEM/blob/master/code-diagram.svg[alt="Code Diagram", link="https://github.com/timelab/ADEM/", align="center"]
 
 
 == States
 
-== Tasks
+These are the states the main loop controls.
+
+START::
+  - Activate accelerometer
+  - Set up serial
+  - Sets up tasks
+  - -> SLEEP
+
+SLEEP::
+  - Move to CONFIG
+  - Activate gps -> GPS_TEST
+  - Acticate wifi -> WIFI_TEST
+
+CONFIG::
+  - Configure wifi-client, wifi-ap, back-end, etc. -> SLEEP
+
+GPS_TEST::
+  - -> COLLECT
+  - Suspend gps -> SLEEP
+
+COLLECT::
+  - Collect data
+  - -> GPS_TEST
+
+WIFI_TEST::
+  - -> UPLOAD
+  - Suspend wifi -> SLEEP
+
+UPLOAD::
+  - Upload data
+  - Empty datastore
+  - -> WIFI_TEST
+
+
+=== Transition states
+
+Additionally we have a few transition state. These are pseudo-states used for performing tasks and moving to the next state.
+
+- GPS_START
+- GPS_STOP
+- WIFI_START
+- WIFI_STOP
+
 
 == Pseudo-code
 
@@ -47,7 +89,7 @@ if STATE == SLEEP:
 
     if accelerometer.move == True:
         Set STATE to GPS_START
-        Start GPS task
+        Activate gps task
 
         Set STATE to GPS_TEST
 
@@ -67,19 +109,24 @@ elif STATE == GPS_TEST:
     if accelerometer.move == True:
         if gps.ready == True:
             Set STATE to COLLECT_START
-            Start sensor tasks
+            Activate barometer task
+            Activate humidity task
+            Activate particulate task
 
             Set STATE to COLLECT
 
     else:
         Set STATE to GPS_STOP
-        Stop GPS task
+        Suspend barometer task
+        Suspend humidity task
+        Suspend particulate task
+        Suspend gps task
 
         Set STATE to SLEEP
 
 elif STATE == COLLECT:
 
-    Write sensor data
+    Write sensor data to datastore
 
     if accelerometer.move == False or gps.ready == False:
         Set STATE to GPS_TEST
@@ -100,6 +147,7 @@ elif STATE == UPLOAD:
     // Upload action finishes successfully or times out
     Create JSON of X records
     Send to Server
+    Empty datastore
 
     Set STATE to WIFI_TEST
 
