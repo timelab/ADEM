@@ -7,42 +7,51 @@ completed and still on-going.
 |============================================================================================
 | Task                                               | Status                | Owner
 | Hardware selection                                 | Completed             | Koen ?
-| Breadboard prototype                               | Ongoing               | Dag
-| PCB design                                         | Ongoing               | Koen
-| Pin assignments                                    | Ongoing               | Koen
+| Testing individual sensors                         | Completed ?           | Koen
+| Breadboard prototype                               | Completed             | Dag
+| PCB design                                         | Ongoing ?             | Koen
 |============================================================================================
 
 
 == Firmware status
 [options="header", width="100%"]
 |============================================================================================
-| Task                                               | Status                | Owner
-| Testing individual sensors                         | Completed ?           | Koen
-| Sensor libraries                                   |                       |
-| - Scheduler                                        | Completed             | Koen
-| - GPS library                                      | TBD                   | Dag
-| - Dust meter (PPD42)                               | Finished              | Lieven
-| - Temperature / Humidity (HTU21D)                  | Finished              | Koen
-| - Barometer (BMP180)                               | Finished              | Koen
-| - Accelerometer (MPU6050)                          | TBD                   | Koen
-| - NeoPixel                                         | TBD                   | Stijn
-| - Buzzer                                           | Optional              |
-| Code integration                                   | Ongoing               |
-| WIFI configuration                                 | Ongoing               | Marco ?
-| Data buffering                                     | TBD (beta)            |
-| Filesystem                                         | TBD (beta)            |
-| OTA Firmware updating                              | TBD (beta)            |
-| Documentation                                      | Always evolving       | Dag
+| Task                                     | Release | Status                | Owner
+| Component / libraries                    |         |                       |
+| - Scheduler                              | alpha   | Completed             | Koen
+| - Datastore                              | alpha   | TBD                   |
+| - GPS library                            | alpha   | TBD                   | Dag
+| - Dust meter (PPD42)                     | alpha   | Completed             | Lieven
+| - Temperature / Humidity (HTU21D)        | alpha   | Completed             | Koen
+| - Barometer (BMP180)                     | alpha   | Completed             | Koen
+| - Accelerometer (MPU6050)                | alpha   | TBD                   | Koen
+| - NeoPixel                               | alpha   | TBD                   | Stijn
+| - Buzzer                                 | beta    | Optional              |
+| Code integration                         |         |                       |
+| - Modularity                             | alpha   | Completed             | Koen / Lieven
+| - Pseudo-code                            | alpha   | Ongoing               | Lieven / Dag
+| - Cleanuo                                | alpha   | Completed             | Dag
+| - Code conformity                        | beta    | Ongoing               | Dag
+| WiFi integration                         |         |                       |
+| - WiFi Client (upload)                   | alpha   | Ongoing               | Marco
+| - Wifi AP (setup)                        | beta?   | TBD                   | Marco
+| - OTA firmware updates                   | beta    | TBD                   |
+| Datastore                                |         |                       |
+| - Internal memory                        | alpha   | TBD                   |
+| - I2C memory                             | beta    | TBD                   |
+| - Filesystem                             | beta    | TBD                   |
 |============================================================================================
 
 
 == Documentation status
 [options="header", width="100%"]
 |============================================================================================
-| Add prototype fritzing design                      | TBD                   | Dag
-| Document pseudo-code                               | TBD                   | Dag
+| Task                                               | Status                | Owner
+| Pin assignments                                    | Completed ?           | Koen
+| Add breadboard prototype design (fritzing)         | TBD                   | Dag
+| Document pseudo-code                               | Ongoing               | Dag
 | Create state diagram and conditions                | TBD                   | Dag
-| Add technical questions and answers                | TBD                   |
+| Add technical questions and answers                | Completed             | Dag
 |============================================================================================
 
 
