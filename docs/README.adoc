@@ -7,11 +7,11 @@
 :toc:
 :toclevels: 2
 
-Welcome to the ADEM project documentation. This is a work in progress
-so feel free to ask for clarification through GitHub's
-https://github.com/timelab/ADEM/issues[issue interface] or even better,
-send us updates through GitHub's
-https://github.com/timelab/ADEM/pulls[pull request interface].
+Welcome to the ADEM project documentation.
+
+The aim of this project is to create a device that collects air polution data (PM10 and PM25 fine dust) and is mounted on bicycles to crowdsource factual air pollution information in and around the city of Ghent, Belgium.
+
+The hardware and firmware design is modular and extendable. The device can be locally reproduced and repaired.
 
 :numbered:
 :leveloffset: 1
@@ -23,10 +23,18 @@ include::03-hardware.adoc[]
 
 include::04-prototype.adoc[]
 
+include::05-firmware-design.adoc[]
+
 :numbered!:
 [appendix]
 include::0a-questions-and-answers.adoc[]
 
+[appendix]
 include::TODO.adoc[]
+
+This is a work in progress so feel free to ask for clarification through GitHub's
+https://github.com/timelab/ADEM/issues[issue interface] or even better,
+send us updates through GitHub's
+https://github.com/timelab/ADEM/pulls[pull request interface].
 
 image::http://ik-adem.be/wp-content/themes/adem/assets/images/adem_logo.svg[alt="ADEM logo", link="http://ik-adem.be/", align="right"]
