@@ -20,6 +20,15 @@ Email: ja@ik-adem.be
 ....
 
 
+== Project collaboration
+
+GitHub repository::
+    https://github.com/timelab/ADEM
+
+Google Drive::
+    https://drive.google.com/open?id=0B5B2OKuFeGQfT0p0bUllNUdlb0k
+
+
 == Technical information
 
 Technical documentation::
