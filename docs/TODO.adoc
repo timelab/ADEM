@@ -29,12 +29,14 @@ completed and still on-going.
 | - Buzzer                                 | beta    | Optional              |
 | Code integration                         |         |                       |
 | - Modularity                             | alpha   | Completed             | Koen / Lieven
-| - Pseudo-code                            | alpha   | Ongoing               | Lieven / Dag
+| - Pseudo-code                            | alpha   | TBD                   | Lieven / Dag
 | - Cleanup                                | alpha   | Completed             | Dag
+| - Library naming                         | alpha   | Completed             | Dag
+| - Travis CI                              | alpha   | Completed             | Dag
 | - Code conformity                        | beta    | Ongoing               | Dag
 | WiFi integration                         |         |                       |
-| - WiFi Client (upload)                   | alpha   | Ongoing               | Marco
-| - Wifi AP (setup)                        | beta?   | TBD                   | Marco
+| - Wi-Fi Client (upload)                  | alpha   | Ongoing               | Marco
+| - Wi-Fi AP (setup)                       | beta?   | TBD                   | Marco
 | - OTA firmware updates                   | beta    | TBD                   |
 | Shake detection                          | beta    | TBD                   |
 | Datastore                                |         |                       |
@@ -48,10 +50,10 @@ completed and still on-going.
 [options="header", width="100%"]
 |============================================================================================
 | Task                                               | Status                | Owner
-| Pin assignments                                    | Completed ?           | Koen
+| Pin assignments                                    | Completed             | Koen / Dag
 | Add breadboard prototype design (fritzing)         | TBD                   | Dag
-| Document pseudo-code                               | Ongoing               | Dag
-| Create state diagram and conditions                | TBD                   | Dag
+| Document pseudo-code                               | Completed             | Dag
+| Create state diagram and conditions                | Completed             | Dag
 | Add technical questions and answers                | Completed             | Dag
 |============================================================================================
 
