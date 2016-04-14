@@ -81,17 +81,17 @@ Get the changes from the online repository and merge them into local files
 
 In order to build project code, you need to ensure that Arduino can find the libraries we use.
 
-On Linux you can do this with the following command:
+On Linux and MacOS/X you can do this with the following command:
 
+   $ cd /path/to/git/clone/ADEM
    $ ln -sf "$PWD/libraries/"* ~/Arduino/libraries/
 
 
 === External libraries
 
-All external libraries we depend upon for the firmware are included in the repository.
-This to ensure that we have reproducible builds. Hence there is no need to download them separately.
+All external libraries we depend upon for the firmware are included in the repository. This to ensure that we have reproducible builds and can integrate easily with Travis CI. Hence there is no need to download them separately.
 
-The following external libraries are being used:
+The following external libraries are currently being used:
 
 Adafruit NeoPixel::
   - Version: 1.0.4
