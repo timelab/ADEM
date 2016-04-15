@@ -1,6 +1,6 @@
 = Hardware
 
-The project uses the SparkFun ESP8266 Thing.
+The project uses the SparkFun ESP8266 Thing Development board.
 
 This ESP8266 based WiFi controller development board runs the ADEM firmware and conveniently hosts a LiPo battery management system that is key in the mobility aspect of this project. Apart from the headers for the SparkFun Thing, the project's printed circuit board has room for a GPS module, temperature and pressure sensors and connections to external parts like the PPD40NS dust sensor.
 
