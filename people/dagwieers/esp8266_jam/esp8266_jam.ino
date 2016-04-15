@@ -5,6 +5,7 @@
 #include <ESP8266WiFi.h>
 #include <particulate_PPD42.h>
 #include <TinyGPS++.h>
+#include "config.h"
 
 #ifdef DEBUGSERIAL
 #include <SoftwareSerial.h>
@@ -13,9 +14,6 @@
 #ifdef __AVR__
   #include <avr/power.h>
 #endif
-
-#define WIFI_SSID "timelab-wifi"
-#define WIFI_WPA2 "timelab09"
 
 #define NEOPIXEL_PIN 5
 #define I2C_SDA_PIN 2

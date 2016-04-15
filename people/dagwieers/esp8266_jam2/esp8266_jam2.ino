@@ -3,15 +3,11 @@
 #include <particulate_PPD42.h>
 #include <TinyGPS++.h>
 #include <SoftwareSerial.h>
+#include "config.h"
 
 #ifdef __AVR__
   #include <avr/power.h>
 #endif
-
-//#define WIFI_SSID "timelab-wifi"
-//#define WIFI_WPA2 "timelab09"
-#define WIFI_SSID "zelfbestuur"
-#define WIFI_WPA2 "zezullenhemniettemmendefierevlaamseleeuw"
 
 #define NEOPIXEL_PIN 5
 #define I2C_SDA_PIN 2
