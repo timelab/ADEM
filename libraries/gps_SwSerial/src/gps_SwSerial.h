@@ -32,25 +32,25 @@ public:
     virtual void process();
     virtual String report();
 
+    boolean ready = false;
+
 private:
     StaticJsonBuffer<200> jsonBuffer;
 
-    const unsigned char OSS = 0;  // Oversampling Setting
-
-    SoftwareSerial swserial;
-    TinyGPSPlus tinygps;
-
-    boolean _error = false;
-    boolean readData(void);
     TinyGPSDate date;
     TinyGPSTime time;
     TinyGPSLocation location;
     TinyGPSInteger satellites;
-    int baud = 9600;
+    String FormatDateTime(TinyGPSDate date, TinyGPSTime time);
 
+    int baud = 9600;
+    boolean _error = false;
+    boolean readData(void);
     float GetData();
 
-    String FormatDateTime(TinyGPSDate date, TinyGPSTime time);
+    SoftwareSerial swserial;
+    TinyGPSPlus tinygps;
+
 };
 
 #endif

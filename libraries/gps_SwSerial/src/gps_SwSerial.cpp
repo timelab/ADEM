@@ -15,7 +15,9 @@ SwSerialGPS::SwSerialGPS(int rx, int tx, int bd) {
 }
 
 SwSerialGPS::SwSerialGPS() {
-    SwSerialGPS(4, 0, 9600);
+    swserial = SoftwareSerial(4, 0, false, 64);
+    tinygps = TinyGPSPlus();
+    baud = 9600;
 }
 
 void SwSerialGPS::begin(void) {
@@ -47,7 +49,6 @@ float SwSerialGPS::GetData(void) {
     satellites = tinygps.satellites;
 }
 
-
 void SwSerialGPS::read() {
     GetData();
 }
@@ -66,7 +67,10 @@ String SwSerialGPS::report()  {
     root["Sensor"] = "GPS";
 
     if (tinygps.date.isValid() && tinygps.time.isValid()) {
+        ready = true;
         root["Time"] = FormatDateTime(date, time);
+    } else {
+        ready = false;
     }
 
     if (tinygps.location.isValid()) {

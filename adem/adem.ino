@@ -58,7 +58,7 @@ void buzzer_block(void *) {
 
 void gps_block(void *) {
   Serial.println(":gps: -> Dump time and location record");
-//  Serial.println(gps.report());
+  //Serial.println(gps.report());
 }
 
 void humidity_block(void *) {
@@ -107,7 +107,6 @@ void setup() {
   particulate.begin();
   Serial.println("Particulate sensor initialized...");
 
-//  schedule = TickerSchedlr::Instance(200); // HERE OR IN SETUP?
   accelerometer_task = TickerTask::createPeriodic(&accelerometer_block, 500);
   accelerometer_task->name = "accelerometer";
   barometer_task = TickerTask::createPeriodic(&barometer_block, 60000);
@@ -126,16 +125,12 @@ void setup() {
   //wifiap_task->name = "wifiap";
   //wificlient_task = TickerTask::createPeriodic(&wificlient_block, 5000);
   //wificlient_task->name = "wificlient";
+  Serial.println("All tasks created...");
 
-//  schedule = TickerSchedlr::Instance(200);  // HERE OR IN SETUP? OR IS THIS DOUBLE
-  
   Serial.print("Task accelerometer next time is "); Serial.println(accelerometer_task->getNextTime());
   Serial.print("Task accelerometer period is "); Serial.println(accelerometer_task->interval);
   Serial.print("Task accelerometer type is "); Serial.println(accelerometer_task->tasktype);
   Serial.print("Schedule time "); Serial.println(schedule->getTickTime());
-
-  Serial.println("schedule added");
-  Serial.println("Tasks created...");
 
   Serial.println("Setup finished.");
 
@@ -152,7 +147,7 @@ void loop() {
     if (true) {
 
         state = GPS_START;
-        // gps.begin();
+        //gps.begin();
         // Activate gps task
 
         state = GPS_TEST;
@@ -169,8 +164,6 @@ void loop() {
 
         state = WIFI_TEST;
         led.setcolor(0, 63, 0, 63); // Purple
-
-
 
       //} else if (accelerometer.shaking) {
       } else if (false) {
@@ -193,7 +186,7 @@ void loop() {
 
       state = AP_STOP;
       // Suspend wifiap task
-      // wifiap.end();
+      //wifiap.end();
 
       state = SLEEP;
       led.setcolor(0, 0, 0, 0); // Black
@@ -228,10 +221,10 @@ void loop() {
       // Suspend humidity task
       // Suspend particulate task
       // Suspend gps task
-      // barometer.end();
-      // humidity.end();
-      // particulate.end();
-      // gps.end();
+      barometer.end();
+      humidity.end();
+      particulate.end();
+      //gps.end();
 
       state = SLEEP;
       led.setcolor(0, 0, 0, 0); // Black
