@@ -16,7 +16,7 @@ NOTE: For uploading new firmware, the baudrate can go up to 460800. The baudrate
 Below pins are based on the SparkFun ESP8266 Thing.
 
 .Unfinished Fritzing diagram
-image::https://drive.google.com/file/d/0B5B2OKuFeGQfWjY5S21PNXlLc1k/view?usp=sharing[alt="Fritzing diagram", link="https://drive.google.com/file/d/0B5B2OKuFeGQfUVlVLWI4eS1ITm8/view?usp=sharing"]
+image::https://drive.google.com/file/d/0B5B2OKuFeGQfWjY5S21PNXlLc1k/view?usp=sharing[alt="Fritzing diagram", link="https://drive.google.com/file/d/0B5B2OKuFeGQfWjY5S21PNXlLc1k/view?usp=sharing"]
 
 
 === Summary
