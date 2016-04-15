@@ -2,7 +2,7 @@
 
 #define NEOPIXEL_PIN 5
 
-NeoPixelLed led = NeoPixelLed(1, NEOPIXEL_PIN);
+NeoPixelLed led = NeoPixelLed(1, NEOPIXEL_PIN, NEO_GRB + NEO_KHZ800);
 
 void setup() {
     led.begin();
