@@ -2,7 +2,7 @@
 #include <barometer_BMP085.h>
 #include <humidity_HTU21D.h>
 //#include <gps_SoftwareSerial.h>
-//#include <led_NeoPixel.h>
+#include <led_NeoPixel.h>
 #include <particulate_PPD42.h>
 #include <TickerSchedlr.h>
 
@@ -24,7 +24,7 @@ BMP085Sensor barometer;
 //PassiveBuzzer buzzer;
 //GPSSensor gps;
 HTU21DFSensor humidity;
-//NeoPixelLed led = NeoPixelLed(1, NEOPIXEL_PIN, NEO_GRB + NEO_KHZ800);
+NeoPixelLed led = NeoPixelLed(1, NEOPIXEL_PIN, NEO_GRB + NEO_KHZ800);
 PPD42Sensor particulate;
 //WIFIap wifiap;
 //WIFIcl wificl;
@@ -90,9 +90,9 @@ void setup() {
   Serial.println("Setup started.");
   Serial.println("Serial communication initialized...");
 
-  //led.begin();
-  //led.setcolor(0, 63, 0, 0); // Red
-  //Serial.println("LED initialized...");
+  led.begin();
+  led.setcolor(0, 63, 0, 0); // Red
+  Serial.println("LED initialized...");
 
   Serial.print("Initializing PPD42...");
   particulate.begin();
@@ -137,7 +137,7 @@ void setup() {
   Serial.println("Setup finished.");
 
   state = SLEEP;
-  //led.setcolor(0, 0, 0, 0); // Black
+  led.setcolor(0, 0, 0, 0); // Black
 }
 
 // the loop function runs over and over again until power down or reset
@@ -153,7 +153,7 @@ void loop() {
         // Activate gps task
 
         state = GPS_TEST;
-        //led.setcolor(0, 63, 31, 0); // Orange
+        led.setcolor(0, 63, 31, 0); // Orange
 
     } else {
 
@@ -165,7 +165,7 @@ void loop() {
         // Activate wificlient task
 
         state = WIFI_TEST;
-        //led.setcolor(0, 63, 0, 63); // Purple
+        led.setcolor(0, 63, 0, 63); // Purple
 
 
 
@@ -177,7 +177,7 @@ void loop() {
         // Activate wifiap task
 
         state = CONFIG;
-        //led.setcolor(0, 0, 63, 63); // Yellow
+        led.setcolor(0, 0, 63, 63); // Yellow
 
       }
 
@@ -193,7 +193,7 @@ void loop() {
       // wifiap.end();
 
       state = SLEEP;
-      //led.setcolor(0, 0, 0, 0); // Black
+      led.setcolor(0, 0, 0, 0); // Black
 
     }
 
@@ -214,7 +214,7 @@ void loop() {
         // Activate particulate task
 
         state = COLLECT;
-        //led.setcolor(0, 0, 63, 0); // Green
+        led.setcolor(0, 0, 63, 0); // Green
 
       }
 
@@ -231,7 +231,7 @@ void loop() {
       // gps.end();
 
       state = SLEEP;
-      //led.setcolor(0, 0, 0, 0); // Black
+      led.setcolor(0, 0, 0, 0); // Black
 
     }
 
@@ -244,7 +244,7 @@ void loop() {
     if (false) {
 
       state = GPS_TEST;
-      //led.setcolor(0, 63, 31, 0); // Orange
+      led.setcolor(0, 63, 31, 0); // Orange
  
     }
 
@@ -254,7 +254,7 @@ void loop() {
     if (false) {
 
       state = UPLOAD;
-      //led.setcolor(0, 0, 0, 63); // Blue
+      led.setcolor(0, 0, 0, 63); // Blue
 
     }
 
@@ -265,7 +265,7 @@ void loop() {
       // wificlient.end();
 
       state = SLEEP;
-      //led.setcolor(0, 0, 0, 0); // Black
+      led.setcolor(0, 0, 0, 0); // Black
 
     }
 
@@ -277,7 +277,7 @@ void loop() {
     // Empty datastore
 
     state = WIFI_TEST;
-    //led.setcolor(0, 63, 0, 63); // Purple
+    led.setcolor(0, 63, 0, 63); // Purple
 
   }
 

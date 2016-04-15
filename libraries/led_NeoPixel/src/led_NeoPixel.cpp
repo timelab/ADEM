@@ -17,6 +17,7 @@ NeoPixelLed::NeoPixelLed() {
 }
 
 void NeoPixelLed::begin() {
+    neopixel.begin();
     neopixel.setBrightness(63);
 }
 
