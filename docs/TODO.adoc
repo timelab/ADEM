@@ -20,12 +20,12 @@ completed and still on-going.
 | Task                                     | Release | Status                | Owner
 | Component / libraries                    |         |                       |
 | - Scheduler                              | alpha   | Completed (suspend?)  | Koen
-| - Datastore                              | alpha   | TBD                   | Lieven
+| - Datastore                              | alpha   | Ongoing               | Lieven
 | - GPS library                            | alpha   | TBD                   | Dag
 | - Dust meter (PPD42)                     | alpha   | Completed             | Lieven
 | - Temperature / Humidity (HTU21D)        | alpha   | Completed             | Koen
 | - Barometer (BMP180)                     | alpha   | Completed             | Koen
-| - Accelerometer (MPU6050)                | alpha   | TBD                   | Koen
+| - Accelerometer (MPU6050)                | alpha   | Ongoing               | Koen
 | - NeoPixel                               | alpha   | TBD                   | Stijn
 | - Buzzer                                 | beta    | Optional              |
 | Code integration                         |         |                       |
@@ -39,9 +39,9 @@ completed and still on-going.
 | - Wi-Fi Client (upload)                  | alpha   | Ongoing               | Marco
 | - Wi-Fi AP (setup)                       | beta?   | TBD                   | Marco
 | - OTA firmware updates                   | beta    | TBD                   |
-| Shake detection                          | beta    | TBD                   |
+| Shake detection                          | beta    | Ongoing               | Koen
 | Datastore                                |         |                       |
-| - Internal memory                        | alpha   | TBD                   | Lieven
+| - Internal memory                        | alpha   | Ongoing               | Lieven
 | - I2C memory                             | beta    | TBD                   |
 | - Filesystem                             | beta    | TBD                   |
 |============================================================================================
