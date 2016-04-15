@@ -37,5 +37,8 @@ Technical documentation::
 ESP8266 book::
     http://neilkolban.com/tech/esp8266/
 
+ESP8266 wiki::
+    https://github.com/esp8266/esp8266-wiki/wiki
+
 
 image::http://ik-adem.be/wp-content/themes/adem/assets/images/adem_logo.svg[alt="ADEM logo", link="http://ik-adem.be/", align="right"]
