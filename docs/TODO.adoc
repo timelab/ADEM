@@ -21,7 +21,7 @@ completed and still on-going.
 | Component / libraries                    |         |                       |
 | - Scheduler                              | alpha   | Completed (suspend?)  | Koen
 | - Datastore                              | alpha   | Ongoing               | Lieven
-| - GPS library                            | alpha   | TBD                   | Dag
+| - GPS library                            | alpha   | Ongoing (need help)   | Dag
 | - Dust meter (PPD42)                     | alpha   | Completed             | Lieven
 | - Temperature / Humidity (HTU21D)        | alpha   | Completed             | Koen
 | - Barometer (BMP180)                     | alpha   | Completed             | Koen
