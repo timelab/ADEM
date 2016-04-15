@@ -1,9 +1,10 @@
-#include <TickerSchedlr.h>
-#include <Adafruit_NeoPixel.h>
-#include <particulate_PPD42.h>
+//#include <accelerator_MPU6050.h>
 #include <barometer_BMP085.h>
 #include <humidity_HTU21D.h>
 //#include <gps_SoftwareSerial.h>
+//#include <led_NeoPixel.h>
+#include <particulate_PPD42.h>
+#include <TickerSchedlr.h>
 
 #define NEOPIXEL_PIN 5
 #define I2C_SDA_PIN 2
@@ -23,8 +24,7 @@ BMP085Sensor barometer;
 //PassiveBuzzer buzzer;
 //GPSSensor gps;
 HTU21DFSensor humidity;
-Adafruit_NeoPixel neopixel = Adafruit_NeoPixel(1, NEOPIXEL_PIN, NEO_GRB + NEO_KHZ800);
-//LEDSensor led;
+//NeoPixelLed led = NeoPixelLed(1, NEOPIXEL_PIN, NEO_GRB + NEO_KHZ800);
 PPD42Sensor particulate;
 //WIFIap wifiap;
 //WIFIcl wificl;
@@ -38,7 +38,7 @@ TickerTask *barometer_task = NULL;
 TickerTask *buzzer_task = NULL;
 TickerTask *gps_task = NULL;
 TickerTask *humidity_task = NULL;
-TickerTask *led_task = NULL;
+//TickerTask *led_task = NULL;
 TickerTask *particulate_task = NULL;
 //TickerTask *wifiap_task = NULL;
 //TickerTask *wificl_task = NULL;
@@ -51,7 +51,7 @@ void accelerometer_block(void *) {
 
 void barometer_block(void *) {
   Serial.println(":barometer: -> Dump record");
-  Serial.print(barometer.report());
+  Serial.println(barometer.report());
 }
 
 void buzzer_block(void *) {
@@ -65,12 +65,12 @@ void gps_block(void *) {
 
 void humidity_block(void *) {
   Serial.println(":humidity: -> Dump record");
-  Serial.print(humidity.report());
+  Serial.println(humidity.report());
 }
 
-void led_block(void *) {
+//void led_block(void *) {
 //  Serial.println(":led_block:");
-}
+//}
 
 void particulate_block(void *) {
   Serial.println(":particulate: -> Dump record");
@@ -90,15 +90,13 @@ void setup() {
   Serial.println("Setup started.");
   Serial.println("Serial communication initialized...");
 
-  neopixel.begin();
-  neopixel.setBrightness(63);
-  neopixel.setPixelColor(0, 63, 0, 0); neopixel.show(); // Red
-  
-  Serial.println("NeoPixel initialized...");
+  //led.begin();
+  //led.setcolor(0, 63, 0, 0); // Red
+  //Serial.println("LED initialized...");
 
   Serial.print("Initializing PPD42...");
   particulate.begin();
-  Serial.print(" done");
+  Serial.println(" done");
 
   humidity.begin();
   Serial.println("Humidity sensor initialized...");
@@ -117,8 +115,8 @@ void setup() {
   gps_task->name = "gps";
   humidity_task = TickerTask::createPeriodic(&humidity_block, 60000);
   humidity_task->name = "humidity";
-  led_task = TickerTask::createPeriodic(&led_block, 1000);
-  led_task->name = "led";
+  //led_task = TickerTask::createPeriodic(&led_block, 1000);
+  //led_task->name = "led";
   particulate_task = TickerTask::createPeriodic(&particulate_block, 30000);
   particulate_task->name = "particulate";
   //wifiap_task = TickerTask::createPeriodic(&wifiap_block, 5000);
@@ -139,7 +137,7 @@ void setup() {
   Serial.println("Setup finished.");
 
   state = SLEEP;
-  neopixel.setPixelColor(0, 0, 0, 0); neopixel.show(); // Black
+  //led.setcolor(0, 0, 0, 0); // Black
 }
 
 // the loop function runs over and over again until power down or reset
@@ -149,42 +147,42 @@ void loop() {
 
     // if (accelerometer.moving) {
     if (true) {
-      
+
         state = GPS_START;
         // gps.begin();
         // Activate gps task
 
         state = GPS_TEST;
-        neopixel.setPixelColor(0, 63, 31, 0); neopixel.show(); // Orange
-        
+        //led.setcolor(0, 63, 31, 0); // Orange
+
     } else {
 
       // if (! buffer.empty) {
       if (false) {
-        
+
         state = WIFI_START;
         // wificlient.begin();
         // Activate wificlient task
 
         state = WIFI_TEST;
-        neopixel.setPixelColor(0, 63, 0, 63); neopixel.show(); // Purple
+        //led.setcolor(0, 63, 0, 63); // Purple
 
 
 
       //} else if (accelerometer.shaking) {
       } else if (false) {
-        
+
         state = AP_START;
         // wifiap.begin();
         // Activate wifiap task
 
         state = CONFIG;
-        neopixel.setPixelColor(0, 0, 63, 63); neopixel.show(); // Yellow
-        
+        //led.setcolor(0, 0, 63, 63); // Yellow
+
       }
-      
+
     }
-  
+
   } else if (state == CONFIG) {
 
     //if (finished || timeout || canceled) {
@@ -195,10 +193,10 @@ void loop() {
       // wifiap.end();
 
       state = SLEEP;
-      neopixel.setPixelColor(0, 0, 0, 0); neopixel.show(); // Black
-      
+      //led.setcolor(0, 0, 0, 0); // Black
+
     }
-    
+
   } else if (state = GPS_TEST) {
 
     //if (accelerometer.moving) {
@@ -206,7 +204,7 @@ void loop() {
 
       //if (gps.ready) {
       if (true) {
-        
+
         state = COLLECT_START;
         barometer.begin();
         humidity.begin();
@@ -216,10 +214,10 @@ void loop() {
         // Activate particulate task
 
         state = COLLECT;
-        neopixel.setPixelColor(0, 0, 63, 0); neopixel.show(); // Green
-        
+        //led.setcolor(0, 0, 63, 0); // Green
+
       }
-      
+
     } else {
 
       state = GPS_STOP;
@@ -233,10 +231,10 @@ void loop() {
       // gps.end();
 
       state = SLEEP;
-      neopixel.setPixelColor(0, 0, 0, 0); neopixel.show(); // Black
+      //led.setcolor(0, 0, 0, 0); // Black
 
     }
-    
+
   } else if (state == COLLECT) {
 
     // sensor tasks should be reporting on their own
@@ -244,20 +242,20 @@ void loop() {
 
     //if (! accelerometer.moving || buffer.empty || wifi.timeout )) {
     if (false) {
-      
+
       state = GPS_TEST;
-      neopixel.setPixelColor(0, 63, 31, 0); neopixel.show(); // Orange
-      
+      //led.setcolor(0, 63, 31, 0); // Orange
+ 
     }
-    
+
   } else if (state == WIFI_TEST) {
 
     //if (wificlient.fix) {
     if (false) {
-      
+
       state = UPLOAD;
-      neopixel.setPixelColor(0, 0, 0, 63); neopixel.show(); // Blue
-      
+      //led.setcolor(0, 0, 0, 63); // Blue
+
     }
 
     //if (accelerometer.moving || buffer.empty || wificlient.timeout) {
@@ -267,10 +265,10 @@ void loop() {
       // wificlient.end();
 
       state = SLEEP;
-      neopixel.setPixelColor(0, 0, 0, 0); neopixel.show(); // Black
-      
+      //led.setcolor(0, 0, 0, 0); // Black
+
     }
-    
+
   } else if (state = UPLOAD) {
 
     // Upload action finishes successfully or times out
@@ -279,9 +277,9 @@ void loop() {
     // Empty datastore
 
     state = WIFI_TEST;
-    neopixel.setPixelColor(0, 63, 0, 63); neopixel.show(); // Purple
- 
+    //led.setcolor(0, 63, 0, 63); // Purple
+
   }
-   
+
   schedule->tick();
 }
