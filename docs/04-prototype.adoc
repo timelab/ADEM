@@ -11,6 +11,50 @@
 NOTE: For uploading new firmware, the baudrate can go up to *460800*. The baudrate can be selected from the Arduino IDE (Sketch).
 
 
+== Firmware boot mode information
+If you have issues running your firmware, you will see a message like this:
+
+----
+ ets Jan  8 2013,rst cause:2, boot mode:(1,6)
+----
+
+There is a small overview of the different cases:
+
+.reset causes
+[options="header"]
+|=========================
+| code | reset cause
+| 0    |
+| 1    | normal boot
+| 2    | reset pin
+| 3    | software reset
+| 4    | watchdog reset
+|=========================
+
+.boot mode
+[options="header"]
+|==============================
+| code | description
+| 0    |
+| 1    | download from UART0
+| 3    | boot from flash
+| 4+   | boot from SD-card
+|==============================
+
+.reset info
+[options="header"]
+|=================================================================================================
+| code | name                    | reason
+| 0    | REASON_DEFAULT_RST      | normal startup by power on
+| 1    | REASON_WDT_RST          | hardware watch dog reset
+| 2    | REASON_EXCEPTION_RST    | exception reset, GPIO status won’t change
+| 3    | REASON_SOFT_WDT_RST     | software watch dog reset, GPIO status won’t change
+| 4    | REASON_SOFT_RESTART     | software restart ,system_restart , GPIO status won’t change
+| 5    | REASON_DEEP_SLEEP_AWAKE | wake up from deep-sleep
+| 6    | REASON_EXT_SYS_RST      | external system reset
+|=================================================================================================
+
+
 == Pin assignments
 
 Below pins are based on the SparkFun ESP8266 Thing.
