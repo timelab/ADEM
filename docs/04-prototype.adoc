@@ -8,7 +8,7 @@
 - For the SoftwareSerial interface to the GPS module, we use the default baudrate of *9600*.
   (Up for debate)
 
-NOTE: For uploading new firmware, the baudrate can go up to 460800. The baudrate can be selected from the Arduino IDE (Sketch).
+NOTE: For uploading new firmware, the baudrate can go up to *460800*. The baudrate can be selected from the Arduino IDE (Sketch).
 
 
 == Pin assignments

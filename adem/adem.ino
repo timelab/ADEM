@@ -46,48 +46,43 @@ TickerTask *particulate_task = NULL;
 // Task code blocks
 
 void accelerometer_block(void *) {
-  Serial.println(" :accelerometer_block: ");
+  Serial.println(":accelerometer:");
 }
 
 void barometer_block(void *) {
-  Serial.println(" :barometer_block: ");
-  Serial.println(" -> Dump barometer record");
+  Serial.println(":barometer: -> Dump record");
   Serial.print(barometer.report());
 }
 
 void buzzer_block(void *) {
-//  Serial.println(" :buzzer_block: ");
+//  Serial.println(":buzzer_block:");
 }
 
 void gps_block(void *) {
-  Serial.println(" :gps_block: ");
   // gps.report();
-  Serial.println(" -> Dump time record");
-  Serial.println(" -> Dump location record");
+  Serial.println(":gps: -> Dump time and location record");
 }
 
 void humidity_block(void *) {
-  Serial.println(" :humidity_block: ");
-  Serial.println(" -> Dump humidity record");
+  Serial.println(":humidity: -> Dump record");
   Serial.print(humidity.report());
 }
 
 void led_block(void *) {
-  Serial.println(" :led_block: ");
+//  Serial.println(":led_block:");
 }
 
 void particulate_block(void *) {
-  Serial.println(" :particulate_block: ");
-  Serial.println(" -> Dump particulate record");
+  Serial.println(":particulate: -> Dump record");
   //Serial.print(particulate.report());
 }
 
 //void wifiap_block(void *) {
-//  Serial.println(" :wifiap_block: ");
+//  Serial.println(":wifiap_block:");
 //}
 
 //void wificlient_block(void *) {
-//  Serial.println(" :wificlient_block: ");
+//  Serial.println(":wificlient_block:");
 //}
 
 void setup() {
@@ -100,9 +95,6 @@ void setup() {
   neopixel.setPixelColor(0, 63, 0, 0); neopixel.show(); // Red
   
   Serial.println("NeoPixel initialized...");
-
-//  gps_Serial.begin(GPS_BAUD);  
-//  Serial.print("GPS initialized...");
 
   Serial.print("Initializing PPD42...");
   particulate.begin();
@@ -132,7 +124,7 @@ void setup() {
   //wifiap_task = TickerTask::createPeriodic(&wifiap_block, 5000);
   //wifiap_task->name = "wifiap";
   //wificlient_task = TickerTask::createPeriodic(&wificlient_block, 5000);
-  //wificlient_task->name = "wificl";
+  //wificlient_task->name = "wificlient";
 
   schedule = TickerSchedlr::Instance();  // HERE OR IN SETUP? OR IS THIS DOUBLE
   
