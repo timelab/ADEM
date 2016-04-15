@@ -21,7 +21,7 @@ completed and still on-going.
 | Component / libraries                    |         |                       |
 | - Scheduler                              | alpha   | Completed (suspend?)  | Koen
 | - Datastore                              | alpha   | Ongoing               | Lieven
-| - GPS library                            | alpha   | Ongoing (need help)   | Dag
+| - GPS library (SwSerial)                 | alpha   | Ongoing (need help)   | Dag
 | - Dust meter (PPD42)                     | alpha   | Completed             | Lieven
 | - Temperature / Humidity (HTU21D)        | alpha   | Completed             | Koen
 | - Barometer (BMP180)                     | alpha   | Completed             | Koen
@@ -36,13 +36,15 @@ completed and still on-going.
 | - Code conformity                        | beta    | Ongoing               | Dag
 | WiFi integration                         |         |                       |
 | - Wi-Fi Client (upload)                  | alpha   | Ongoing               | Marco
+| - Upload code                            | alpha   | Ongoing               |
 | - Wi-Fi AP (setup)                       | beta?   | TBD                   | Marco
-| - OTA firmware updates                   | beta    | TBD                   |
-| Shake detection                          | beta    | Ongoing               | Koen
+| - Config website                         | beta?   | TBD                   |
+| - OTA firmware updates                   | beta?   | TBD                   |
 | Datastore                                |         |                       |
 | - Internal memory                        | alpha   | Ongoing               | Lieven
 | - I2C memory                             | beta    | TBD                   |
-| - Filesystem                             | beta    | TBD                   |
+| - Filesystem                             | beta?   | TBD                   |
+| Shaking/moving detection                 | alpha   | Ongoing               | Koen
 |============================================================================================
 
 

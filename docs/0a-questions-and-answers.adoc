@@ -1,12 +1,12 @@
 = Questions and Answers
 
-== At what frequency will we measure ?
+== What are we measuring at what frequency ?
 
 [options="header", width="100%"]
 |============================================================================================
 | Information                                        | Sensor                | Frequency
-| Movement (?)                                       | Accelerometer         | 1 sec
-| Harlem shake (?)                                   | Accelerometer         | 1 sec
+| Moving                                             | Accelerometer         | 1 sec
+| Shaking                                            | Accelerometer         | 1 sec
 | Time                                               | GPS                   | 1 sec
 | Location (longitude/lattitude)                     | GPS                   | 1 sec
 | Particulate matter PM10                            | Particulate           | 30 secs
@@ -15,8 +15,11 @@
 | Temperature                                        | Humidity              | 1 min
 | Pressure                                           | Barometer             | 1 min
 | Temperature                                        | Barometer             | 1 min
-| Altitude (optional)                                | GPS                   | 1 sec
-| Speed (optional)                                   | GPS                   | 1 sec
+| Altitude (optional)                                | GPS                   | N/A
+| Speed (optional)                                   | GPS                   | N/A
+| Temperature                                        | Accelerometer         | N/A
+| Acceleration                                       | Accelerometer         | N/A
+| Gyroscope                                          | Accelerometer         | N/A
 |============================================================================================
 
 
