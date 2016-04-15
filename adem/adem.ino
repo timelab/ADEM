@@ -1,7 +1,7 @@
 //#include <accelerator_MPU6050.h>
 #include <barometer_BMP085.h>
+//#include <gps_SwSerial.h>
 #include <humidity_HTU21D.h>
-//#include <gps_SoftwareSerial.h>
 #include <led_NeoPixel.h>
 #include <particulate_PPD42.h>
 #include <TickerSchedlr.h>
@@ -22,15 +22,13 @@ state_t state = START;
 //MPU6050Sensor accelerometer;
 BMP085Sensor barometer;
 //PassiveBuzzer buzzer;
-//GPSSensor gps;
+//SwSerialGPS gps = SwSerialGPS(8, 7, 9600);
 HTU21DFSensor humidity;
 NeoPixelLed led = NeoPixelLed(1, NEOPIXEL_PIN, NEO_GRB + NEO_KHZ800);
 PPD42Sensor particulate;
 //WIFIap wifiap;
 //WIFIcl wificl;
-
-// Scheduler
-TickerSchedlr *schedule = 0; //TickerSchedlr::Instance(200); HERE OR IN SETUP?
+TickerSchedlr *schedule = TickerSchedlr::Instance(200);
 
 // Tasks
 TickerTask *accelerometer_task = NULL;
@@ -38,10 +36,10 @@ TickerTask *barometer_task = NULL;
 TickerTask *buzzer_task = NULL;
 TickerTask *gps_task = NULL;
 TickerTask *humidity_task = NULL;
-//TickerTask *led_task = NULL;
+TickerTask *led_task = NULL;
 TickerTask *particulate_task = NULL;
-//TickerTask *wifiap_task = NULL;
-//TickerTask *wificl_task = NULL;
+TickerTask *wifiap_task = NULL;
+TickerTask *wificl_task = NULL;
 
 // Task code blocks
 
@@ -59,8 +57,8 @@ void buzzer_block(void *) {
 }
 
 void gps_block(void *) {
-  // gps.report();
   Serial.println(":gps: -> Dump time and location record");
+//  Serial.println(gps.report());
 }
 
 void humidity_block(void *) {
@@ -91,20 +89,25 @@ void setup() {
   Serial.println("Serial communication initialized...");
 
   led.begin();
-  led.setcolor(0, 63, 0, 0); // Red
   Serial.println("LED initialized...");
+  led.setcolor(0, 63, 0, 0); // Red
 
-  Serial.print("Initializing PPD42...");
-  particulate.begin();
-  Serial.println(" done");
+  //accelerator.begin()
+  //Serial.println("Accelerator sensor initialized...");
+
+//  barometer.begin();
+  Serial.println("Barometer sensor initialized...");
+
+  //buzzer.begin()
+  //Serial.println("Buzzer initialized...");
 
   humidity.begin();
   Serial.println("Humidity sensor initialized...");
 
-  barometer.begin();
-  Serial.println("Barometer sensor initialized...");
+  particulate.begin();
+  Serial.println("Particulate sensor initialized...");
 
-  schedule = TickerSchedlr::Instance(200); // HERE OR IN SETUP?
+//  schedule = TickerSchedlr::Instance(200); // HERE OR IN SETUP?
   accelerometer_task = TickerTask::createPeriodic(&accelerometer_block, 500);
   accelerometer_task->name = "accelerometer";
   barometer_task = TickerTask::createPeriodic(&barometer_block, 60000);
@@ -124,7 +127,7 @@ void setup() {
   //wificlient_task = TickerTask::createPeriodic(&wificlient_block, 5000);
   //wificlient_task->name = "wificlient";
 
-  schedule = TickerSchedlr::Instance();  // HERE OR IN SETUP? OR IS THIS DOUBLE
+//  schedule = TickerSchedlr::Instance(200);  // HERE OR IN SETUP? OR IS THIS DOUBLE
   
   Serial.print("Task accelerometer next time is "); Serial.println(accelerometer_task->getNextTime());
   Serial.print("Task accelerometer period is "); Serial.println(accelerometer_task->interval);
@@ -238,7 +241,7 @@ void loop() {
   } else if (state == COLLECT) {
 
     // sensor tasks should be reporting on their own
-//    Serial.println("Collecting...");
+    //Serial.println("Collecting...");
 
     //if (! accelerometer.moving || buffer.empty || wifi.timeout )) {
     if (false) {
