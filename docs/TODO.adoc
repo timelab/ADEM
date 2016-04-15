@@ -26,13 +26,12 @@ completed and still on-going.
 | - Temperature / Humidity (HTU21D)        | alpha   | Completed             | Koen
 | - Barometer (BMP180)                     | alpha   | Completed             | Koen
 | - Accelerometer (MPU6050)                | alpha   | Ongoing               | Koen
-| - NeoPixel                               | alpha   | Completed             | Dag / Stijn
+| - LED (NeoPixel)                         | alpha   | Completed             | Dag / Stijn
 | - Buzzer                                 | beta    | Optional              |
 | Code integration                         |         |                       |
 | - Modularity                             | alpha   | Completed             | Koen / Lieven
 | - Pseudo-code                            | alpha   | Completed             | Lieven / Dag
-| - Cleanup                                | alpha   | Completed             | Dag
-| - Library naming                         | alpha   | Completed             | Dag
+| - Cleanup / library naming               | alpha   | Completed             | Dag
 | - Travis CI                              | alpha   | Completed             | Dag
 | - Code conformity                        | beta    | Ongoing               | Dag
 | WiFi integration                         |         |                       |
