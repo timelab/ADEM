@@ -24,7 +24,7 @@ There is a small overview of the different cases:
 [options="header"]
 |=========================
 | code | reset cause
-| 0    |
+| 0    | unknown
 | 1    | normal boot
 | 2    | reset pin
 | 3    | software reset
@@ -35,12 +35,14 @@ There is a small overview of the different cases:
 [options="header"]
 |==============================
 | code | description
-| 0    |
+| 0    | invalid
 | 1    | download from UART0
+| 2    | invalid
 | 3    | boot from flash
-| 4+   | boot from SD-card
+| 4-7  | boot from SD-card
 |==============================
 
+////
 .reset info
 [options="header"]
 |=================================================================================================
@@ -53,11 +55,12 @@ There is a small overview of the different cases:
 | 5    | REASON_DEEP_SLEEP_AWAKE | wake up from deep-sleep
 | 6    | REASON_EXT_SYS_RST      | external system reset
 |=================================================================================================
+////
 
 
 == Pin assignments
 
-Below pins are based on the SparkFun ESP8266 Thing.
+Below pins are based on the SparkFun ESP8266 Thing Development board.
 
 .Unfinished Fritzing diagram
 image::https://drive.google.com/file/d/0B5B2OKuFeGQfWjY5S21PNXlLc1k/view?usp=sharing[alt="Fritzing diagram", link="https://drive.google.com/file/d/0B5B2OKuFeGQfWjY5S21PNXlLc1k/view?usp=sharing"]
