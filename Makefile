@@ -8,13 +8,13 @@ ESP8266_BAUD = 38400
 #ESP8266_BAUD = 115200
 SKETCH = adem.ino
 
-BOARD = "esp8266:esp8266:thing"
-HWTYPE= "esp8266"
+BOARD = esp8266:esp8266:thing
+HWTYPE= esp8266
 
 ESPTOOL = $(ARDUINO15_PATH)/packages/$(HWTYPE)/tools/esptool/0.4.8/esptool
 CTAGS = $(ARDUINO_PATH)/tools-builder/ctags/5.8-arduino10
 
-PREFS = "-prefs=tools.ctags.path=$(CTAGS)"
+PREFS = -prefs=tools.ctags.path=$(CTAGS)
 
 all:
 	@if [ ! -d "$(ARDUINO_PATH)" ]; then echo "Please make a symlink from your Arduino installation to $(ARDUINO_PATH)."; false; fi
