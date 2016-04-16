@@ -18,7 +18,9 @@ NeoPixelLed::NeoPixelLed() {
 
 void NeoPixelLed::begin() {
     neopixel.begin();
+    // FIXME: Brightness does not seem to work, so we correct using colors
     neopixel.setBrightness(31);
+    neopixel.show();
 }
 
 void NeoPixelLed::end () {

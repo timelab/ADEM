@@ -34,6 +34,7 @@ PPD42Sensor particulate;
 const int SCHED_MAX_TASKS = 200;
 TickerSchedlr *schedule = NULL;
 
+// FIXME: Since brightness does not seem to work, use "darker" colors
 // Colors
 uint32_t black = led.Color(0, 0, 0);
 uint32_t white = led.Color(63, 63, 63);
