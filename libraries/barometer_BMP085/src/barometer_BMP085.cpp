@@ -47,7 +47,7 @@ String BMP085Sensor::report()  {
 	StaticJsonBuffer<200> jsonBuffer;
 	JsonObject& root = jsonBuffer.createObject();
 	char response[200];
-	root["Sensor"] = "BMP085";
+	root["Sensor"] = "BMP085/BMP180";
 	root["Temperature"] = (float)_temperature/10.0;
 	root["Pressure"] = (float)_pressure/100.0;
 	root.printTo(response, sizeof(response));

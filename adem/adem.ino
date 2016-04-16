@@ -14,6 +14,14 @@
 
 #define SERIAL_BAUD 74880
 
+#ifdef DEBUG
+#define __LOG(msg) Serial.print(msg)
+#define __LOGLN(msg) Serial.println(msg)
+#else
+#define __LOG(msg)
+#define __LOGLN(msg)
+#endif
+
 // Different states of the program
 enum state_t { START, SLEEP, CONFIG, GPSTEST, COLLECT, WIFITEST, UPLOAD, RESET };
 char *states[] { "START", "SLEEP", "CONFIG", "GPSTEST", "COLLECT", "WIFITEST", "UPLOAD", "RESET" };
@@ -59,11 +67,11 @@ TickerTask *particulate_task = NULL;
 
 // TASKS
 void accelerometer_run(void *) {
-//  Serial.println(":accelerometer:");
+//  __LOGLN(":accelerometer:");
 }
 
 void barometer_run(void *) {
-  //barometer.read();
+  barometer.read();
   Serial.println(barometer.report());
 }
 
@@ -79,23 +87,27 @@ void humidity_run(void *) {
 
 void particulate_run(void *) {
   Serial.println(":particulate: -> Dump record");
-  //Serial.print(particulate.report());
+  //Serial.println(particulate.report());
 }
 
 
 // STATES
 void start_state() {
-  //accelerator.begin()
-  //Serial.println("Accelerator sensor initialized...");
+//  Serial.print("Initializing accelerator sensor... ");
+//  accelerator.begin()
+//  Serial.println("OK");
 
-  //barometer.begin();
-  Serial.println("Barometer sensor initialized...");
-
+  Serial.print("Initializing humidity sensor... ");
   humidity.begin();
-  Serial.println("Humidity sensor initialized...");
+  Serial.println("OK");
 
+  Serial.print("Initializing particulate sensor... ");
   particulate.begin();
-  Serial.println("Particulate sensor initialized...");
+  Serial.println("OK");
+
+  Serial.print("Initializing barometer sensor... ");
+  barometer.begin();
+  Serial.println("OK");
 
   accelerometer_task = TickerTask::createPeriodic(&accelerometer_run, 500);
   accelerometer_task->name = "accelerometer";
@@ -152,7 +164,7 @@ void gpstest_state() {
 void collect_state() {
 
   // sensor tasks should be reporting on their own
-//  Serial.println("Collecting...");
+//  __LOGLN("Collecting...");
 
   //if (! accelerometer.moving || ! gps.ready )) {
   if (! gps.ready) {
@@ -256,14 +268,17 @@ void setup() {
   state = START;
 
   Serial.begin(SERIAL_BAUD);
-  Serial.println("Setup started.");
-  Serial.println("Serial communication initialized...");
+  __LOGLN("Setup started in DEBUG mode.");
 
+  Serial.println("Serial communication... OK");
+
+  Serial.print("Initializing LED... ");
   led.begin();
-  Serial.println("LED initialized...");
+  Serial.println("OK");
 
+  Serial.print("Initializing scheduler... ");
   schedule = TickerSchedlr::Instance(SCHED_MAX_TASKS);
-  Serial.println("Scheduler started...");
+  Serial.println("OK");
 }
 
 // the loop function runs over and over again until power down or reset
@@ -281,8 +296,7 @@ void loop() {
   }
 
   if (state != next_state) {
-    Serial.print("Transition from "); Serial.print(states[state]);
-    Serial.print(" to "); Serial.println(states[next_state]);
+    __LOG("Transition from "); __LOG(states[state]); __LOG(" to "); __LOGLN(states[next_state]);
 
     switch(state) {
 
@@ -334,12 +348,12 @@ void loop() {
 
     }
 
-    Serial.println("End of transition."); 
-
     prev_state = state;
     state = next_state;
 
-    led.setcolor(led_state, colors[state]);
+    led.setcolor(led_state, colors[next_state]);
+
+    __LOG("End transition to ");  __LOGLN(states[next_state]);
   }
 
   schedule->tick();

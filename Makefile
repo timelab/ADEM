@@ -16,7 +16,12 @@ HWTYPE = esp8266
 ESPTOOL = $(ARDUINO15_PATH)/packages/$(HWTYPE)/tools/esptool/0.4.8/esptool
 CTAGS = $(ARDUINO_PATH)/tools-builder/ctags/5.8-arduino10
 
-PREFS = -prefs=tools.ctags.path=$(CTAGS)
+CXX_FLAGS = -DDEBUG
+PREFS = -prefs=build.debug_level="$(CXX_FLAGS)" -prefs=tools.ctags.path="$(CTAGS)"
+
+SKETCHES = $(find $(CURDIR) -name *.ino)
+
+.PHONY: all flash upload tests
 
 all:
 	@if [ ! -d "$(ARDUINO_PATH)" ]; then echo "Please make a symlink from your Arduino installation to $(ARDUINO_PATH)."; false; fi
@@ -36,6 +41,9 @@ flash:
 	$(ESPTOOL) -v -cd ck -cb $(SERIAL_BAUD) -cp $(SERIAL_PORT) -ca 0x00000 -cf $(TARGET_DIR)/$(shell basename $(SKETCH)).bin
 
 upload: all flash
+
+tests:
+	$(foreach SKETCH,$(SKETCHES), make SKETCH=$(SKETCH); )
 
 clean:
 	rm -rf $(TARGET_DIR)

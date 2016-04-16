@@ -46,8 +46,8 @@
 #  define SCHED_BUFFER_SIZE 100
 #endif
 
-// #define DEBUG  // uncomment this line to get debug output; be aware of the volume of serial logging it can overflow the buffers
-#if defined(DEBUG)
+// #define DEBUG_SCHED  // uncomment this line to get debug output; be aware of the volume of serial logging it can overflow the buffers
+#if defined(DEBUG_SCHED)
 #define __LOG(msg) (Serial.print(msg))
 #define __LOGLN(msg) (Serial.println(msg))
 #else
