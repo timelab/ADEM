@@ -32,7 +32,7 @@ PPD42Sensor particulate;
 //WIFIap wifiap;
 //WIFIcl wificl;
 const int SCHED_MAX_TASKS = 200;
-TickerSchedlr *schedule = TickerSchedlr::Instance(SCHED_MAX_TASKS);
+TickerSchedlr *schedule = NULL;
 
 
 // Tasks
@@ -125,6 +125,7 @@ void start_state() {
   //wifiap_task->name = "wifiap";
   //wificlient_task = TickerTask::createPeriodic(&wificlient_run, 5000);
   //wificlient_task->name = "wificlient";
+
   Serial.println("All tasks created...");
 
   next_state = SLEEP;
@@ -170,7 +171,7 @@ void gpstest_state() {
 void collect_state() {
 
   // sensor tasks should be reporting on their own
-  Serial.println("Collecting...");
+//  Serial.println("Collecting...");
 
   //if (! accelerometer.moving || buffer.empty || wifi.timeout )) {
   if (false) {
@@ -288,6 +289,9 @@ void setup() {
 
   led.begin();
   Serial.println("LED initialized...");
+
+  schedule = TickerSchedlr::Instance(SCHED_MAX_TASKS);
+  Serial.println("Scheduler started...");
 }
 
 // the loop function runs over and over again until power down or reset
