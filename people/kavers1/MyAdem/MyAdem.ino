@@ -31,8 +31,8 @@ Adafruit_NeoPixel strip = Adafruit_NeoPixel(1, pin1, NEO_GRB + NEO_KHZ800);
 
 void flip(void *)
 {
-//	int state = digitalRead(12);  // get the current state of GPIO1 pin
-//	digitalWrite(12, !state);     // set pin to the opposite state
+	int state = digitalRead(12);  // get the current state of GPIO1 pin
+	digitalWrite(12, !state);     // set pin to the opposite state
 	__LOG(count);
 	__LOG(" :flip1: ");
 	__LOGLN(state);
