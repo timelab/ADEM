@@ -28,7 +28,8 @@ NeoPixelLed led = NeoPixelLed(1, NEOPIXEL_PIN, NEO_GRB + NEO_KHZ800);
 PPD42Sensor particulate;
 //WIFIap wifiap;
 //WIFIcl wificl;
-TickerSchedlr *schedule = TickerSchedlr::Instance(200);
+const int SCHED_MAX_TASKS = 200;
+TickerSchedlr *schedule = TickerSchedlr::Instance(SCHED_MAX_TASKS);
 
 // Tasks
 TickerTask *accelerometer_task = NULL;
@@ -43,44 +44,44 @@ TickerTask *wificl_task = NULL;
 
 // Task code blocks
 
-void accelerometer_block(void *) {
+void accelerometer_run(void *) {
   Serial.println(":accelerometer:");
 }
 
-void barometer_block(void *) {
+void barometer_run(void *) {
   Serial.println(":barometer: -> Dump record");
   Serial.println(barometer.report());
 }
 
-void buzzer_block(void *) {
-//  Serial.println(":buzzer_block:");
+void buzzer_run(void *) {
+//  Serial.println(":buzzer_run:");
 }
 
-void gps_block(void *) {
+void gps_run(void *) {
   Serial.println(":gps: -> Dump time and location record");
   //Serial.println(gps.report());
 }
 
-void humidity_block(void *) {
+void humidity_run(void *) {
   Serial.println(":humidity: -> Dump record");
   Serial.println(humidity.report());
 }
 
-//void led_block(void *) {
-//  Serial.println(":led_block:");
+//void led_run(void *) {
+//  Serial.println(":led_run:");
 //}
 
-void particulate_block(void *) {
+void particulate_run(void *) {
   Serial.println(":particulate: -> Dump record");
   //Serial.print(particulate.report());
 }
 
-//void wifiap_block(void *) {
-//  Serial.println(":wifiap_block:");
+//void wifiap_run(void *) {
+//  Serial.println(":wifiap_run:");
 //}
 
-//void wificlient_block(void *) {
-//  Serial.println(":wificlient_block:");
+//void wificlient_run(void *) {
+//  Serial.println(":wificlient_run:");
 //}
 
 void setup() {
@@ -107,23 +108,23 @@ void setup() {
   particulate.begin();
   Serial.println("Particulate sensor initialized...");
 
-  accelerometer_task = TickerTask::createPeriodic(&accelerometer_block, 500);
+  accelerometer_task = TickerTask::createPeriodic(&accelerometer_run, 500);
   accelerometer_task->name = "accelerometer";
-  barometer_task = TickerTask::createPeriodic(&barometer_block, 60000);
+  barometer_task = TickerTask::createPeriodic(&barometer_run, 60000);
   barometer_task->name = "barometer";
-  buzzer_task = TickerTask::createPeriodic(&buzzer_block, 100);
+  buzzer_task = TickerTask::createPeriodic(&buzzer_run, 100);
   buzzer_task->name = "buzzer";
-  gps_task = TickerTask::createPeriodic(&gps_block, 1000);
+  gps_task = TickerTask::createPeriodic(&gps_run, 1000);
   gps_task->name = "gps";
-  humidity_task = TickerTask::createPeriodic(&humidity_block, 60000);
+  humidity_task = TickerTask::createPeriodic(&humidity_run, 60000);
   humidity_task->name = "humidity";
-  //led_task = TickerTask::createPeriodic(&led_block, 1000);
+  //led_task = TickerTask::createPeriodic(&led_run, 1000);
   //led_task->name = "led";
-  particulate_task = TickerTask::createPeriodic(&particulate_block, 30000);
+  particulate_task = TickerTask::createPeriodic(&particulate_run, 30000);
   particulate_task->name = "particulate";
-  //wifiap_task = TickerTask::createPeriodic(&wifiap_block, 5000);
+  //wifiap_task = TickerTask::createPeriodic(&wifiap_run, 5000);
   //wifiap_task->name = "wifiap";
-  //wificlient_task = TickerTask::createPeriodic(&wificlient_block, 5000);
+  //wificlient_task = TickerTask::createPeriodic(&wificlient_run, 5000);
   //wificlient_task->name = "wificlient";
   Serial.println("All tasks created...");
 
