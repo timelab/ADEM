@@ -1,6 +1,6 @@
 //#include <accelerator_MPU6050.h>
 #include <barometer_BMP085.h>
-//#include <gps_SwSerial.h>
+#include <gps_SwSerial.h>
 #include <humidity_HTU21D.h>
 #include <led_NeoPixel.h>
 #include <particulate_PPD42.h>

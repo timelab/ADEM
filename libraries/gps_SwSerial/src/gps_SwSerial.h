@@ -48,8 +48,8 @@ private:
     boolean readData(void);
     float GetData();
 
-    SoftwareSerial swserial;
-    TinyGPSPlus tinygps;
+    SoftwareSerial *swserial;
+    TinyGPSPlus *tinygps;
 
 };
 

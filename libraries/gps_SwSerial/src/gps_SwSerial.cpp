@@ -9,19 +9,19 @@
 #endif
 
 SwSerialGPS::SwSerialGPS(int rx, int tx, int bd) {
-    swserial = SoftwareSerial(rx, tx, false, 64);
-    tinygps = TinyGPSPlus();
+    swserial = new SoftwareSerial(rx, tx, false, 64);
+    tinygps = new TinyGPSPlus();
     baud = bd;
 }
 
 SwSerialGPS::SwSerialGPS() {
-    swserial = SoftwareSerial(4, 0, false, 64);
-    tinygps = TinyGPSPlus();
+    swserial = new SoftwareSerial(4, 0, false, 64);
+    tinygps = new TinyGPSPlus();
     baud = 9600;
 }
 
 void SwSerialGPS::begin(void) {
-    swserial.begin(baud);
+    swserial->begin(baud);
 }
 
 void SwSerialGPS::end() {
@@ -37,16 +37,16 @@ float SwSerialGPS::GetData(void) {
 
     unsigned long start = millis();
     do {
-        while (swserial.available() > 0) {
-            tinygps.encode(swserial.read());
+        while (swserial->available() > 0) {
+            tinygps->encode(swserial->read());
         }
         delay(5);
     } while (millis() - start < 100);
 
-    date = tinygps.date;
-    time = tinygps.time;
-    location = tinygps.location;
-    satellites = tinygps.satellites;
+    date = tinygps->date;
+    time = tinygps->time;
+    location = tinygps->location;
+    satellites = tinygps->satellites;
 }
 
 void SwSerialGPS::read() {
@@ -66,19 +66,19 @@ String SwSerialGPS::report()  {
     char response[200];
     root["Sensor"] = "GPS";
 
-    if (tinygps.date.isValid() && tinygps.time.isValid()) {
+    if (tinygps->date.isValid() && tinygps->time.isValid()) {
         ready = true;
         root["Time"] = FormatDateTime(date, time);
     } else {
         ready = false;
     }
 
-    if (tinygps.location.isValid()) {
+    if (tinygps->location.isValid()) {
         root["Lattitude"] = location.lat();
         root["Longitude"] = location.lng();
     }
 
-//    if (tinygps.satellites.isValid()) {
+//    if (tinygps->satellites.isValid()) {
 //        root["Satellites"] = satellites.value;
 //    }
 
