@@ -63,14 +63,17 @@ void accelerometer_run(void *) {
 }
 
 void barometer_run(void *) {
+  //barometer.read();
   Serial.println(barometer.report());
 }
 
 void gps_run(void *) {
+  gps.read();
   Serial.println(gps.report());
 }
 
 void humidity_run(void *) {
+  humidity.read();
   Serial.println(humidity.report());
 }
 
@@ -105,7 +108,7 @@ void start_state() {
   particulate_task = TickerTask::createPeriodic(&particulate_run, 30000);
   particulate_task->name = "particulate";
 
-  Serial.println("All tasks created...");
+  Serial.println("Periodic tasks initialized...");
 
   next_state = SLEEP;
 }
@@ -128,22 +131,22 @@ void sleep_state() {
 
 void config_state() {
 
-    //if (finished || timeout || canceled) {
-    if (true) {
-      next_state = SLEEP;
-    }
+  //if (finished || timeout || canceled) {
+  if (true) {
+    next_state = SLEEP;
+  }
 }
 
 void gpstest_state() {
 
-    //if (accelerometer.moving) {
-    if (true) {
-      if (gps.ready) {
-        next_state = COLLECT;
-      }
-    } else {
-      next_state = SLEEP;
+  //if (accelerometer.moving) {
+  if (true) {
+    if (gps.ready) {
+      next_state = COLLECT;
     }
+  } else {
+    next_state = SLEEP;
+  }
 }
 
 void collect_state() {
@@ -151,23 +154,23 @@ void collect_state() {
   // sensor tasks should be reporting on their own
 //  Serial.println("Collecting...");
 
-  //if (! accelerometer.moving || buffer.empty || wifi.timeout )) {
-  if (false) {
+  //if (! accelerometer.moving || ! gps.ready )) {
+  if (! gps.ready) {
     next_state = GPSTEST;
   }
 }
 
 void wifitest_state() {
 
-    //if (wificlient.fix) {
-    if (false) {
-      state = UPLOAD;
-    }
+  //if (wificlient.fix) {
+  if (false) {
+    state = UPLOAD;
+  }
 
-    //if (accelerometer.moving || buffer.empty || wificlient.timeout) {
-    if (false) {
-      next_state = SLEEP;
-    }
+  //if (accelerometer.moving || buffer.empty || wificlient.timeout) {
+  if (false) {
+    next_state = SLEEP;
+  }
 }
 
 void upload_state() {
@@ -177,7 +180,10 @@ void upload_state() {
   // Send to server
   // Empty datastore
 
-  next_state = WIFITEST;
+//  if (buffer.empty) {
+  if (true) {
+    next_state = WIFITEST;
+  }
 }
 
 
@@ -284,7 +290,7 @@ void loop() {
         switch(next_state) {
           case SLEEP:     start_to_sleep(); break;
           default:        next_state = RESET;
-        }; Serial.println("During case."); delay(100); break;
+        }; break;
 
       case SLEEP:
         switch(next_state) {

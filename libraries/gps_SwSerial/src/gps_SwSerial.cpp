@@ -82,7 +82,6 @@ String SwSerialGPS::report()  {
 //        root["Satellites"] = satellites.value;
 //    }
 
-//    root.prettyPrintTo(response, sizeof(response));
     root.printTo(response, sizeof(response));
     return response;
 }
