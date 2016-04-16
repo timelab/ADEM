@@ -105,6 +105,7 @@ void start_state() {
   particulate.begin();
   Serial.println("OK");
 
+  // FIXME: Moving barometer.begin() up, calibration hangs forever ??
   Serial.print("Initializing barometer sensor... ");
   barometer.begin();
   Serial.println("OK");
