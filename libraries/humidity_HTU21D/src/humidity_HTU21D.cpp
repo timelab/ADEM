@@ -120,12 +120,9 @@ String HTU21DFSensor::report()  {
 	StaticJsonBuffer<200> jsonBuffer;
 	JsonObject& root = jsonBuffer.createObject();
 	char response[200];
-	root["sensor"] = "HTU21DF";
+	root["Sensor"] = "HTU21DF";
 	root["Temperature"] = temperature;
 	root["Humidity"] = humidity;
-	root.prettyPrintTo(response,sizeof(response));
+	root.printTo(response,sizeof(response));
 	return response;
 }
-
-
-/*********************************************************************/
