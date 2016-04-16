@@ -5,18 +5,12 @@ Created by Dag Wieers, Stijn Diependaele
 Read https://www.arduino.cc/en/Reference/APIStyleGuide for inspiration!
 */
 
-#ifndef _LED_h
-#define _LED_h
+#ifndef _NeoPixelLed_h
+#define _NeoPixelLed_h
 
-
+#include <Arduino.h>
 #include <Sensor.h> // - Skeleton Library for ADEM sensors.
 #include <Adafruit_NeoPixel.h>
-
-#if defined(ARDUINO) && ARDUINO >= 100
-    #include <Arduino.h>
-#else
-    #include "WProgram.h"
-#endif
 
 //abstract class Sensor
 class NeoPixelLed {
@@ -31,12 +25,14 @@ public:
     virtual void write();
     virtual void process();
     virtual String report();
-    //Sensor ();
+
     virtual void setbrightness(uint8_t);
     virtual void setcolor(uint16_t n, uint8_t r, uint8_t g, uint8_t b);
+    virtual void setcolor(uint16_t n, uint32_t c);
+
+    virtual uint32_t Color(uint8_t r, uint8_t g, uint8_t b);
 
 private:
-
     Adafruit_NeoPixel neopixel;
 
 };

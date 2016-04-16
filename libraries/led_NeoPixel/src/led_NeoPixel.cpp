@@ -18,7 +18,7 @@ NeoPixelLed::NeoPixelLed() {
 
 void NeoPixelLed::begin() {
     neopixel.begin();
-    neopixel.setBrightness(63);
+    neopixel.setBrightness(31);
 }
 
 void NeoPixelLed::end () {
@@ -45,4 +45,15 @@ void NeoPixelLed::setbrightness(uint8_t br) {
 void NeoPixelLed::setcolor(uint16_t n, uint8_t r, uint8_t g, uint8_t b) {
     neopixel.setPixelColor(n, r, g, b);
     neopixel.show();
+}
+
+void NeoPixelLed::setcolor(uint16_t n, uint32_t c) {
+    neopixel.setPixelColor(n, c);
+    neopixel.show();
+}
+
+// Convert separate R,G,B into packed 32-bit RGB color.
+// Packed format is always RGB, regardless of LED strand color order.
+uint32_t NeoPixelLed::Color(uint8_t r, uint8_t g, uint8_t b) {
+  return ((uint32_t)r << 16) | ((uint32_t)g <<  8) | b;
 }

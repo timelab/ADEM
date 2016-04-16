@@ -25,7 +25,7 @@ state_t next_state = SLEEP;
 //MPU6050Sensor accelerometer;
 BMP085Sensor barometer;
 //PassiveBuzzer buzzer;
-//SwSerialGPS gps = SwSerialGPS(8, 7, 9600);
+SwSerialGPS gps = SwSerialGPS(0, 4, 9600);
 HTU21DFSensor humidity;
 NeoPixelLed led = NeoPixelLed(1, NEOPIXEL_PIN, NEO_GRB + NEO_KHZ800);
 PPD42Sensor particulate;
@@ -34,6 +34,20 @@ PPD42Sensor particulate;
 const int SCHED_MAX_TASKS = 200;
 TickerSchedlr *schedule = NULL;
 
+// Colors
+uint32_t black = led.Color(0, 0, 0);
+uint32_t white = led.Color(63, 63, 63);
+uint32_t red = led.Color(63, 0, 0);
+uint32_t orange = led.Color(63, 31, 0);
+uint32_t yellow = led.Color(63, 63, 0);
+uint32_t green = led.Color(0, 63, 0);
+uint32_t light_blue = led.Color(0, 63, 63);
+uint32_t blue = led.Color(0, 0, 63);
+uint32_t purple = led.Color(31, 0, 63);
+
+uint32_t colors[] = { red, black, yellow, orange, green, purple, blue, white };
+
+uint16_t led_state = 0;
 
 // Tasks
 TickerTask *accelerometer_task = NULL;
@@ -52,8 +66,7 @@ void barometer_run(void *) {
 }
 
 void gps_run(void *) {
-  Serial.println(":gps: -> Dump time and location record");
-  //Serial.println(gps.report());
+  Serial.println(gps.report());
 }
 
 void humidity_run(void *) {
@@ -68,8 +81,6 @@ void particulate_run(void *) {
 
 // STATES
 void start_state() {
-  led.setcolor(0, 63, 0, 0); // Red
-
   //accelerator.begin()
   //Serial.println("Accelerator sensor initialized...");
 
@@ -126,8 +137,7 @@ void gpstest_state() {
 
     //if (accelerometer.moving) {
     if (true) {
-      //if (gps.ready) {
-      if (true) {
+      if (gps.ready) {
         next_state = COLLECT;
       }
     } else {
@@ -172,42 +182,34 @@ void upload_state() {
 
 // TRANSITIONS
 void start_to_sleep() {
-  Serial.println("start_to_sleep begins");
-  led.setcolor(0, 0, 0, 0); // Black
-  Serial.println("start_to_sleep ends");
 }
 
 void sleep_to_config() {
 
-  led.setcolor(0, 0, 63, 63); // Yellow
   //wifiap.begin();
   // Resume wifiap task
 }
 
 void sleep_to_gpstest() {
 
-  led.setcolor(0, 63, 31, 0); // Orange
-  //gps.begin();
+  gps.begin();
   // Resume gps task
 }
 
 void sleep_to_wifitest() {
 
-  led.setcolor(0, 63, 0, 63); // Purple
   //wificlient.begin();
   // Resume wificlient task
 }
 
 void config_to_sleep() {
 
-  led.setcolor(0, 0, 0, 0); // Black
   // Suspend wifiap task
   //wifiap.end();
 }
 
 void gpstest_to_sleep() {
 
-  led.setcolor(0, 0, 0, 0); // Black
   // Suspend barometer task
   // Suspend humidity task
   // Suspend particulate task
@@ -220,7 +222,6 @@ void gpstest_to_sleep() {
 
 void gpstest_to_collect() {
 
-  led.setcolor(0, 0, 63, 0); // Green
   barometer.begin();
   humidity.begin();
   particulate.begin();
@@ -233,18 +234,15 @@ void collect_to_gpstest() {
 }
 
 void wifitest_to_sleep() {
-  led.setcolor(0, 0, 0, 0); // Black
 
   // Suspend wificlient task
   //wificlient.end();
 }
 
 void wifitest_to_upload() {
-  led.setcolor(0, 0, 0, 63); // Blue
 }
 
 void upload_to_wifitest() {
-  led.setcolor(0, 63, 0, 63); // Purple
 }
 
 void setup() {
@@ -334,11 +332,11 @@ void loop() {
     prev_state = state;
     state = next_state;
 
-    // FIXME: Set the led here based on state
+    led.setcolor(led_state, colors[state]);
   }
 
   schedule->tick();
 
 }
 
-// vim: syntax=c
+// vim:syntax=cpp
