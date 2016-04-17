@@ -9,7 +9,7 @@ completed and still on-going.
 | Hardware selection                                 | Completed             | Koen ?
 | Testing individual sensors                         | Completed ?           | Koen
 | Breadboard prototype                               | Completed             | Dag
-| Add breadboard prototype design (fritzing)         | Ongoing               | Dag
+| Add breadboard prototype design (fritzing)         | Completed             | Dag
 | PCB design                                         | Ongoing ?             | Koen
 |============================================================================================
 
@@ -20,8 +20,8 @@ completed and still on-going.
 | Task                                     | Release | Status                | Owner
 | Component / libraries                    |         |                       |
 | - Scheduler                              | alpha   | Completed (suspend?)  | Koen
-| - Datastore                              | alpha   | Ongoing               | Lieven
-| - GPS library (SwSerial)                 | alpha   | Ongoing (need help)   | Dag
+| - Datastore                              | alpha   | Ongoing               | Koen
+| - GPS library (SwSerial)                 | alpha   | Completed             | Dag / Lieven
 | - Dust meter (PPD42)                     | alpha   | Completed             | Lieven
 | - Temperature / Humidity (HTU21D)        | alpha   | Completed             | Koen
 | - Barometer (BMP180)                     | alpha   | Completed             | Koen
@@ -33,6 +33,9 @@ completed and still on-going.
 | - Pseudo-code                            | alpha   | Completed             | Lieven / Dag
 | - Cleanup / library naming               | alpha   | Completed             | Dag
 | - Travis CI                              | alpha   | Completed             | Dag
+| - State machine                          | alpha   | Completed             | Lieven / Dag / Koen
+| - DEBUG mode                             | alpha   | Completed             | Dag
+| - Serial input to state machine (debug)  | alpha   | Completed             | Dag
 | - Code conformity                        | beta    | Ongoing               | Dag
 | WiFi integration                         |         |                       |
 | - Wi-Fi Client (upload)                  | alpha   | Ongoing               | Marco
@@ -41,10 +44,11 @@ completed and still on-going.
 | - Config website                         | beta?   | TBD                   |
 | - OTA firmware updates                   | beta?   | TBD                   |
 | Datastore                                |         |                       |
-| - Internal memory                        | alpha   | Ongoing               | Lieven
+| - Internal memory                        | alpha   | Ongoing               | Koen
 | - I2C memory                             | beta    | TBD                   |
 | - Filesystem                             | beta?   | TBD                   |
 | Shaking/moving detection                 | alpha   | Ongoing               | Koen
+| Troubleshoot existing FIXMEs             | beta?   | TBD                   | You ?
 |============================================================================================
 
 
@@ -56,7 +60,8 @@ completed and still on-going.
 | Document pseudo-code                               | Completed             | Dag
 | Create state diagram and conditions                | Completed             | Dag
 | Add technical questions and answers                | Completed             | Dag
-| Update project license to LGPLv3                   | Ongoing               | Dag
+| Update project license to LGPLv3                   | TBD                   | Dag
+| Read the documentation and test procedures         | TBD                   | You ?
 |============================================================================================
 
 
