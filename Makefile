@@ -2,11 +2,11 @@ ARDUINO_PATH = $(CURDIR)/Arduino
 ARDUINO15_PATH = $(HOME)/.arduino15
 TARGET_DIR = $(CURDIR)/Build
 
-SERIAL_PORT = /dev/ttyUSB0
-SERIAL_BAUD = 921600
-ESP8266_BAUD = 38400
-#ESP8266_BAUD = 74880
-#ESP8266_BAUD = 115200
+SERIAL_PORT := /dev/ttyUSB0
+#SERIAL_BAUD := 38400
+SERIAL_BAUD := 74880
+#SERIAL_BAUD := 115200
+FLASH_BAUD := 921600
 
 SKETCH = adem/adem.ino
 
@@ -16,7 +16,7 @@ HWTYPE = esp8266
 ESPTOOL = $(ARDUINO15_PATH)/packages/$(HWTYPE)/tools/esptool/0.4.8/esptool
 CTAGS = $(ARDUINO_PATH)/tools-builder/ctags/5.8-arduino10
 
-CXX_FLAGS = -DDEBUG
+CXX_FLAGS := -DDEBUG
 PREFS = -prefs=build.debug_level="$(CXX_FLAGS)" -prefs=tools.ctags.path="$(CTAGS)"
 
 SKETCHES = $(find $(CURDIR) -name *.ino)
@@ -38,7 +38,9 @@ all:
 		$(SKETCH)
 
 flash:
-	$(ESPTOOL) -v -cd ck -cb $(SERIAL_BAUD) -cp $(SERIAL_PORT) -ca 0x00000 -cf $(TARGET_DIR)/$(shell basename $(SKETCH)).bin
+	tput reset > $(SERIAL_PORT)
+	$(ESPTOOL) -v -cd nodemcu -cb $(FLASH_BAUD) -cp $(SERIAL_PORT) -ca 0x00000 -cf $(TARGET_DIR)/$(shell basename $(SKETCH)).bin
+	tput reset > $(SERIAL_PORT)
 
 upload: all flash
 
@@ -48,7 +50,14 @@ tests:
 clean:
 	rm -rf $(TARGET_DIR)
 
+serial:
+#	stty -F $(SERIAL_PORT) speed $(SERIAL_BAUD) cs8 -cstopb -parenb
+#	stty -F $(SERIAL_PORT) speed $(SERIAL_BAUD)
+	@echo "Serial speed is $(SERIAL_BAUD)"
+	cat <$(SERIAL_PORT)
+
 monitor:
-#	stty -F $(SERIAL_PORT) $(ESP8266_BAUD)
+#	stty -F $(SERIAL_PORT) speed $(SERIAL_BAUD) cs8 -cstopb -parenb
 #	screen $(SERIAL_PORT) $$(stty speed <$(SERIAL_PORT))
-	screen $(SERIAL_PORT) $(ESP8266_BAUD)
+	@echo "Serial speed is $(SERIAL_BAUD)"
+	screen $(SERIAL_PORT) $(SERIAL_BAUD)
