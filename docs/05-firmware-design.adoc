@@ -5,62 +5,54 @@
 image::https://drive.google.com/file/d/0B5B2OKuFeGQfSWpKemVRNHZqeDg/view?usp=sharing[alt="Code Diagram", link="https://drive.google.com/file/d/0B5B2OKuFeGQfSFFJQkZjZVJLMGM/view?usp=sharing", align="center"]
 
 
+== State machine
+
+The state machine is part of the main loop and simply calls the specific state _loop_ code (e.g. +sleep_state()+) or handles a state transition (e.g. +start_to_sleep()+).
+
+The current design is a simplified version, we expect additional states to be required in the future (e.g. for deep sleep, in-house measuring, etc.)
+
+
 == States
 
 These are the states the main loop controls.
 
-START::
-  - LED Red
-  - Activate accelerometer
-  - Set up serial
-  - Sets up tasks
-  - -> SLEEP
+ - START -> SLEEP
+ - SLEEP
+ - CONFIG
+ - GPSTEST
+ - COLLECT
+ - WIFITEST
+ - UPLOAD
+ - RESET -> START
 
-SLEEP::
-  - LED off
-  - Move to CONFIG
-  - Activate gps -> GPS_TEST
-  - Acticate wifi -> WIFI_TEST
-
-CONFIG::
-  - LED Yellow
-  - Configure wifi-client, wifi-ap, back-end, etc. -> SLEEP
-
-GPS_TEST::
-  - LED Orange
-  - -> COLLECT
-  - Suspend gps -> SLEEP
-
-COLLECT::
-  - LED Green
-  - Collect data
-  - -> GPS_TEST
-
-WIFI_TEST::
-  - LED Purple
-  - -> UPLOAD
-  - Suspend wifi -> SLEEP
-
-UPLOAD::
-  - LED Blue
-  - Upload data
-  - Empty datastore
-  - -> WIFI_TEST
+The conditional decisions made during a state are performed within the state _loop_. We defined specific functions for these inner loops (e.g. +sleep_state()+ or +collect_state()+).
 
 
-=== Transition states
+== State transitions
 
-Additionally we have a few transition state. These are pseudo-states used for performing tasks and moving to the next state.
+Additionally when we move from one state to another state in the state machine, we require some things to happen. E.g. enable the sensors, or disconnect the GPS module. For this the state-machine will call specific _transition_ functions (e.g. +start_to_sleep()+ or +sleep_to_gpstest()+).
 
-- AP_START
-- AP_STOP
-- GPS_START
-- GPS_STOP
-- WIFI_START
-- WIFI_STOP
+It is these functions that perform the most work. The state machine itself only directs to a state _loop_ or a transition _call_.
+
+Some of these transitions do not need anything specific to happen.
+
+=== Tasks
+
+During the main loop, the scheduler also preserves time for other tasks to perform actions. These tasks allow e.g. the accelerator sensor to collect new data and update information that can influence the state machine.
+
+Typically each sensor has its own task, however they may not be running the whole time but only in a specific state (e.g. COLLECT):
+
+ - accelerator _(always enabled)_
+ - barometer _(enabled in COLLECT state)_
+ - gps _(enabled in GPSTEST and COLLECT state)_
+ - humidity _(enabled in COLLECT state)_
+ - particulate _(enabled in COLLECT state)_
 
 
 == Pseudo-code
+
+Below was our first design of the state machine. It may help in understand what is going on underneath.
+Today this code is properly split into different functions and the state machine is clear an concise.
 
 === GLOBAL
 
