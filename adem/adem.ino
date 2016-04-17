@@ -67,7 +67,7 @@ TickerTask *particulate_task = NULL;
 
 // TASKS
 void accelerometer_run(void *) {
-  __LOGLN(":accelerometer: -> Check moving/shaking");
+  //LOGLN(":accelerometer: -> Check moving/shaking");
   //accelerometer.read();
   // Serial.println(accelerometer.report());
 }
@@ -88,9 +88,9 @@ void humidity_run(void *) {
 }
 
 void particulate_run(void *) {
-  __LOGLN(":particulate: -> Dump record");
-  //particulate.read();
-  //__LOGLN(particulate.report());
+//  __LOGLN(":particulate: -> Dump record");
+  particulate.read();
+  __LOGLN(particulate.report());
 }
 
 
@@ -155,7 +155,7 @@ void config_state() {
 
 void gpstest_state() {
 
-  gps.read();
+//  gps.read();
 
   //if (accelerometer.moving) {
   if (true) {
