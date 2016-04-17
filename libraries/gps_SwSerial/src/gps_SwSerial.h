@@ -2,16 +2,11 @@
 
 #ifndef _SwSerialGPS_h
 #define _SwSerialGPS_h
+#include <Arduino.h>
 #include <Sensor.h> // - Skeleton Library for ADEM sensors.
 #include <ArduinoJson.h>
 #include <TinyGPS++.h>
 #include <SoftwareSerial.h>
-
-#if defined(ARDUINO) && ARDUINO >= 100
-#include <Arduino.h>
-#else
-#include "WProgram.h"
-#endif
 
 #define GPS_RX_PIN 4
 #define GPS_TX_PIN 0
@@ -44,9 +39,6 @@ private:
     String FormatDateTime(TinyGPSDate date, TinyGPSTime time);
 
     int baud = 9600;
-    boolean _error = false;
-    boolean readData(void);
-    float GetData();
 
     SoftwareSerial *swserial;
     TinyGPSPlus *tinygps;

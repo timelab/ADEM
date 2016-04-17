@@ -8,6 +8,14 @@
 #include <util/delay.h>
 #endif
 
+#ifdef DEBUG_GPS:
+#define __LOG(msg) Serial.print(msg)
+#define __LOGLN(msg) Serial.println(msg)
+#else
+#define __LOG(msg)
+#define __LOGLN(msg)
+#endif
+
 SwSerialGPS::SwSerialGPS(int rx, int tx, int bd) {
     swserial = new SoftwareSerial(rx, tx, false, 64);
     tinygps = new TinyGPSPlus();
@@ -33,24 +41,21 @@ void SwSerialGPS::write() {
 void SwSerialGPS::process() {
 }
 
-float SwSerialGPS::GetData(void) {
+void SwSerialGPS::read() {
 
     unsigned long start = millis();
     do {
         while (swserial->available() > 0) {
-            tinygps->encode(swserial->read());
+            char c = swserial->read();
+            __LOG(c);
+            tinygps->encode(c);
         }
-        delay(5);
     } while (millis() - start < 100);
 
     date = tinygps->date;
     time = tinygps->time;
     location = tinygps->location;
     satellites = tinygps->satellites;
-}
-
-void SwSerialGPS::read() {
-    GetData();
 }
 
 String SwSerialGPS::FormatDateTime(TinyGPSDate date, TinyGPSTime time) {
@@ -67,20 +72,20 @@ String SwSerialGPS::report()  {
     root["Sensor"] = "GPS";
 
     if (tinygps->date.isValid() && tinygps->time.isValid()) {
-        ready = true;
         root["Time"] = FormatDateTime(date, time);
+    }
+
+    if (tinygps->location.isValid()) {
+        ready = true;
+        root["Lattitude"] = location.lat();
+        root["Longitude"] = location.lng();
     } else {
         ready = false;
     }
 
-    if (tinygps->location.isValid()) {
-        root["Lattitude"] = location.lat();
-        root["Longitude"] = location.lng();
+    if (tinygps->satellites.isValid()) {
+        root["Satellites"] = satellites.value();
     }
-
-//    if (tinygps->satellites.isValid()) {
-//        root["Satellites"] = satellites.value;
-//    }
 
     root.printTo(response, sizeof(response));
     return response;
