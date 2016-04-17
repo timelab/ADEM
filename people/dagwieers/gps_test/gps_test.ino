@@ -19,7 +19,6 @@
  */
 
 #include <gps_SwSerial.h>
-#include <led_NeoPixel.h>
 
 #define DEBUG_GPS 1
 
