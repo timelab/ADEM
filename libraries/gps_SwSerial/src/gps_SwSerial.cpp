@@ -29,7 +29,7 @@
 #endif
 
 SwSerialGPS::SwSerialGPS(int rx, int tx, int bd) {
-    swserial = new SoftwareSerial(rx, tx, false, 64);
+    swserial = new SoftwareSerial(rx, tx, false, 512);
     tinygps = new TinyGPSPlus();
     baud = bd;
 }
@@ -59,13 +59,11 @@ void SwSerialGPS::process() {
 void SwSerialGPS::read() {
 
     unsigned long start = millis();
-    do {
-        while (swserial->available() > 0) {
-            char c = swserial->read();
-            __LOG(c);
-            tinygps->encode(c);
-        }
-    } while (millis() - start < 100);
+    while (swserial->available() > 0 and millis() - start < 150) {
+        char c = swserial->read();
+        __LOG(c);
+        tinygps->encode(c);
+    }
 
     date = tinygps->date;
     time = tinygps->time;
