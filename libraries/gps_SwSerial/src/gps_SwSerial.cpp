@@ -23,9 +23,7 @@ SwSerialGPS::SwSerialGPS(int rx, int tx, int bd) {
 }
 
 SwSerialGPS::SwSerialGPS() {
-    swserial = new SoftwareSerial(4, 0, false, 64);
-    tinygps = new TinyGPSPlus();
-    baud = 9600;
+    SwSerialGPS(4, 0, 9600);
 }
 
 void SwSerialGPS::begin(void) {
