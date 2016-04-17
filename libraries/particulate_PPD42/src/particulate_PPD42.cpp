@@ -45,7 +45,7 @@ void PPD42Sensor::end() {
 	_activated = false;
 	// detach the interrupts
 	detachInterrupt(_PPD_PM10_PIN);
-	detachInterrupt(_PPD_PM25_PIN);	
+	detachInterrupt(_PPD_PM25_PIN);
 }
 
 void PPD42Sensor::read() {
@@ -109,6 +109,6 @@ String PPD42Sensor::report()  {
     root["Sensor"] = "PPD42";
     root["PM25"] = readPM25Ppm();
     root["PM10"] = readPM10Ppm();
-    root.prettyPrintTo(response,sizeof(response));
+    root.printTo(response,sizeof(response));
     return response;
 }
