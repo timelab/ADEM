@@ -1,10 +1,12 @@
+#include <ESP8266WiFi.h>
+#include <TickerSchedlr.h>
+
 //#include <accelerator_MPU6050.h>
 #include <barometer_BMP085.h>
 #include <gps_SwSerial.h>
 #include <humidity_HTU21D.h>
 #include <led_NeoPixel.h>
 #include <particulate_PPD42.h>
-#include <TickerSchedlr.h>
 
 #define NEOPIXEL_PIN 5
 #define I2C_SDA_PIN 2
@@ -76,7 +78,7 @@ TickerTask *particulate_task = NULL;
 
 // TASKS
 void accelerometer_run(void *) {
-  //LOGLN(":accelerometer: -> Check moving/shaking");
+  //LOGLN(":accelerometer: -> Check moving/shaken");
   //accelerometer.read();
   // Serial.println(accelerometer.report());
 }
@@ -97,7 +99,6 @@ void humidity_run(void *) {
 }
 
 void particulate_run(void *) {
-//  __LOGLN(":particulate: -> Dump record");
   particulate.read();
   __LOGLN(particulate.report());
 }
@@ -124,30 +125,20 @@ void start_state() {
 
   accelerometer_task = TickerTask::createPeriodic(&accelerometer_run, 1000);
   accelerometer_task->name = "accelerometer";
-  barometer_task = TickerTask::createPeriodic(&barometer_run, 30000);
-  barometer_task->name = "barometer";
-  gps_task = TickerTask::createPeriodic(&gps_run, 1000);
-  gps_task->name = "gps";
-  humidity_task = TickerTask::createPeriodic(&humidity_run, 30000);
-  humidity_task->name = "humidity";
-  particulate_task = TickerTask::createPeriodic(&particulate_run, 30000);
-  particulate_task->name = "particulate";
-
-  Serial.println("Periodic tasks initialized...");
 
   next_state = SLEEP;
 }
 
 void sleep_state() {
 
-  // if (accelerometer.moving) {
+  // if (accelerometer.moving or debug.moving) {
   if (debug.moving) {
     next_state = GPSTEST;
   } else {
     // if (! buffer.empty) {
     if (false) {
       next_state = WIFITEST;
-    //} else if (accelerometer.shaken) {
+    //} else if (accelerometer.shaken or debug.shaken) {
     } else if (debug.shaken) {
       next_state = CONFIG;
     }
@@ -156,7 +147,7 @@ void sleep_state() {
 
 void config_state() {
 
-  //if (finished || timeout || canceled) {
+  //if (finished or timeout or canceled) {
   if (true) {
     next_state = SLEEP;
   }
@@ -164,9 +155,9 @@ void config_state() {
 
 void gpstest_state() {
 
-//  gps.read();
+  //gps.read();
 
-  //if (accelerometer.moving) {
+  //if (accelerometer.moving or debug.moving) {
   if (debug.moving) {
     if (gps.ready or debug.gpsready) {
       next_state = COLLECT;
@@ -181,20 +172,20 @@ void collect_state() {
   // Sensor tasks should be reporting on their own
   //LOGLN("Collecting...");
 
-  //if (! accelerometer.moving || ! gps.ready )) {
-  if (! debug.moving or (! gps.ready and ! debug.gpsready)) {
+  //if ( not (accelerometer.moving or debug.moving) or not (gps.ready or debug.gpsready) ) {
+  if ( not (debug.moving) or not (gps.ready or debug.gpsready)) {
     next_state = GPSTEST;
   }
 }
 
 void wifitest_state() {
 
-  //if (wificlient.fix) {
+  //if (wificlient.fix or debug.wifi) {
   if (debug.wifi) {
     state = UPLOAD;
   }
 
-  //if (accelerometer.moving || buffer.empty || wificlient.timeout) {
+  //if (accelerometer.moving or debug.moving or buffer.empty or wificlient.timeout) {
   if (debug.moving) {
     next_state = SLEEP;
   }
@@ -222,19 +213,22 @@ void sleep_to_config() {
 
   //wifiap.begin();
   // Resume wifiap task
+
+  debug.shaken = false;
 }
 
 void sleep_to_gpstest() {
 
-  gps.begin();
   // Resume gps task
+  gps.begin();
+  gps_task = TickerTask::createPeriodic(&gps_run, 1000);
+  gps_task->name = "gps";
 }
 
 void sleep_to_wifitest() {
 
   //wificlient.begin();
   // Resume wificlient task
-  debug.shaken = false;
 }
 
 void config_to_sleep() {
@@ -245,32 +239,40 @@ void config_to_sleep() {
 
 void gpstest_to_sleep() {
 
-  // Suspend barometer task
-  // Suspend humidity task
-  // Suspend particulate task
   // Suspend gps task
-  barometer.end();
-  humidity.end();
-  particulate.end();
-  //gps.end();
+  gps_task->clear();
+  gps.end();
 }
 
 void gpstest_to_collect() {
 
+  // Resume sensor tasks
   barometer.begin();
+  barometer_task = TickerTask::createPeriodic(&barometer_run, 10000);
+  barometer_task->name = "barometer";
   humidity.begin();
+  humidity_task = TickerTask::createPeriodic(&humidity_run, 10000);
+  humidity_task->name = "humidity";
   particulate.begin();
-  // Resume barometer task
-  // Resume humidity task
-  // Resume particulate task
+  particulate_task = TickerTask::createPeriodic(&particulate_run, 10000);
+  particulate_task->name = "particulate";
 }
 
 void collect_to_gpstest() {
+
+  // Suspend sensor tasks
+  barometer_task->clear();
+  barometer.end();
+  humidity_task->clear();
+  humidity.end();
+  particulate_task->clear();
+  particulate.end();
 }
 
 void wifitest_to_sleep() {
 
   // Suspend wificlient task
+  //wificlient_task-kill();
   //wificlient.end();
 }
 
@@ -285,10 +287,13 @@ void setup() {
   state = START;
 
   Serial.begin(SERIAL_BAUD);
-  __LOGLN("Setup started in DEBUG mode.");
-  __LOGLN("Press \"g\" for gpsready, \"m\" for moving, \"s\" to shake or \"w\" for wifi.");
-
+  Serial.println();
   Serial.println("Serial communication... OK");
+
+  __LOGLN();
+  __LOGLN("Setup started in DEBUG mode.");
+  __LOGLN("Press \"g\" for gpsfix, \"m\" for moving, \"r\" to restart, \"s\" to shake and \"w\" for wifi.");
+  __LOGLN();
 
   Serial.print("Initializing LED... ");
   led.begin();
@@ -372,7 +377,7 @@ void loop() {
 
     led.setcolor(led_state, colors[next_state]);
 
-    __LOG("Transition to ");  __LOG(states[next_state]); __LOGLN(" ended.");
+//    __LOG("Transition to ");  __LOG(states[next_state]); __LOGLN(" ended.");
   }
 
   schedule->tick();
@@ -391,6 +396,10 @@ void loop() {
           debug.moving = ! debug.moving;
           __LOG("debug.moving is set to "); __LOGLN(debug.moving);
           break;
+        case 'r':
+          __LOGLN("Restarting system.");
+          ESP.restart();
+          break;
         case 's':
           debug.shaken = ! debug.shaken;
           __LOG("debug.shaken is set to "); __LOGLN(debug.shaken);
@@ -401,7 +410,6 @@ void loop() {
           break;
         default:
           __LOGLN("No action.");
-          break;
       }
     }
   }
