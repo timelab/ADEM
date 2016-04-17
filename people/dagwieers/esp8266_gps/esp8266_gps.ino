@@ -26,14 +26,14 @@
 #endif
 
 // hardware specific values
-#define SparkFun_ESP8266_LED_PIN 5      // We can later use GPIO5 for driving a buzzer
-#define SparkFun_SERIAL_BAUD 74880
+#define LED_PIN 5      // We can later use GPIO5 for driving a buzzer
+#define SERIAL_BAUD 74880
 
 #define GPS_RX_PIN 4                    // to GPS module RX pin. Does not work on GPIO 16 (XPD).
 #define GPS_TX_PIN SW_SERIAL_UNUSED_PIN // we send no data to the GPS module
 //#define PPD_PM10_PIN 12                 // to PPD42NS pin 4, do not use GPIO16, does not seem to work: 12
 //#define PPD_PM25_PIN 13                 // to PPD42NS pin 2, do not use GPIO16
-#define NEOPIXEL_PIN 0
+#define NEOPIXEL_PIN 5
 #define GPS_BAUD 9600
 
 int esp_ChipId = 0;
@@ -51,17 +51,18 @@ void setup() {
 
   pixels.begin();
   pixels.setBrightness(64);
+  pixels.show();
   
   // We can use the LED on the SparkFun board for debugging
   // and turn it on during setup and when we store the sampled data
-//  pinMode(SparkFun_ESP8266_LED_PIN, OUTPUT);
+//  pinMode(LED_PIN, OUTPUT);
   
   // Initialization for debug output  
   // Don't open serial yet, this makes reprogramming more likely to be successful
-  delay(5000);
+//  delay(5000);
   
   // Start serial communication
-  Serial.begin(SparkFun_SERIAL_BAUD);
+  Serial.begin(SERIAL_BAUD);
   Serial.println("Initializing serial communication... done");
 
   Serial.print("Initializing PPD42...");
