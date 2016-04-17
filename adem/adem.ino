@@ -33,7 +33,7 @@ state_t next_state = SLEEP;
 //MPU6050Sensor accelerometer;
 BMP085Sensor barometer;
 //PassiveBuzzer buzzer;
-SwSerialGPS gps = SwSerialGPS(0, 4, 9600);
+SwSerialGPS gps = SwSerialGPS(4, 0, 9600);
 HTU21DFSensor humidity;
 NeoPixelLed led = NeoPixelLed(1, NEOPIXEL_PIN, NEO_GRB + NEO_KHZ800);
 PPD42Sensor particulate;
@@ -67,27 +67,30 @@ TickerTask *particulate_task = NULL;
 
 // TASKS
 void accelerometer_run(void *) {
-//  __LOGLN(":accelerometer:");
+  __LOGLN(":accelerometer: -> Check moving/shaking");
+  //accelerometer.read();
+  // Serial.println(accelerometer.report());
 }
 
 void barometer_run(void *) {
   barometer.read();
-  Serial.println(barometer.report());
+  __LOGLN(barometer.report());
 }
 
 void gps_run(void *) {
   gps.read();
-  Serial.println(gps.report());
+  __LOGLN(gps.report());
 }
 
 void humidity_run(void *) {
   humidity.read();
-  Serial.println(humidity.report());
+  __LOGLN(humidity.report());
 }
 
 void particulate_run(void *) {
-  Serial.println(":particulate: -> Dump record");
-  //Serial.println(particulate.report());
+  __LOGLN(":particulate: -> Dump record");
+  //particulate.read();
+  //__LOGLN(particulate.report());
 }
 
 
@@ -110,13 +113,13 @@ void start_state() {
   barometer.begin();
   Serial.println("OK");
 
-  accelerometer_task = TickerTask::createPeriodic(&accelerometer_run, 500);
+  accelerometer_task = TickerTask::createPeriodic(&accelerometer_run, 1000);
   accelerometer_task->name = "accelerometer";
-  barometer_task = TickerTask::createPeriodic(&barometer_run, 60000);
+  barometer_task = TickerTask::createPeriodic(&barometer_run, 30000);
   barometer_task->name = "barometer";
   gps_task = TickerTask::createPeriodic(&gps_run, 1000);
   gps_task->name = "gps";
-  humidity_task = TickerTask::createPeriodic(&humidity_run, 60000);
+  humidity_task = TickerTask::createPeriodic(&humidity_run, 30000);
   humidity_task->name = "humidity";
   particulate_task = TickerTask::createPeriodic(&particulate_run, 30000);
   particulate_task->name = "particulate";
@@ -152,6 +155,8 @@ void config_state() {
 
 void gpstest_state() {
 
+  gps.read();
+
   //if (accelerometer.moving) {
   if (true) {
     if (gps.ready) {
@@ -164,8 +169,8 @@ void gpstest_state() {
 
 void collect_state() {
 
-  // sensor tasks should be reporting on their own
-//  __LOGLN("Collecting...");
+  // Sensor tasks should be reporting on their own
+  //LOGLN("Collecting...");
 
   //if (! accelerometer.moving || ! gps.ready )) {
   if (! gps.ready) {
@@ -265,6 +270,7 @@ void wifitest_to_upload() {
 void upload_to_wifitest() {
 }
 
+
 void setup() {
   state = START;
 
@@ -282,7 +288,8 @@ void setup() {
   Serial.println("OK");
 }
 
-// the loop function runs over and over again until power down or reset
+
+// Main loop takes care of state and transition management
 void loop() {
 
   switch(state) {
