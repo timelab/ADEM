@@ -69,6 +69,8 @@ void SwSerialGPS::read() {
     time = tinygps->time;
     location = tinygps->location;
     satellites = tinygps->satellites;
+    altitude = tinygps->altitude;
+    speed = tinygps->speed;
 }
 
 String SwSerialGPS::FormatDateTime(TinyGPSDate date, TinyGPSTime time) {
@@ -82,6 +84,7 @@ String SwSerialGPS::report()  {
     StaticJsonBuffer<200> jsonBuffer;
     JsonObject& root = jsonBuffer.createObject();
     char response[200];
+
     root["Sensor"] = "GPS";
 
     if (tinygps->date.isValid() && tinygps->time.isValid()) {
@@ -89,11 +92,19 @@ String SwSerialGPS::report()  {
     }
 
     if (tinygps->location.isValid()) {
-        ready = true;
         root["Lattitude"] = location.lat();
         root["Longitude"] = location.lng();
+        ready = true;
     } else {
         ready = false;
+    }
+
+    if (tinygps->altitude.isValid()) {
+        root["Altitude"] = altitude.meters();
+    }
+
+    if (tinygps->speed.isValid()) {
+        root["Speed"] = speed.kmph();
     }
 
     if (tinygps->satellites.isValid()) {
