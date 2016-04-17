@@ -55,6 +55,8 @@ private:
     TinyGPSTime time;
     TinyGPSLocation location;
     TinyGPSInteger satellites;
+    TinyGPSAltitude altitude;
+    TinyGPSSpeed speed;
     String FormatDateTime(TinyGPSDate date, TinyGPSTime time);
 
     int baud = 9600;
