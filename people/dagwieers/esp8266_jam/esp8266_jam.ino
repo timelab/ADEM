@@ -1,3 +1,23 @@
+/*
+ * This file is part of the ADEM project.
+ *
+ * ADEM is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License,·
+ * (at your option) any later version.
+ *
+ * ADEM is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with ADEM.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * Copyright 2016 Dag Wieers
+ *
+ */
+
 // Serial debugging off
 #define DEBUGSERIAL true
 
@@ -33,7 +53,7 @@
 #else
 #define __LOG(msg) Serial1.print(msg); if (client) client.print(msg);
 #define __LOGLN(msg) Serial1.print(msg); if (client) client.println(msg);
-#endif      
+#endif
 
 // Neopixel needs to be outside of setup()
 Adafruit_NeoPixel neopixel = Adafruit_NeoPixel(1, NEOPIXEL_PIN, NEO_GRB + NEO_KHZ800);
@@ -71,13 +91,13 @@ void setup() {
 //  pinMode(SERIAL_RX_PIN, INPUT);
 //  pinMode(SERIAL_TX_PIN, OUTPUT);
   Serial.begin(SERIAL_BAUD);
-  gps_Serial.begin(GPS_BAUD);  
+  gps_Serial.begin(GPS_BAUD);
 #else
 //  pinMode(SERIAL1_RX_PIN, INPUT);
 //  pinMode(SERIAL1_TX_PIN, OUTPUT);
   Serial1.begin(SERIAL1_BAUD)
 //  pinMode(GPS_RX_PIN, INPUT);
-  Serial.begin(GPS_BAUD);  
+  Serial.begin(GPS_BAUD);
 #endif
 
   __LOGLN("Boot started.");
@@ -133,7 +153,7 @@ void loop() {
     client.println("Location: " + String(gps.location.lat())+","+String(gps.location.lng()));
     client.println("Satellites: " + String(gps.satellites.value()));
     client.flush();
-    
+
     delay(500);
   } else {
     client = server.available();
@@ -155,7 +175,7 @@ void loop() {
         neopixel.show();
       } else {
         neopixel.setPixelColor(0, 0, 70, 0);
-        neopixel.show();    
+        neopixel.show();
       }
 */
 
@@ -163,7 +183,7 @@ void loop() {
       client.print("Content-Type: text/plain\r\n\r\n");
       client.flush();
       __LOGLN("Answering web request.");
-      
+
 //    } else {
 //      Serial.println("No web client.");
     }

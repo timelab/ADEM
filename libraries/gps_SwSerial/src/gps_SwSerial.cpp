@@ -1,12 +1,24 @@
-// 
-// 
-// 
+/*
+ * This file is part of the ADEM project.
+ *
+ * ADEM is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License,·
+ * (at your option) any later version.
+ *
+ * ADEM is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with ADEM.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * Copyright 2016 Dag Wieers, Lieven Blancke
+ *
+ */
 
 #include "gps_SwSerial.h"
-
-#if defined(__AVR__)
-#include <util/delay.h>
-#endif
 
 #ifdef DEBUG_GPS:
 #define __LOG(msg) Serial.print(msg)
@@ -24,6 +36,11 @@ SwSerialGPS::SwSerialGPS(int rx, int tx, int bd) {
 
 SwSerialGPS::SwSerialGPS() {
     SwSerialGPS(4, 0, 9600);
+}
+
+SwSerialGPS::~SwSerialGPS() {
+    delete tinygps;
+    delete swserial;
 }
 
 void SwSerialGPS::begin(void) {

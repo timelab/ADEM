@@ -1,20 +1,22 @@
-/*************************************************/
-/* Mobile Arduino Dust Sensor                    */
-/*      - SparkFun ESP8266 Thing Wi-Fi           */
-/*      - Shinyei PPD42NS dust sensor            */
-/*************************************************/
-/* !!! THIS CODE IS STILL IN ALPHA STAGE !!!     */
-/*************************************************/
-/* Based on these open source projects:          */
-/* * Arduino Dust Sensor code by Shadowandy      */
-/*   www.shadowandy.net                          */
-/* * TinyGPS:                                    */
-/*   https://github.com/mikalhart/TinyGPSPlus    */
-/* * Arduino core for ESP8266 WiFi chip:         */
-/*   https://github.com/esp8266/Arduino          */
-/* * ESP softwareserial, Peter Lerup             */
-/*   https://github.com/plerup/espsoftwareserial */
-/*************************************************/
+/*
+ * This file is part of the ADEM project.
+ *
+ * ADEM is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License,·
+ * (at your option) any later version.
+ *
+ * ADEM is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with ADEM.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * Copyright 2016 Dag Wieers
+ *
+ */
 
 #include <Adafruit_NeoPixel.h>
 #include <particulate_PPD42.h>

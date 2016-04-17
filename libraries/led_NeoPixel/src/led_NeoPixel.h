@@ -1,22 +1,34 @@
-// led_NeoPixel.h
 /*
-Created by Dag Wieers, Stijn Diependaele
-
-Read https://www.arduino.cc/en/Reference/APIStyleGuide for inspiration!
-*/
+ * This file is part of the ADEM project.
+ *
+ * ADEM is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License,·
+ * (at your option) any later version.
+ *
+ * ADEM is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with ADEM.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * Copyright 2016 Dag Wieers, Stijn Diependaele
+ *
+ */
 
 #ifndef _NeoPixelLed_h
 #define _NeoPixelLed_h
 
 #include <Arduino.h>
-#include <Sensor.h> // - Skeleton Library for ADEM sensors.
 #include <Adafruit_NeoPixel.h>
 
-//abstract class Sensor
 class NeoPixelLed {
 public:
     NeoPixelLed(uint16_t n, uint8_t p=5, neoPixelType t=NEO_GRB + NEO_KHZ800);
     NeoPixelLed();
+    ~NeoPixelLed();
 
     //virtual function must be implemented
     virtual void begin();
