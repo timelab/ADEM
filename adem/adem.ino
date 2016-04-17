@@ -29,6 +29,15 @@ state_t prev_state = START;
 state_t state = START;
 state_t next_state = SLEEP;
 
+// DEBUG input
+class Debug {
+public:
+  boolean gpsready = false;
+  boolean moving = false;
+  boolean shaken = false;
+  boolean wifi = false;
+} debug;
+
 // Objects for all the sensor libraries
 //MPU6050Sensor accelerometer;
 BMP085Sensor barometer;
@@ -45,14 +54,14 @@ TickerSchedlr *schedule = NULL;
 // FIXME: Since brightness does not seem to work, use "darker" colors
 // Colors
 uint32_t black = led.Color(0, 0, 0);
-uint32_t white = led.Color(63, 63, 63);
-uint32_t red = led.Color(63, 0, 0);
-uint32_t orange = led.Color(63, 31, 0);
-uint32_t yellow = led.Color(63, 63, 0);
-uint32_t green = led.Color(0, 63, 0);
-uint32_t light_blue = led.Color(0, 63, 63);
-uint32_t blue = led.Color(0, 0, 63);
-uint32_t purple = led.Color(31, 0, 63);
+uint32_t white = led.Color(127, 127, 127);
+uint32_t red = led.Color(127, 0, 0);
+uint32_t orange = led.Color(127, 31, 0);
+uint32_t yellow = led.Color(127, 127, 0);
+uint32_t green = led.Color(0, 127, 0);
+uint32_t light_blue = led.Color(0, 127, 127);
+uint32_t blue = led.Color(0, 0, 127);
+uint32_t purple = led.Color(31, 0, 127);
 
 uint32_t colors[] = { red, black, yellow, orange, green, purple, blue, white };
 
@@ -132,14 +141,14 @@ void start_state() {
 void sleep_state() {
 
   // if (accelerometer.moving) {
-  if (true) {
+  if (debug.moving) {
     next_state = GPSTEST;
   } else {
     // if (! buffer.empty) {
     if (false) {
       next_state = WIFITEST;
-    //} else if (accelerometer.shaking) {
-    } else if (false) {
+    //} else if (accelerometer.shaken) {
+    } else if (debug.shaken) {
       next_state = CONFIG;
     }
   }
@@ -158,8 +167,8 @@ void gpstest_state() {
 //  gps.read();
 
   //if (accelerometer.moving) {
-  if (true) {
-    if (gps.ready) {
+  if (debug.moving) {
+    if (gps.ready or debug.gpsready) {
       next_state = COLLECT;
     }
   } else {
@@ -173,7 +182,7 @@ void collect_state() {
   //LOGLN("Collecting...");
 
   //if (! accelerometer.moving || ! gps.ready )) {
-  if (! gps.ready) {
+  if (! debug.moving or (! gps.ready and ! debug.gpsready)) {
     next_state = GPSTEST;
   }
 }
@@ -181,12 +190,12 @@ void collect_state() {
 void wifitest_state() {
 
   //if (wificlient.fix) {
-  if (false) {
+  if (debug.wifi) {
     state = UPLOAD;
   }
 
   //if (accelerometer.moving || buffer.empty || wificlient.timeout) {
-  if (false) {
+  if (debug.moving) {
     next_state = SLEEP;
   }
 }
@@ -225,6 +234,7 @@ void sleep_to_wifitest() {
 
   //wificlient.begin();
   // Resume wificlient task
+  debug.shaken = false;
 }
 
 void config_to_sleep() {
@@ -276,6 +286,7 @@ void setup() {
 
   Serial.begin(SERIAL_BAUD);
   __LOGLN("Setup started in DEBUG mode.");
+  __LOGLN("Press \"g\" for gpsready, \"m\" for moving, \"s\" to shake or \"w\" for wifi.");
 
   Serial.println("Serial communication... OK");
 
@@ -361,10 +372,40 @@ void loop() {
 
     led.setcolor(led_state, colors[next_state]);
 
-    __LOG("End transition to ");  __LOGLN(states[next_state]);
+    __LOG("Transition to ");  __LOG(states[next_state]); __LOGLN(" ended.");
   }
 
   schedule->tick();
+
+#ifdef DEBUG
+  if (Serial.available() > 0) {
+    char c = Serial.read();
+    if (c != '\n') {
+      __LOG("Key "); __LOG(c); __LOG(" is pressed. ");
+      switch (c) {
+        case 'g':
+          debug.gpsready = ! debug.gpsready;
+          __LOG("debug.gpsready is set to "); __LOGLN(debug.gpsready);
+          break;
+        case 'm':
+          debug.moving = ! debug.moving;
+          __LOG("debug.moving is set to "); __LOGLN(debug.moving);
+          break;
+        case 's':
+          debug.shaken = ! debug.shaken;
+          __LOG("debug.shaken is set to "); __LOGLN(debug.shaken);
+          break;
+        case 'w':
+          debug.wifi = ! debug.wifi;
+          __LOG("debug.wifi is set to "); __LOGLN(debug.wifi);
+          break;
+        default:
+          __LOGLN("No action.");
+          break;
+      }
+    }
+  }
+#endif
 
 }
 
