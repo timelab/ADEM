@@ -11,8 +11,6 @@ void setup() {
     Serial.begin(SERIAL_BAUD);
     Serial.println("Booting...");
 
-    Serial.println("LED initialized.");
-
     gps.begin();
     Serial.println("GPS initialized.");
     delay(500);
