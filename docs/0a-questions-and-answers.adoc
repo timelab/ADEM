@@ -8,7 +8,7 @@
 | Moving                                             | Accelerometer         | 1 sec
 | Shaking                                            | Accelerometer         | 1 sec
 | Time                                               | GPS                   | 1 sec
-| Location (longitude/lattitude)                     | GPS                   | 1 sec
+| Location (longitude/latitude)                      | GPS                   | 1 sec
 | Particulate matter PM10                            | Particulate           | 30 secs
 | Particulate matter PM24                            | Particulate           | 20 secs
 | Humidity                                           | Humidity              | 1 min
