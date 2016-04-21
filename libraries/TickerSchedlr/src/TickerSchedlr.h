@@ -81,9 +81,9 @@ private:
 	long _next_time;     // when do we have to run next
 	long _last_time;     // last execution time given in millis() units
 	long _duration;      // how long did it take to run the task
-
+	
 public:
-	volatile bool enabled = true;
+	volatile bool _enabled = true;
 
 	~TickerTask();
 	// factory methods to create tasks
@@ -111,6 +111,8 @@ public:
 	void exec();    // execute current task outside scheduler 
 	void clear();
 	void setNextTime();
+	void suspend();
+	void enable();
 	inline uint32_t getNextTime() { return _next_time; };
 	inline uint32_t getDuration() { return _duration; };
 	inline uint32_t getLastTime() { return _last_time; };
