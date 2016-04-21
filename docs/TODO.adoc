@@ -19,7 +19,7 @@ completed and still on-going.
 |============================================================================================
 | Task                                     | Release | Status                | Owner
 | Component / libraries                    |         |                       |
-| - Scheduler                              | alpha   | Completed (suspend?)  | Koen
+| - Scheduler                              | alpha   | Completed             | Koen
 | - Datastore                              | alpha   | Ongoing               | Koen
 | - GPS library (SwSerial)                 | alpha   | Completed             | Dag / Lieven
 | - Dust meter (PPD42)                     | alpha   | Completed             | Lieven
