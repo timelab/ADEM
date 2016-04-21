@@ -276,7 +276,7 @@ void TickerTask::suspend(){
 	_enabled = false;
 }
 
-void TisckerTask::enable(){
+void TickerTask::enable(){
 	_enabled = true;
 }
 
