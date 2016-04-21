@@ -86,7 +86,7 @@ void TickerSchedlr::tick(){
 		if (task){
 			__LOG(" "); __LOG(task->name); __LOG("->"); __LOG(task->tasktype);
 			/* check if the task has been scheduled to run now or in the past */
-			if (task && __TASK_IS_REGULAR(*task) && task._enabled) {
+			if (task && __TASK_IS_REGULAR(*task) && task->_enabled) {
 				__LOG(" is a regular task");
 				/* task has been scheduled to execute */
 				if (task->getNextTime() <= _ticktime){
@@ -121,7 +121,7 @@ void TickerSchedlr::tick(){
 	while (_nextSchedule > updateTickTime() && i < _maxTsk) {
 		TickerTask * task = tasks[_idlePtr++];
 		// execute idle tasks 
-		if (task && __TASK_IS_IDLE(*task) && task._enabled){
+		if (task && __TASK_IS_IDLE(*task) && task->_enabled){
 			__LOGLN(" IDLE tasks");
 			yield();
 			task->exec();
