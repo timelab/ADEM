@@ -20,22 +20,16 @@
 * SOFTWARE.
 *
 *
-* similar ideas foudn in :
+* similar ideas found in:
 *  https://github.com/ivanseidel/ArduinoThread
 *  https://github.com/Toshik/TickerScheduler
 *  https://github.com/cyphar/sched
 *
 */
 
-
-
 //#include <Ticker.h>
 #include <stdint.h>
-#if defined(ARDUINO) && ARDUINO >= 100
 #include <Arduino.h>
-#else
-#include <WProgram.h>
-#endif
 #include <inttypes.h>
 
 #if !defined(__TICKERSCHED_H__)
@@ -46,12 +40,12 @@
 #  define SCHED_BUFFER_SIZE 100
 #endif
 
-// #define DEBUG  // uncomment this line to get debug output; be aware of the volume of serial logging it can overflow the buffers
-#if defined(DEBUG)
+// #define DEBUG_SCHED  // uncomment this line to get debug output; be aware of the volume of serial logging it can overflow the buffers
+#if defined(DEBUG_SCHED)
 #define __LOG(msg) (Serial.print(msg))
 #define __LOGLN(msg) (Serial.println(msg))
 #else
-#define __LOG(msg) 
+#define __LOG(msg)
 #define __LOGLN(msg)
 #endif
 
