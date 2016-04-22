@@ -23,6 +23,7 @@
 
 //#include <accelerator_MPU6050.h>
 #include <barometer_BMP085.h>
+#include <battery_lipo.h>
 #include <gps_SwSerial.h>
 #include <humidity_HTU21D.h>
 #include <led_NeoPixel.h>
@@ -61,6 +62,7 @@ public:
 // Objects for all the sensor libraries
 //MPU6050Sensor accelerometer;
 BMP085Sensor barometer;
+LipoBattery battery;
 //PassiveBuzzer buzzer;
 SwSerialGPS gps = SwSerialGPS(GPS_RX_PIN, GPS_TX_PIN, GPS_BAUD);
 HTU21DFSensor humidity;
@@ -90,6 +92,7 @@ uint16_t led_state = 0;
 // Tasks
 TickerTask *accelerometer_task = NULL;
 TickerTask *barometer_task = NULL;
+TickerTask *battery_task = NULL;
 TickerTask *gps_task = NULL;
 TickerTask *humidity_task = NULL;
 TickerTask *particulate_task = NULL;
@@ -104,6 +107,11 @@ void accelerometer_run(void *) {
 void barometer_run(void *) {
   barometer.read();
   __LOGLN(barometer.report());
+}
+
+void battery_run(void *) {
+  battery.read();
+//  __LOGLN(barometer.report());
 }
 
 void gps_run(void *) {
@@ -125,6 +133,7 @@ void particulate_run(void *) {
 // STATES
 void start_state() {
 //  accelerator.begin()
+  battery.begin();
   humidity.begin();
   // FIXME: Moving barometer.begin() up, calibration hangs forever ??
   barometer.begin();
@@ -132,6 +141,9 @@ void start_state() {
 
   accelerometer_task = TickerTask::createPeriodic(&accelerometer_run, 1000);
   accelerometer_task->name = "accelerometer";
+
+  battery_task = TickerTask::createPeriodic(&battery_run, 5000);
+  battery_task->name = "battery";
 
   next_state = SLEEP;
 }
