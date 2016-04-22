@@ -41,6 +41,7 @@ http://www.howmuchsnow.com/arduino/airquality/grovedust/[tutorial]
 
 | GPS                       | XM37-1612 / GY-NEO6MV2    | (11.66€ banggood) |
 https://www.iprototype.nl/docs/gps-LS20031-datasheet-gyneo6mv2.pdf[datasheet]
+https://www.u-blox.com/sites/default/files/products/documents/u6-PowerMgt_AppNote_%28GPS.G6-X-10014%29.pdf[power management]
 
 | Humidity + Temperature    | HTU21D                    | (4.35€ banggood)  |
 https://www.adafruit.com/datasheets/1899_HTU21D.pdf[datasheet]

@@ -77,7 +77,9 @@ Get the changes from the online repository and merge them into local files
     $ git pull --rebase
 
 
-== Installing required libraries in Arduino
+== Build the firmware
+
+=== Installing required libraries in Arduino
 
 In order to build project code using Arduino Sketch IDE, you need to ensure that Arduino can find the libraries we use.
 
@@ -87,7 +89,7 @@ On Linux and MacOS/X you can do this with the following command:
    $ ln -sf "$PWD/libraries/"* ~/Arduino/libraries/
 
 
-== Using make for building Arduino code
+=== Using make for building Arduino code
 
 The project also provides a Makefile with the instructions to build, flash/upload and monitor the device.
 
@@ -109,7 +111,7 @@ Now you can start building the source code by doing:
 
   $ make
 
-You can also build our test code by doing something like:
+You can also build other test code by doing something like:
 
   $ make SKETCH=people/dagwieers/gps_test/gps_test.ino
 
@@ -129,10 +131,10 @@ You can also influence the serial port and baud rate used for flashing:
 
   $ make upload SERIAL_PORT=/dev/ttyUSB0 FLASH_BAUD=115200
 
-The default serial port for flashing is `/dev/ttyUSB0` and the default baud rate is `921600`.
+The default serial port for flashing is `/dev/ttyUSB0` and the default baud rate for flashing is `921600`.
 
 
-== Connecting to the device
+=== Connecting to the device
 
 The most "stable" way to connect to your device is unfortunately still using the Serial Monitor of the Arduino Sketch IDE. This has something to do with the serial port initialization and baud rate. Once the port is initialized (at 74880), you can usually switch to using this:
 
@@ -144,12 +146,12 @@ or:
 
 The first command is using the GNU screen tool for connecting to the device, and this enables also sending characters to the device. The second command is a simple `cat` to your device. You can influence the device and baud rate using:
 
-  $ make monitor SERIAL_PORT=/dev/ttyUSB0 SERIAL_BAUD=38400
+  $ make monitor SERIAL_PORT=/dev/ttyUSB0 SERIAL_BAUD=74880
 
-The default serial port for monitoring is `/dev/ttyUSB0` and the default baud rate is `74880`.
+The default serial port for monitoring is `/dev/ttyUSB0` and the default baud rate for monitoring is `38400`.
 
 
-== Building with DEBUG enabled
+=== Building with DEBUG enabled
 
 We also provide a way to enable debugging for your build.
 
@@ -164,7 +166,7 @@ If you want to build without DEBUG mode, you can simply do:
   $ make CXX_FLAGS=
 
 
-=== External libraries
+== External libraries
 
 All external libraries we depend upon for the firmware are included in the repository. This to ensure that we have reproducible builds and can integrate easily with Travis CI. Hence there is no need to download them separately.
 
