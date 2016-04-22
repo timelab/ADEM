@@ -38,9 +38,7 @@ all:
 		$(SKETCH)
 
 flash:
-	tput reset > $(SERIAL_PORT)
-	$(ESPTOOL) -v -cd nodemcu -cb $(FLASH_BAUD) -cp $(SERIAL_PORT) -ca 0x00000 -cf $(BUILD_PATH)/$(shell basename $(SKETCH)).bin
-	tput reset > $(SERIAL_PORT)
+	"$(ESPTOOL)" -v -cd nodemcu -cb $(FLASH_BAUD) -cp $(SERIAL_PORT) -ca 0x00000 -cf "$(BUILD_PATH)/$(shell basename $(SKETCH)).bin"
 
 upload: all flash
 
@@ -51,15 +49,17 @@ clean:
 	rm -rf $(BUILD_PATH)
 
 serial:
-#	stty -F $(SERIAL_PORT) speed $(SERIAL_BAUD) cs8 -cstopb -parenb
-#	stty -F $(SERIAL_PORT) speed $(SERIAL_BAUD)
 	@echo "Serial speed is $(SERIAL_BAUD)"
-	setserial -v /dev/ttyUSB0 spd_cust divisor $$(( 24000000 / ( 2 * $(SERIAL_BAUD) ) ))
+	setserial -v $(SERIAL_PORT) spd_cust divisor $$(( 24000000 / ( 2 * $(SERIAL_BAUD) ) ))
+#	stty -F $(SERIAL_PORT) ispeed $(SERIAL_BAUD) ospeed $(SERIAL_BAUD) cs8 -cstopb parenb
+#	stty -F $(SERIAL_PORT) ispeed $(SERIAL_BAUD) ospeed $(SERIAL_BAUD)
+#	stty <$(SERIAL_PORT)
 	cat <$(SERIAL_PORT)
 
 monitor:
-#	stty -F $(SERIAL_PORT) speed $(SERIAL_BAUD) cs8 -cstopb -parenb
-#	screen $(SERIAL_PORT) $$(stty speed <$(SERIAL_PORT))
 	@echo "Serial speed is $(SERIAL_BAUD)"
-	setserial -v /dev/ttyUSB0 spd_cust divisor $$(( 24000000 / ( 2 * $(SERIAL_BAUD) ) ))
-	screen $(SERIAL_PORT) $(SERIAL_BAUD)
+	setserial -v $(SERIAL_PORT) spd_cust divisor $$(( 24000000 / ( 2 * $(SERIAL_BAUD) ) ))
+#	stty -F $(SERIAL_PORT) ispeed $(SERIAL_BAUD) ospeed $(SERIAL_BAUD) cs8 -cstopb parenb
+#	stty -F $(SERIAL_PORT) ispeed $(SERIAL_BAUD) ospeed $(SERIAL_BAUD)
+	stty <$(SERIAL_PORT)
+	screen $(SERIAL_PORT) $(SERIAL_BAUD),cs8,-ixon,-ixoff,-istrip
