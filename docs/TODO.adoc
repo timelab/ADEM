@@ -26,7 +26,8 @@ completed and still on-going.
 | - Temperature / Humidity (HTU21D)        | alpha   | Completed             | Koen
 | - Barometer (BMP180)                     | alpha   | Completed             | Koen
 | - Accelerometer (MPU6050)                | alpha   | Ongoing               | Koen
-| - LED (NeoPixel)                         | alpha   | Completed             | Dag / Stijn
+| - LED (NeoPixel)                         | alpha   | Completed             | Stijn / Dag
+| - Battery (Lipo)                         | alpha   | Ongoing               | Dag
 | - Buzzer                                 | beta    | Optional              |
 | Code integration                         |         |                       |
 | - Modularity                             | alpha   | Completed             | Koen / Lieven
@@ -48,6 +49,7 @@ completed and still on-going.
 | - I2C memory                             | beta    | TBD                   |
 | - Filesystem                             | beta?   | TBD                   |
 | Shaking/moving detection                 | alpha   | Ongoing               | Koen
+| Power management                         | beta    | TBD                   |
 | Troubleshoot existing FIXMEs             | beta?   | TBD                   | You ?
 |============================================================================================
 
