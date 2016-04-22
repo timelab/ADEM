@@ -20,7 +20,6 @@
 
 #include "barometer_BMP085.h"
 
-
 BMP085Sensor::BMP085Sensor() {
 
 }
@@ -28,7 +27,9 @@ BMP085Sensor::BMP085Sensor() {
 // eventueel overloading, bv met INPUT pins, OUTPUT pins...
 
 void BMP085Sensor::begin() {
+	Serial.print("Initializing barometer sensor... ");
 	begin(BMP085_ADDRESS);
+	Serial.println("OK");
 }
 
 void BMP085Sensor::begin(uint8_t address) {

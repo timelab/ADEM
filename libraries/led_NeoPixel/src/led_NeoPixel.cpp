@@ -32,10 +32,12 @@ NeoPixelLed::~NeoPixelLed() {
 }
 
 void NeoPixelLed::begin() {
+    Serial.print("Initializing LED... ");
     neopixel.begin();
     // FIXME: Brightness does not seem to work, so we correct using colors
     neopixel.setBrightness(31);
     neopixel.show();
+    Serial.println("OK");
 }
 
 void NeoPixelLed::end () {

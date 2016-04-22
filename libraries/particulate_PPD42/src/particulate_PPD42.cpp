@@ -45,6 +45,8 @@ PPD42Sensor::PPD42Sensor(){
 }
 
 void PPD42Sensor::begin() {
+	Serial.print("Initializing particulate sensor... ");
+
 	// initialization for the dust sensor
 	_readMillisPM10 = millis(); //Fetch the current time
 	_readMillisPM25 = millis(); //Fetch the current time
@@ -58,6 +60,8 @@ void PPD42Sensor::begin() {
 	// Attach interrupts handlers to hardware pins
 	attachInterrupt(digitalPinToInterrupt(_PPD_PM10_PIN), _handleInterruptPM10, CHANGE);
 	attachInterrupt(digitalPinToInterrupt(_PPD_PM25_PIN), _handleInterruptPM25, CHANGE);
+
+	Serial.println("OK");
 }
 
 void PPD42Sensor::end() {

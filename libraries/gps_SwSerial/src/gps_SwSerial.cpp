@@ -44,7 +44,9 @@ SwSerialGPS::~SwSerialGPS() {
 }
 
 void SwSerialGPS::begin(void) {
+    Serial.print("Initializing GPS... ");
     swserial->begin(baud);
+    Serial.println("OK");
 }
 
 void SwSerialGPS::end() {

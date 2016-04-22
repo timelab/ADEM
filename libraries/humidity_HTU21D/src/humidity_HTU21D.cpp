@@ -43,9 +43,10 @@
 HTU21DFSensor::HTU21DFSensor() {
 }
 
-
 void HTU21DFSensor::begin(void) {
+	Serial.print("Initializing humidity sensor... ");
 	begin(HTU21DF_I2CADDR);
+	Serial.println("OK");
 }
 
 void HTU21DFSensor::begin(uint8_t address) {

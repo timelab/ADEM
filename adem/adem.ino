@@ -28,12 +28,10 @@
 #include <led_NeoPixel.h>
 #include <particulate_PPD42.h>
 
+#define GPS_TX_PIN 0
+#define GPS_RX_PIN 4
+#define GPS_BAUD 9600
 #define NEOPIXEL_PIN 5
-#define I2C_SDA_PIN 2
-#define I2C_SCL_PIN 14
-#define SERIAL_RX_PIN 8
-#define SERIAL_TX_PIN 7
-
 #define SERIAL_BAUD 74880
 
 #ifdef DEBUG
@@ -64,7 +62,7 @@ public:
 //MPU6050Sensor accelerometer;
 BMP085Sensor barometer;
 //PassiveBuzzer buzzer;
-SwSerialGPS gps = SwSerialGPS(4, 0, 9600);
+SwSerialGPS gps = SwSerialGPS(GPS_RX_PIN, GPS_TX_PIN, GPS_BAUD);
 HTU21DFSensor humidity;
 NeoPixelLed led = NeoPixelLed(1, NEOPIXEL_PIN, NEO_GRB + NEO_KHZ800);
 PPD42Sensor particulate;
@@ -126,22 +124,11 @@ void particulate_run(void *) {
 
 // STATES
 void start_state() {
-//  Serial.print("Initializing accelerator sensor... ");
 //  accelerator.begin()
-//  Serial.println("OK");
-
-  Serial.print("Initializing humidity sensor... ");
   humidity.begin();
-  Serial.println("OK");
-
   // FIXME: Moving barometer.begin() up, calibration hangs forever ??
-  Serial.print("Initializing barometer sensor... ");
   barometer.begin();
-  Serial.println("OK");
-
-  Serial.print("Initializing particulate sensor... ");
   particulate.begin();
-  Serial.println("OK");
 
   accelerometer_task = TickerTask::createPeriodic(&accelerometer_run, 1000);
   accelerometer_task->name = "accelerometer";
@@ -316,12 +303,14 @@ void setup() {
   __LOGLN("Press \"g\" for gpsfix, \"m\" for moving, \"r\" to restart, \"s\" to shake and \"w\" for wifi.");
   __LOGLN();
 
-  Serial.print("Initializing LED... ");
   led.begin();
-  Serial.println("OK");
 
   Serial.print("Initializing scheduler... ");
   schedule = TickerSchedlr::Instance(SCHED_MAX_TASKS);
+  Serial.println("OK");
+
+  Serial.print("Turning WiFi off... ");
+  WiFi.forceSleepBegin();
   Serial.println("OK");
 }
 
