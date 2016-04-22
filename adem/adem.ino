@@ -134,13 +134,13 @@ void start_state() {
   humidity.begin();
   Serial.println("OK");
 
-  Serial.print("Initializing particulate sensor... ");
-  particulate.begin();
-  Serial.println("OK");
-
   // FIXME: Moving barometer.begin() up, calibration hangs forever ??
   Serial.print("Initializing barometer sensor... ");
   barometer.begin();
+  Serial.println("OK");
+
+  Serial.print("Initializing particulate sensor... ");
+  particulate.begin();
   Serial.println("OK");
 
   accelerometer_task = TickerTask::createPeriodic(&accelerometer_run, 1000);
@@ -231,8 +231,8 @@ void start_to_sleep() {
 
 void sleep_to_config() {
 
-  //wifiap.begin();
   // Resume wifiap task
+  //wifiap.begin();
 
   debug.shaken = false;
 }
@@ -305,6 +305,7 @@ void upload_to_wifitest() {
 
 void setup() {
   state = START;
+  led.setcolor(led_state, colors[state]);
 
   Serial.begin(SERIAL_BAUD);
   Serial.println();
@@ -405,16 +406,16 @@ void loop() {
 #ifdef DEBUG
   if (Serial.available() > 0) {
     char c = Serial.read();
-    if (c != '\n') {
+    if (c != '\n' and c != '\r') {
       __LOG("Key "); __LOG(c); __LOG(" is pressed. ");
       switch (c) {
         case 'g':
           debug.gpsready = ! debug.gpsready;
-          __LOG("debug.gpsready is set to "); __LOGLN(debug.gpsready);
+          __LOG("debug.gpsready is "); __LOGLN(debug.gpsready?"on.":"off.");
           break;
         case 'm':
           debug.moving = ! debug.moving;
-          __LOG("debug.moving is set to "); __LOGLN(debug.moving);
+          __LOG("debug.moving is "); __LOGLN(debug.moving?"on.":"off.");
           break;
         case 'r':
           __LOGLN("Restarting system.");
@@ -422,11 +423,11 @@ void loop() {
           break;
         case 's':
           debug.shaken = ! debug.shaken;
-          __LOG("debug.shaken is set to "); __LOGLN(debug.shaken);
+          __LOG("debug.shaken is "); __LOGLN(debug.shaken?"on.":"off.");
           break;
         case 'w':
           debug.wifi = ! debug.wifi;
-          __LOG("debug.wifi is set to "); __LOGLN(debug.wifi);
+          __LOG("debug.wifi is "); __LOGLN(debug.wifi?"on.":"off.");
           break;
         default:
           __LOGLN("No action.");
