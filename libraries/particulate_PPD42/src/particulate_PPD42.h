@@ -1,6 +1,25 @@
 /*
+ * This file is part of the ADEM project.
+ *
+ * ADEM is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License,·
+ * (at your option) any later version.
+ *
+ * ADEM is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with ADEM.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * Copyright 2016 Lieven Blancke
+ *
+ */
+
+/*
   Ppd42.h - Library for ADEM PPD42 sensor.
-  Created by Lieven Blancke.
 
 	You can test this library feeding a square wave with a known
 	duty cycle into the PM10 input pin. The readPM10() function
@@ -18,12 +37,7 @@
 
 #include <Sensor.h> // - Skeleton Library for ADEM sensors.
 #include <ArduinoJson.h>
-
-#if defined(ARDUINO) && ARDUINO >= 100
 #include <Arduino.h>
-#else
-#include "WProgram.h"
-#endif
 
 class PPD42Sensor : public Sensor {
   public:

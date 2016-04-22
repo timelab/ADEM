@@ -1,21 +1,40 @@
-// 
-// 
-// 
-
-#include "humidity_HTU21D.h"
+/*
+ * This file is part of the ADEM project.
+ *
+ * ADEM is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License,·
+ * (at your option) any later version.
+ *
+ * ADEM is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with ADEM.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * Copyright 2016 Lieven Blancke, Koen Verstringe
+ *
+ */
 
 /***************************************************
-This is a library for the HTU21DF Humidity & Temp Sensor
-Designed specifically to work with the HTU21DF sensor from Adafruit
-----> https://www.adafruit.com/products/1899
-These displays use I2C to communicate, 2 pins are required to
-interface
-Adafruit invests time and resources providing this open source code,
-please support Adafruit and open-source hardware by purchasing
-products from Adafruit!
-Written by Limor Fried/Ladyada for Adafruit Industries.
-BSD license, all text above must be included in any redistribution
+  This is a library for the HTU21DF Humidity & Temp Sensor
+
+  Designed specifically to work with the HTU21DF sensor from Adafruit
+  ----> https://www.adafruit.com/products/1899
+
+  These displays use I2C to communicate, 2 pins are required to
+  interface
+  Adafruit invests time and resources providing this open source code,
+  please support Adafruit and open-source hardware by purchasing
+  products from Adafruit!
+
+  Written by Limor Fried/Ladyada for Adafruit Industries.
+  BSD license, all text above must be included in any redistribution
 ****************************************************/
+
+#include "humidity_HTU21D.h"
 
 #if defined(__AVR__)
 #include <util/delay.h>

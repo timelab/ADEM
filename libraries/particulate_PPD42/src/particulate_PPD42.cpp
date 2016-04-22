@@ -1,9 +1,28 @@
 /*
-  Ppd42.cpp - Library for ADEM PPD42 dust sensor.
-  Created by Lieven Blancke.
+ * This file is part of the ADEM project.
+ *
+ * ADEM is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License,·
+ * (at your option) any later version.
+ *
+ * ADEM is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with ADEM.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * Copyright 2016 Lieven Blancke
+ *
+ */
 
-	Connect PPD42 PM10 pin to Arduino pin 12
-	Connect PPD42 PM25 pin to Arduino pin 13
+/*
+  Ppd42.cpp - Library for ADEM PPD42 dust sensor.
+
+  Connect PPD42 PM10 pin to Arduino pin 12
+  Connect PPD42 PM25 pin to Arduino pin 13
 */
 
 #include <Arduino.h>
