@@ -44,11 +44,29 @@
 #endif
 
 // Different states of the program
-enum state_t { START, SLEEP, CONFIG, GPSTEST, COLLECT, WIFITEST, UPLOAD, RESET };
-char *states[] { "START", "SLEEP", "CONFIG", "GPSTEST", "COLLECT", "WIFITEST", "UPLOAD", "RESET" };
-state_t prev_state = START;
-state_t state = START;
-state_t next_state = SLEEP;
+enum state_t {
+  STATE_START,
+  STATE_SLEEP,
+  STATE_CONFIG,
+  STATE_GPSTEST,
+  STATE_COLLECT,
+  STATE_WIFITEST,
+  STATE_UPLOAD,
+  STATE_RESET,
+};
+char *states[] {
+  "START",
+  "SLEEP",
+  "CONFIG",
+  "GPSTEST",
+  "COLLECT",
+  "WIFITEST",
+  "UPLOAD",
+  "RESET",
+};
+state_t prev_state = STATE_START;
+state_t state = STATE_START;
+state_t next_state = STATE_SLEEP;
 
 // DEBUG input
 class Debug {
@@ -58,6 +76,17 @@ public:
   boolean shaken = false;
   boolean wifi = false;
 } debug;
+
+class StubAccelerometer {
+public:
+  boolean moving = false;
+  boolean shaken = false;
+} accelerometer;
+
+class StubBuffer {
+public:
+  boolean empty = true;
+} buffer;
 
 // Objects for all the sensor libraries
 //MPU6050Sensor accelerometer;
@@ -78,14 +107,23 @@ TickerSchedlr *schedule = NULL;
 uint32_t black = led.Color(0, 0, 0);
 uint32_t white = led.Color(127, 127, 127);
 uint32_t red = led.Color(127, 0, 0);
-uint32_t orange = led.Color(127, 31, 0);
+uint32_t orange = led.Color(127, 63, 0);
 uint32_t yellow = led.Color(127, 127, 0);
 uint32_t green = led.Color(0, 127, 0);
 uint32_t light_blue = led.Color(0, 127, 127);
 uint32_t blue = led.Color(0, 0, 127);
-uint32_t purple = led.Color(31, 0, 127);
+uint32_t purple = led.Color(63, 0, 127);
 
-uint32_t colors[] = { red, black, yellow, orange, green, purple, blue, white };
+uint32_t colors[] = {
+  red,
+  black,
+  yellow,
+  orange,
+  green,
+  purple,
+  blue,
+  white,
+};
 
 uint16_t led_state = 0;
 
@@ -111,7 +149,7 @@ void barometer_run(void *) {
 
 void battery_run(void *) {
   battery.read();
-//  __LOGLN(barometer.report());
+//  __LOGLN(battery.report());
 }
 
 void gps_run(void *) {
@@ -142,33 +180,31 @@ void start_state() {
   accelerometer_task = TickerTask::createPeriodic(&accelerometer_run, 1000);
   accelerometer_task->name = "accelerometer";
 
-  battery_task = TickerTask::createPeriodic(&battery_run, 5000);
+  battery_task = TickerTask::createPeriodic(&battery_run, 60000);
   battery_task->name = "battery";
 
-  next_state = SLEEP;
+  next_state = STATE_SLEEP;
 }
 
 void sleep_state() {
 
-  // if (accelerometer.moving or debug.moving) {
-  if (debug.moving) {
-    next_state = GPSTEST;
+  if (accelerometer.moving or debug.moving) {
+    next_state = STATE_GPSTEST;
   } else {
-    // if (! buffer.empty) {
-    if (false) {
-      next_state = WIFITEST;
-    //} else if (accelerometer.shaken or debug.shaken) {
-    } else if (debug.shaken) {
-      next_state = CONFIG;
+    if (! buffer.empty) {
+      next_state = STATE_WIFITEST;
+    } else if (accelerometer.shaken or debug.shaken) {
+      next_state = STATE_CONFIG;
     }
   }
 }
 
 void config_state() {
 
+  // Temporarily use debug.shaken to go in and out config state
   //if (finished or timeout or canceled) {
-  if (true) {
-    next_state = SLEEP;
+  if (! debug.shaken) {
+    next_state = STATE_SLEEP;
   }
 }
 
@@ -176,13 +212,12 @@ void gpstest_state() {
 
   //gps.read();
 
-  //if (accelerometer.moving or debug.moving) {
-  if (debug.moving) {
+  if (accelerometer.moving or debug.moving) {
     if (gps.ready or debug.gpsready) {
-      next_state = COLLECT;
+      next_state = STATE_COLLECT;
     }
   } else {
-    next_state = SLEEP;
+    next_state = STATE_SLEEP;
   }
 }
 
@@ -191,9 +226,8 @@ void collect_state() {
   // Sensor tasks should be reporting on their own
   //LOGLN("Collecting...");
 
-  //if ( not (accelerometer.moving or debug.moving) or not (gps.ready or debug.gpsready) ) {
-  if ( not (debug.moving) or not (gps.ready or debug.gpsready)) {
-    next_state = GPSTEST;
+  if ( not (accelerometer.moving or debug.moving) or not (gps.ready or debug.gpsready) ) {
+    next_state = STATE_GPSTEST;
   }
 }
 
@@ -201,12 +235,11 @@ void wifitest_state() {
 
   //if (wificlient.fix or debug.wifi) {
   if (debug.wifi) {
-    state = UPLOAD;
+    state = STATE_UPLOAD;
   }
 
-  //if (accelerometer.moving or debug.moving or buffer.empty or wificlient.timeout) {
-  if (debug.moving) {
-    next_state = SLEEP;
+  if (accelerometer.moving or debug.moving or buffer.empty or wificlient.timeout) {
+    next_state = STATE_SLEEP;
   }
 }
 
@@ -217,15 +250,24 @@ void upload_state() {
   // Send to server
   // Empty datastore
 
-//  if (buffer.empty) {
-  if (true) {
-    next_state = WIFITEST;
+  if (buffer.empty) {
+    next_state = STATE_WIFITEST;
   }
+}
+
+void reset_state() {
+  ESP.reset();
 }
 
 
 // TRANSITIONS
 void start_to_sleep() {
+
+  Serial.print("Turning WiFi off... ");
+//  wifi_set_sleep_type(LIGHT_SLEEP_T);
+  WiFi.mode(WIFI_OFF);
+  WiFi.forceSleepBegin();
+  Serial.println("OK");
 }
 
 void sleep_to_config() {
@@ -233,7 +275,26 @@ void sleep_to_config() {
   // Resume wifiap task
   //wifiap.begin();
 
-  debug.shaken = false;
+  Serial.print("Starting WiFi as Access Point... ");
+  WiFi.forceSleepWake();
+  WiFi.mode(WIFI_AP);
+  WiFi.softAP("IK-ADEM");
+  Serial.println("OK");
+
+  // Disable for now, it's our temporary switch to go in and out of config
+  //debug.shaken = false;
+
+}
+
+void config_to_sleep() {
+
+  // Suspend wifiap task
+  //wifiap.end();
+  Serial.print("Turning WiFi off... ");
+//  wifi_set_sleep_type(LIGHT_SLEEP_T);
+  WiFi.mode(WIFI_OFF);
+  WiFi.forceSleepBegin();
+  Serial.println("OK");
 }
 
 void sleep_to_gpstest() {
@@ -242,18 +303,6 @@ void sleep_to_gpstest() {
   gps.begin();
   gps_task = TickerTask::createPeriodic(&gps_run, 1000);
   gps_task->name = "gps";
-}
-
-void sleep_to_wifitest() {
-
-  //wificlient.begin();
-  // Resume wificlient task
-}
-
-void config_to_sleep() {
-
-  // Suspend wifiap task
-  //wifiap.end();
 }
 
 void gpstest_to_sleep() {
@@ -288,10 +337,16 @@ void collect_to_gpstest() {
   particulate.end();
 }
 
+void sleep_to_wifitest() {
+
+  //wificlient.begin();
+  // Resume wificlient task
+}
+
 void wifitest_to_sleep() {
 
   // Suspend wificlient task
-  //wificlient_task-kill();
+  //wificlient_task->clear();
   //wificlient.end();
 }
 
@@ -303,8 +358,7 @@ void upload_to_wifitest() {
 
 
 void setup() {
-  state = START;
-  led.setcolor(led_state, colors[state]);
+  state = STATE_START;
 
   Serial.begin(SERIAL_BAUD);
   Serial.println();
@@ -316,13 +370,10 @@ void setup() {
   __LOGLN();
 
   led.begin();
+  led.setcolor(led_state, colors[state]);
 
   Serial.print("Initializing scheduler... ");
   schedule = TickerSchedlr::Instance(SCHED_MAX_TASKS);
-  Serial.println("OK");
-
-  Serial.print("Turning WiFi off... ");
-  WiFi.forceSleepBegin();
   Serial.println("OK");
 }
 
@@ -331,14 +382,15 @@ void setup() {
 void loop() {
 
   switch(state) {
-    case START:     start_state(); break;
-    case SLEEP:     sleep_state(); break;
-    case CONFIG:    config_state(); break;
-    case GPSTEST:   gpstest_state(); break;
-    case COLLECT:   collect_state(); break;
-    case WIFITEST:  wifitest_state(); break;
-    case UPLOAD:    upload_state(); break;
-    default:        start_state(); break;
+    case STATE_START:     start_state(); break;
+    case STATE_SLEEP:     sleep_state(); break;
+    case STATE_CONFIG:    config_state(); break;
+    case STATE_GPSTEST:   gpstest_state(); break;
+    case STATE_COLLECT:   collect_state(); break;
+    case STATE_WIFITEST:  wifitest_state(); break;
+    case STATE_UPLOAD:    upload_state(); break;
+    case STATE_RESET:     reset_state(); break;
+    default:              start_state(); break;
   }
 
   if (state != next_state) {
@@ -346,50 +398,50 @@ void loop() {
 
     switch(state) {
 
-      case START:
+      case STATE_START:
         switch(next_state) {
-          case SLEEP:     start_to_sleep(); break;
-          default:        next_state = RESET;
+          case STATE_SLEEP:     start_to_sleep(); break;
+          default:              next_state = STATE_RESET;
         }; break;
 
-      case SLEEP:
+      case STATE_SLEEP:
         switch(next_state) {
-          case CONFIG:    sleep_to_config(); break;
-          case GPSTEST:   sleep_to_gpstest(); break;
-          case WIFITEST:  sleep_to_wifitest(); break;
-          default:        next_state = RESET;
+          case STATE_CONFIG:    sleep_to_config(); break;
+          case STATE_GPSTEST:   sleep_to_gpstest(); break;
+          case STATE_WIFITEST:  sleep_to_wifitest(); break;
+          default:              next_state = STATE_RESET;
         }; break;
 
-      case CONFIG:
+      case STATE_CONFIG:
         switch(next_state) {
-          case SLEEP:     config_to_sleep(); break;
-          default:        next_state = RESET;
+          case STATE_SLEEP:     config_to_sleep(); break;
+          default:              next_state = STATE_RESET;
         }; break;
 
-      case GPSTEST:
+      case STATE_GPSTEST:
         switch(next_state) {
-          case SLEEP:     gpstest_to_sleep(); break;
-          case COLLECT:   gpstest_to_collect(); break;
-          default:        next_state = RESET;
+          case STATE_SLEEP:     gpstest_to_sleep(); break;
+          case STATE_COLLECT:   gpstest_to_collect(); break;
+          default:              next_state = STATE_RESET;
         }; break;
 
-      case COLLECT:
+      case STATE_COLLECT:
         switch(next_state) {
-          case GPSTEST:   collect_to_gpstest(); break;
-          default:        next_state = RESET;
+          case STATE_GPSTEST:   collect_to_gpstest(); break;
+          default:              next_state = STATE_RESET;
         }; break;
 
-      case WIFITEST:
+      case STATE_WIFITEST:
         switch(next_state) {
-          case SLEEP:     wifitest_to_sleep(); break;
-          case UPLOAD:    wifitest_to_upload(); break;
-          default:        next_state = RESET;
+          case STATE_SLEEP:     wifitest_to_sleep(); break;
+          case STATE_UPLOAD:    wifitest_to_upload(); break;
+          default:              next_state = STATE_RESET;
         }; break;
 
-      case UPLOAD:
+      case STATE_UPLOAD:
         switch(next_state) {
-          case WIFITEST:  upload_to_wifitest(); break;
-          default:        next_state = RESET;
+          case STATE_WIFITEST:  upload_to_wifitest(); break;
+          default:              next_state = STATE_RESET;
         }; break;
 
     }
@@ -420,7 +472,7 @@ void loop() {
           break;
         case 'r':
           __LOGLN("Restarting system.");
-          ESP.restart();
+          next_state = STATE_RESET;
           break;
         case 's':
           debug.shaken = ! debug.shaken;
