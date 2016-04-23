@@ -94,8 +94,8 @@ String SwSerialGPS::report()  {
     }
 
     if (tinygps->location.isValid()) {
-        root["Latitude"] = location.lat();
-        root["Longitude"] = location.lng();
+        root["Latitude"].set(location.lat(), 5);
+        root["Longitude"].set(location.lng(), 5);
         ready = true;
     } else {
         ready = false;
