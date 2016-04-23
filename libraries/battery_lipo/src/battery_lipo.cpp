@@ -18,8 +18,13 @@
  *
  */
 
-#include "battery_lipo.h"
 #include <ESP8266WiFi.h>
+
+extern "C" {
+   ADC_MODE(ADC_VCC);
+}
+
+#include "battery_lipo.h"
 
 #ifdef DEBUG
 #define __LOG(msg) Serial.print(msg)
@@ -28,8 +33,6 @@
 #define __LOG(msg)
 #define __LOGLN(msg)
 #endif
-
-ADC_MODE(ADC_VCC);
 
 LipoBattery::LipoBattery() {
 }
