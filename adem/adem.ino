@@ -88,6 +88,12 @@ public:
   boolean empty = true;
 } buffer;
 
+class StubWifiClient {
+public:
+  boolean fix = false;
+  boolean timeout = true;
+} wificlient;
+
 // Objects for all the sensor libraries
 //MPU6050Sensor accelerometer;
 BMP085Sensor barometer;
@@ -233,8 +239,7 @@ void collect_state() {
 
 void wifitest_state() {
 
-  //if (wificlient.fix or debug.wifi) {
-  if (debug.wifi) {
+  if (wificlient.fix or debug.wifi) {
     state = STATE_UPLOAD;
   }
 
