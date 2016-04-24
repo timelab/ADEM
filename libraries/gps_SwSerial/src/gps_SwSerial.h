@@ -31,6 +31,15 @@
 
 #define GPS_BAUD 9600
 
+struct SwSerialGPSData : sensorData{
+    TinyGPSDate date;
+    TinyGPSTime time;
+    TinyGPSLocation location;
+    TinyGPSInteger satellites;
+    TinyGPSAltitude altitude;
+    TinyGPSSpeed speed;
+};
+
 //abstract class Sensor
 class SwSerialGPS : public Sensor {
 public:
@@ -45,18 +54,14 @@ public:
     virtual void write();
     virtual void process();
     virtual String report();
-
+    virtual String buildReport(sensorData *sData);
+    
     boolean ready = false;
 
 private:
     StaticJsonBuffer<200> jsonBuffer;
-
-    TinyGPSDate date;
-    TinyGPSTime time;
-    TinyGPSLocation location;
-    TinyGPSInteger satellites;
-    TinyGPSAltitude altitude;
-    TinyGPSSpeed speed;
+    
+    SwSerialGPSData measuredData;
     String FormatDateTime(TinyGPSDate date, TinyGPSTime time);
 
     int baud = 9600;

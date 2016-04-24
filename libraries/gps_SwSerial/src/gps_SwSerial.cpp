@@ -32,6 +32,7 @@ SwSerialGPS::SwSerialGPS(int rx, int tx, int bd) {
     swserial = new SoftwareSerial(rx, tx, false, 512);
     tinygps = new TinyGPSPlus();
     baud = bd;
+    measuredData.ID = GPS_SWSERIAL;
 }
 
 SwSerialGPS::SwSerialGPS() {
@@ -67,12 +68,12 @@ void SwSerialGPS::read() {
         tinygps->encode(c);
     }
 
-    date = tinygps->date;
-    time = tinygps->time;
-    location = tinygps->location;
-    satellites = tinygps->satellites;
-    altitude = tinygps->altitude;
-    speed = tinygps->speed;
+    measuredData.date = tinygps->date;
+    measuredData.time = tinygps->time;
+    measuredData.location = tinygps->location;
+    measuredData.satellites = tinygps->satellites;
+    measuredData.altitude = tinygps->altitude;
+    measuredData.speed = tinygps->speed;
 }
 
 String SwSerialGPS::FormatDateTime(TinyGPSDate date, TinyGPSTime time) {
@@ -82,35 +83,43 @@ String SwSerialGPS::FormatDateTime(TinyGPSDate date, TinyGPSTime time) {
 }
 
 String SwSerialGPS::report()  {
+    if (!measuredData.measured)
+        read();
+    measuredData.measured = false;
+    return buildReport( &measuredData);
+}
+
+String SwSerialGPS::buildReport(sensorData *sData)  {
 
     StaticJsonBuffer<200> jsonBuffer;
     JsonObject& root = jsonBuffer.createObject();
     char response[200];
-
+    SwSerialGPSData *gpsData = reinterpret_cast<SwSerialGPSData *>(sData);
+    
     root["Sensor"] = "GPS";
 
-    if (tinygps->date.isValid() && tinygps->time.isValid()) {
-        root["Time"] = FormatDateTime(date, time);
+    if (gpsData->date.isValid() && gpsData->time.isValid()) {
+        root["Time"] = FormatDateTime(gpsData->date,gpsData->time);
     }
 
-    if (tinygps->location.isValid()) {
-        root["Latitude"].set(location.lat(), 5);
-        root["Longitude"].set(location.lng(), 5);
+    if (gpsData->location.isValid()) {
+        root["Latitude"].set(gpsData->location.lat(), 5);
+        root["Longitude"].set(gpsData->location.lng(), 5);
         ready = true;
     } else {
         ready = false;
     }
 
-    if (tinygps->altitude.isValid()) {
-        root["Altitude"] = altitude.meters();
+    if (gpsData->altitude.isValid()) {
+        root["Altitude"] = gpsData->altitude.meters();
     }
 
-    if (tinygps->speed.isValid()) {
-        root["Speed"] = speed.kmph();
+    if (gpsData->speed.isValid()) {
+        root["Speed"] = gpsData->speed.kmph();
     }
 
-    if (tinygps->satellites.isValid()) {
-        root["Satellites"] = satellites.value();
+    if (gpsData->satellites.isValid()) {
+        root["Satellites"] = gpsData->satellites.value();
     }
 
     root.printTo(response, sizeof(response));

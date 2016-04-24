@@ -41,6 +41,7 @@
 #endif
 
 HTU21DFSensor::HTU21DFSensor() {
+    measuredData.ID = HUMIDITY_HTU21D;
 }
 
 void HTU21DFSensor::begin(void) {
@@ -101,7 +102,6 @@ float HTU21DFSensor::GetTemperature(void) {
 	temp /= 65536;
 	temp -= 46.85;
 	
-	temperature = temp;
 	return temp;
 }
 
@@ -127,22 +127,30 @@ float HTU21DFSensor::GetHumidity(void) {
 	hum *= 125;
 	hum /= 65536;
 	hum -= 6;
-	humidity = hum;
 	return hum;
 }
 
 void HTU21DFSensor::read() {
-	GetHumidity();
-	GetTemperature();
+    measuredData.humidity = GetHumidity();
+    measuredData.temperature = GetTemperature();
+    measuredData.measured = true;
 }
 
 String HTU21DFSensor::report()  {
+    if (!measuredData.measured)
+        read();
+    measuredData.measured = false;
+    return buildReport(&measuredData);
+}
+
+String HTU21DFSensor::buildReport(sensorData *sData)  {
 	StaticJsonBuffer<200> jsonBuffer;
 	JsonObject& root = jsonBuffer.createObject();
 	char response[200];
+    HTU21DData *htuData = reinterpret_cast<HTU21DData *>(sData);
 	root["Sensor"] = "HTU21DF";
-	root["Temperature"] = temperature;
-	root["Humidity"] = humidity;
+	root["Temperature"] = htuData->temperature;
+	root["Humidity"] = htuData->humidity;
 	root.printTo(response,sizeof(response));
 	return response;
 }

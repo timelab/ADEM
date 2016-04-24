@@ -48,6 +48,10 @@
 #define HTU21DF_READREG       0xE7
 #define HTU21DF_RESET       0xFE
 
+struct HTU21DData : sensorData {
+    float temperature;
+    float humidity;
+};
 //abstract class Sensor
 class HTU21DFSensor : public Sensor {
 public:
@@ -58,7 +62,8 @@ public:
 	virtual void write();
 	virtual void process();
 	virtual String report();
-	
+    virtual String buildReport(sensorData *sData);
+    
 	//Sensor ();
 	HTU21DFSensor();
 	void begin(uint8_t address);
@@ -68,11 +73,11 @@ private:
 	StaticJsonBuffer<200> jsonBuffer;
 
 	const unsigned char OSS = 0;  // Oversampling Setting
-
+    HTU21DData measuredData;
 	boolean _error = false;
 	boolean readData(void);
-	float humidity, temperature;
-	int8_t _sensor_address = HTU21DF_I2CADDR;
+
+    int8_t _sensor_address = HTU21DF_I2CADDR;
 
 	float GetTemperature();
 	float GetHumidity();

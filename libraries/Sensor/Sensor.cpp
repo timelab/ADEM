@@ -50,5 +50,23 @@ void Sensor::process() {
 
 String Sensor::report()  {
 }
+String Sensor::buildReport(sensorData *sData){
+}
+
+size_t Sensor::bufferedDataSize() {
+    return sizeof(sensorData);
+}
+
+uint8_t * Sensor::dataToBuffer(){
+    return & sensorData;
+};
+
+String Sensor::bufferedReport(uint8_t * bufferedData){
+    sensorData tmpData;
+    memcpy(&tmpData,bufferedData,sizeof(sensorData);
+    buildReport(tmpData);
+}
+
+
 */
 

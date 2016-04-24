@@ -41,7 +41,7 @@ volatile unsigned long PPD42Sensor::_triggeredTotalMicrosPM25 = 0;
 volatile unsigned long PPD42Sensor::_triggeredTotalMicrosPM10 = 0;
 
 PPD42Sensor::PPD42Sensor(){
-
+    measuredData.ID = PARTICULATE_PPD42;
 }
 
 void PPD42Sensor::begin() {
@@ -72,6 +72,9 @@ void PPD42Sensor::end() {
 }
 
 void PPD42Sensor::read() {
+    measuredData.PM10Ppm = readPM10Ppm();
+    measuredData.PM25Ppm = readPM25Ppm();
+    measuredData.measured = true;
 }
 
 unsigned long PPD42Sensor::readPM10Ppm() {
@@ -123,15 +126,23 @@ void PPD42Sensor::_handleInterruptPM25() {
 }
 
 void PPD42Sensor::process() {
+    
+}
+String PPD42Sensor::report()  {
+    if (!measuredData.measured)
+        read();
+    measuredData.measured = false;
+    return buildReport(&measuredData);
 }
 
-String PPD42Sensor::report()  {
+String PPD42Sensor::buildReport(sensorData *sData)  {
     StaticJsonBuffer<200> jsonBuffer;
     JsonObject& root = jsonBuffer.createObject();
     char response[200];
+    PPD42Data * ppd42Data = reinterpret_cast <PPD42Data*>(sData);
     root["Sensor"] = "PPD42";
-    root["PM25"] = readPM25Ppm();
-    root["PM10"] = readPM10Ppm();
+    root["PM25"] = ppd42Data->PM25Ppm;
+    root["PM10"] = ppd42Data->PM10Ppm;
     root.printTo(response,sizeof(response));
     return response;
 }

@@ -27,18 +27,32 @@
 #define sensor_class_h
 
 #include <Arduino.h>
+#include "SensorIDs.h"
+
+struct sensorData{
+    uint8_t ID;
+    bool measured = false;
+};
 
 //abstract class Sensor
 class Sensor {
   public:
-    //virtual function must be implemented
+
+
+  //virtual function must be implemented
     virtual void begin();
     virtual void end();
     virtual void read();
     virtual void write();
     virtual void process();
     virtual String report();
+    virtual String buildReport(sensorData *sData);
+    size_t bufferedDataSize();
+    uint8_t * dataToBuffer();
+    String bufferedReport(uint8_t * bufferedData);
     //Sensor ();
+    private:
+    sensorData measuredData;
 };
 
 #endif

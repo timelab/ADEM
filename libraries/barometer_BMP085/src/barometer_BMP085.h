@@ -30,8 +30,14 @@
 
 #define BMP085_ADDRESS 0x77  // I2C address of BMP085
 
+struct bmp085Data : sensorData {
+    short _temperature;
+    long _pressure;
+};
+
+
 //abstract class Sensor
-class BMP085Sensor {
+class BMP085Sensor : public Sensor{
 public:
 	//virtual function must be implemented
 	virtual void begin();
@@ -40,10 +46,11 @@ public:
 	virtual void write();
 	virtual void process();
 	virtual String report();
+    virtual String buildReport(sensorData *sData);
 	//Sensor ();
 	BMP085Sensor();
 	void begin(uint8_t address);
-
+    
 private:
 		
 	const unsigned char OSS = 1;  // Oversampling Setting
@@ -65,8 +72,7 @@ private:
 	// so ...Temperature(...) must be called before ...Pressure(...).
 	long b5;
 
-	short _temperature;
-	long _pressure;
+    bmp085Data measuredData;
 	int8_t _sensor_address = BMP085_ADDRESS;
 
 	// Use these for altitude conversions

@@ -21,7 +21,7 @@
 #include "barometer_BMP085.h"
 
 BMP085Sensor::BMP085Sensor() {
-
+    measuredData.ID = BAROMETER_BMP085;
 }
 
 // eventueel overloading, bv met INPUT pins, OUTPUT pins...
@@ -41,8 +41,8 @@ void BMP085Sensor::end () {
 }
 
 void BMP085Sensor::read() {
-	_pressure = GetPressure(ReadUP());
-	_temperature = GetTemperature(ReadUT());
+    measuredData._pressure = GetPressure(ReadUP());
+    measuredData._temperature = GetTemperature(ReadUT());
 }
 
 void BMP085Sensor::write() {
@@ -55,12 +55,20 @@ void BMP085Sensor::process() {
 }
 
 String BMP085Sensor::report()  {
+    if (!measuredData.measured)
+        read();
+    measuredData.measured = false;
+    return buildReport(&measuredData);
+}
+
+String BMP085Sensor::buildReport(sensorData * sData)  {
 	StaticJsonBuffer<200> jsonBuffer;
 	JsonObject& root = jsonBuffer.createObject();
 	char response[200];
+    bmp085Data *tmpData = reinterpret_cast <bmp085Data*>(sData);
 	root["Sensor"] = "BMP085/BMP180";
-	root["Temperature"] = (float)_temperature/10.0;
-	root["Pressure"] = (float)_pressure/100.0;
+	root["Temperature"] = (float)tmpData->_temperature/10.0;
+	root["Pressure"] = (float)tmpData->_pressure/100.0;
 	root.printTo(response, sizeof(response));
 	return response;
 }

@@ -38,6 +38,10 @@
 #include <Sensor.h> // - Skeleton Library for ADEM sensors.
 #include <ArduinoJson.h>
 #include <Arduino.h>
+struct PPD42Data : sensorData {
+    long PM10Ppm;
+    long PM25Ppm;
+};
 
 class PPD42Sensor : public Sensor {
   public:
@@ -49,7 +53,8 @@ class PPD42Sensor : public Sensor {
     void process();
     PPD42Sensor();
     String report(); // should report a JSON string
-
+    virtual String buildReport(sensorData *sData);
+    
     unsigned long readPM10Ppm(); // returns the time (in ppm) the sensor triggered
     unsigned long readPM25Ppm();
 
@@ -57,6 +62,7 @@ class PPD42Sensor : public Sensor {
     boolean _activated = false;
     unsigned long _readMillisPM10;
     unsigned long _readMillisPM25;
+    PPD42Data measuredData;
 
     static int _PPD_PM10_PIN;
     static int _PPD_PM25_PIN;
