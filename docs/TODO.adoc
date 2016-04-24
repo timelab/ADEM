@@ -28,7 +28,7 @@ completed and still on-going.
 | - Accelerometer (MPU6050)                | alpha   | Ongoing               | Koen
 | - LED (NeoPixel)                         | alpha   | Completed             | Stijn / Dag
 | - Battery (Lipo)                         | alpha   | Ongoing               | Dag
-| - Buzzer                                 | beta    | Optional              |
+| - Buzzer                                 | beta    | Completed             | Dag
 | Code integration                         |         |                       |
 | - Modularity                             | alpha   | Completed             | Koen / Lieven
 | - Pseudo-code                            | alpha   | Completed             | Lieven / Dag
@@ -51,6 +51,17 @@ completed and still on-going.
 | Shaking/moving detection                 | alpha   | Ongoing               | Koen
 | Power management                         | beta    | TBD                   |
 | Troubleshoot existing FIXMEs             | beta?   | TBD                   | You ?
+|============================================================================================
+
+
+== Known issues
+[options="header", width="100%"]
+|============================================================================================
+| Issue                                                                | Component
+| Barometer calibration hangs when started first (I2C?)                | barometer_BMP085
+| NeoPixel brightness does not seem to have effect                     | led_NeoPixel
+| PPD42 measurements are off                                           | particulate_PPD42
+| There is no free GPIO for buzzer                                     | buzzer_passive
 |============================================================================================
 
 
