@@ -24,6 +24,7 @@
 //#include <accelerator_MPU6050.h>
 #include <barometer_BMP085.h>
 #include <battery_lipo.h>
+#include <buzzer_passive.h>
 #include <gps_SwSerial.h>
 #include <humidity_HTU21D.h>
 #include <led_NeoPixel.h>
@@ -98,7 +99,7 @@ public:
 //MPU6050Sensor accelerometer;
 BMP085Sensor barometer;
 LipoBattery battery;
-//PassiveBuzzer buzzer;
+PassiveBuzzer buzzer;
 SwSerialGPS gps = SwSerialGPS(GPS_RX_PIN, GPS_TX_PIN, GPS_BAUD);
 HTU21DFSensor humidity;
 NeoPixelLed led = NeoPixelLed(1, NEOPIXEL_PIN, NEO_GRB + NEO_KHZ800);
@@ -197,7 +198,7 @@ void sleep_state() {
   if (accelerometer.moving or debug.moving) {
     next_state = STATE_GPSTEST;
   } else {
-    if (! buffer.empty) {
+    if (not buffer.empty) {
       next_state = STATE_WIFITEST;
     } else if (accelerometer.shaken or debug.shaken) {
       next_state = STATE_CONFIG;
@@ -209,7 +210,7 @@ void config_state() {
 
   // Temporarily use debug.shaken to go in and out config state
   //if (finished or timeout or canceled) {
-  if (! debug.shaken) {
+  if (not debug.shaken) {
     next_state = STATE_SLEEP;
   }
 }
@@ -268,6 +269,8 @@ void reset_state() {
 // TRANSITIONS
 void start_to_sleep() {
 
+//  buzzer.start_sound();
+
   Serial.print("Turning WiFi off... ");
 //  wifi_set_sleep_type(LIGHT_SLEEP_T);
   WiFi.mode(WIFI_OFF);
@@ -277,6 +280,8 @@ void start_to_sleep() {
 
 void sleep_to_config() {
 
+//  buzzer.config_sound();
+
   // Resume wifiap task
   //wifiap.begin();
 
@@ -284,6 +289,7 @@ void sleep_to_config() {
   WiFi.forceSleepWake();
   WiFi.mode(WIFI_AP);
   WiFi.softAP("IK-ADEM");
+  delay(50);
   Serial.println("OK");
 
   // Disable for now, it's our temporary switch to go in and out of config
@@ -318,6 +324,8 @@ void gpstest_to_sleep() {
 }
 
 void gpstest_to_collect() {
+
+//  buzzer.collect_sound();
 
   // Resume sensor tasks
   barometer.begin();
@@ -376,6 +384,8 @@ void setup() {
 
   led.begin();
   led.setcolor(led_state, colors[state]);
+
+//  buzzer.begin();
 
   Serial.print("Initializing scheduler... ");
   schedule = TickerSchedlr::Instance(SCHED_MAX_TASKS);
@@ -468,11 +478,11 @@ void loop() {
       __LOG("Key "); __LOG(c); __LOG(" is pressed. ");
       switch (c) {
         case 'g':
-          debug.gpsready = ! debug.gpsready;
+          debug.gpsready = not debug.gpsready;
           __LOG("debug.gpsready is "); __LOGLN(debug.gpsready?"on.":"off.");
           break;
         case 'm':
-          debug.moving = ! debug.moving;
+          debug.moving = not debug.moving;
           __LOG("debug.moving is "); __LOGLN(debug.moving?"on.":"off.");
           break;
         case 'r':
@@ -480,11 +490,11 @@ void loop() {
           next_state = STATE_RESET;
           break;
         case 's':
-          debug.shaken = ! debug.shaken;
+          debug.shaken = not debug.shaken;
           __LOG("debug.shaken is "); __LOGLN(debug.shaken?"on.":"off.");
           break;
         case 'w':
-          debug.wifi = ! debug.wifi;
+          debug.wifi = not debug.wifi;
           __LOG("debug.wifi is "); __LOGLN(debug.wifi?"on.":"off.");
           break;
         default:
