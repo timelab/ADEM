@@ -29,6 +29,7 @@ NeoPixelLed::NeoPixelLed() {
 }
 
 NeoPixelLed::~NeoPixelLed() {
+    delete &neopixel;
 }
 
 void NeoPixelLed::begin() {
