@@ -241,7 +241,7 @@ void collect_state() {
 void wifitest_state() {
 
   if (wificlient.fix or debug.wifi) {
-    state = STATE_UPLOAD;
+    next_state = STATE_UPLOAD;
   }
 
   if (accelerometer.moving or debug.moving or buffer.empty or wificlient.timeout) {
