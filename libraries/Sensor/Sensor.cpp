@@ -26,9 +26,10 @@
 
 
 Sensor::Sensor() {
+	_measured = false;
 }
-//Sensor::~Sensor(){
-//}
+Sensor::~Sensor(){
+}
 
 // eventueel overloading, bv met INPUT pins, OUTPUT pins...
 
