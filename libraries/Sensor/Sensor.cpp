@@ -22,14 +22,16 @@
   Sensor.cpp - Skeleton library for ADEM sensors.
 */
 
-#include <Sensor.h>
+#include "Sensor.h"
 
-/*
+
 Sensor::Sensor() {
 }
-*/
+//Sensor::~Sensor(){
+//}
+
 // eventueel overloading, bv met INPUT pins, OUTPUT pins...
-/*
+
 void Sensor::begin () {
 }
 
@@ -42,31 +44,30 @@ void Sensor::read() {
 void Sensor::write() {
 }
 
-void Sensor::interrupt() {
-}
+//void Sensor::interrupt() {
+//}
 
 void Sensor::process() {
 }
 
 String Sensor::report()  {
 }
-String Sensor::buildReport(sensorData *sData){
-}
 
+String Sensor::buildReport(sensorData *sData){
+
+}
+   
 size_t Sensor::bufferedDataSize() {
-    return sizeof(sensorData);
+    return sizeof(measuredData);
 }
 
 uint8_t * Sensor::dataToBuffer(){
-    return & sensorData;
+    return (uint8_t *) & measuredData;
 };
 
 String Sensor::bufferedReport(uint8_t * bufferedData){
     sensorData tmpData;
-    memcpy(&tmpData,bufferedData,sizeof(sensorData);
-    buildReport(tmpData);
+    memcpy(&tmpData,bufferedData,sizeof(measuredData));
+    buildReport(&tmpData);
 }
-
-
-*/
 

@@ -133,13 +133,13 @@ float HTU21DFSensor::GetHumidity(void) {
 void HTU21DFSensor::read() {
     measuredData.humidity = GetHumidity();
     measuredData.temperature = GetTemperature();
-    measuredData.measured = true;
+    _measured = true;
 }
 
 String HTU21DFSensor::report()  {
-    if (!measuredData.measured)
+    if (!_measured)
         read();
-    measuredData.measured = false;
+    _measured = false;
     return buildReport(&measuredData);
 }
 

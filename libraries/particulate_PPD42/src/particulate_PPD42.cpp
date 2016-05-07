@@ -74,7 +74,7 @@ void PPD42Sensor::end() {
 void PPD42Sensor::read() {
     measuredData.PM10Ppm = readPM10Ppm();
     measuredData.PM25Ppm = readPM25Ppm();
-    measuredData.measured = true;
+    _measured = true;
 }
 
 unsigned long PPD42Sensor::readPM10Ppm() {
@@ -129,9 +129,9 @@ void PPD42Sensor::process() {
     
 }
 String PPD42Sensor::report()  {
-    if (!measuredData.measured)
+    if (!_measured)
         read();
-    measuredData.measured = false;
+    _measured = false;
     return buildReport(&measuredData);
 }
 

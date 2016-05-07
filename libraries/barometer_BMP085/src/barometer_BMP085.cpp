@@ -43,6 +43,7 @@ void BMP085Sensor::end () {
 void BMP085Sensor::read() {
     measuredData._pressure = GetPressure(ReadUP());
     measuredData._temperature = GetTemperature(ReadUT());
+	_measured = true;
 }
 
 void BMP085Sensor::write() {
@@ -55,9 +56,9 @@ void BMP085Sensor::process() {
 }
 
 String BMP085Sensor::report()  {
-    if (!measuredData.measured)
+    if (!_measured)
         read();
-    measuredData.measured = false;
+    _measured = false;
     return buildReport(&measuredData);
 }
 

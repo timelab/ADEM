@@ -74,6 +74,7 @@ void SwSerialGPS::read() {
     measuredData.satellites = tinygps->satellites;
     measuredData.altitude = tinygps->altitude;
     measuredData.speed = tinygps->speed;
+	_measured = true;
 }
 
 String SwSerialGPS::FormatDateTime(TinyGPSDate date, TinyGPSTime time) {
@@ -83,9 +84,9 @@ String SwSerialGPS::FormatDateTime(TinyGPSDate date, TinyGPSTime time) {
 }
 
 String SwSerialGPS::report()  {
-    if (!measuredData.measured)
+    if (!_measured)
         read();
-    measuredData.measured = false;
+    _measured = false;
     return buildReport( &measuredData);
 }
 
