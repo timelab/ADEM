@@ -55,7 +55,7 @@ TickerSchedlr *TickerSchedlr::Instance(int size) {
 	return _schedlr;
 }
 
-long TickerSchedlr::updateTickTime() {
+uint32_t TickerSchedlr::updateTickTime() {
 	/* just use the arduino epoch */
 	//  __LOG("Update tick time ");
 	_ticktime = millis();
@@ -92,7 +92,7 @@ TickerSchedlr::TickerSchedlr(uint8_t size){
 TickerSchedlr::~TickerSchedlr() {
 	__LOGLN("Destroy scheduler");
 	// clear all tasks
-	int i;
+	size_t i;
 	for (i = 0; i < _size; i++) {
 		if (tasks[i] != 0)
 			tasks[i]->clear();
@@ -106,10 +106,9 @@ TickerSchedlr::~TickerSchedlr() {
 
 void TickerSchedlr::tick(){
 	updateTickTime();
-	bool idle = true;
 	__LOG("Scheduler tick "); __LOGLN(_ticktime);
 	/* run through regular tasks */
-	for (int i = 0; i <= _maxTsk; i++) {
+	for (size_t i = 0; i <= _maxTsk; i++) {
 		TickerTask *task = tasks[i];
 		if (task){
 			__LOG(" "); __LOG(task->name); __LOG("->"); __LOG(task->tasktype);
@@ -142,27 +141,30 @@ void TickerSchedlr::tick(){
 			if (_maxTsk == i + 1)
 				_maxTsk--; // shrink itteration size of scheduler since last task is empty
 	}
-	// when _nextSchedule < current time then we can execute the IDLE tasks
+	// when _nextSchedule > current time then we can execute the IDLE tasks
 	// we keep track what IDLE task was executed last to prevent starvation of tasks
-	int i = 0;
-	__LOG(" next_schedule "); __LOG(_nextSchedule); __LOG(" < ? "); __LOGLN(updateTickTime());
+	size_t i = 0;
+	__LOG(" next_schedule "); __LOG(_nextSchedule); __LOG(" > ? "); __LOGLN(updateTickTime());
 	while (_nextSchedule > updateTickTime() && i < _maxTsk) {
 		TickerTask * task = tasks[_idlePtr++];
 		// execute idle tasks 
 		if (task && __TASK_IS_IDLE(*task) && task->_enabled){
-			__LOGLN(" IDLE tasks");
+			__LOG(" "); __LOG(task->name); __LOG("->"); __LOG(task->tasktype);__LOGLN(" IDLE tasks");
 			yield();
 			task->exec();
 			yield();
 		}
 		i++;
 		_idlePtr = (_idlePtr % _size); // circular buffer pointer
+    /// TODO track idle tasks and period limits
+    /// if no idle tasks to execute go into deep sleep mode for specified time to save power consumption
+
 	}
 };
 
 void TickerSchedlr::Add(TickerTask *task){
 	__LOG("Add task to schedule : ");
-	for (int i = 0; i < _size; i++) {
+	for (size_t i = 0; i < _size; i++) {
 		if (tasks[i] == 0){
 			tasks[i] = task;
 			task->ID = i;
@@ -294,7 +296,7 @@ TickerTask * TickerTask::createDelayed(task_fp f, uint32_t span){
 };
 
 
-bool TickerTask::kill(){
+void TickerTask::kill(){
 	// end this task. clear all data in scheduler table
 	clear();
 	yield();
@@ -304,7 +306,7 @@ void TickerTask::suspend(){
 	_enabled = false;
 }
 
-void TickerTask::enable(){
+void TickerTask::resume(){
 	_enabled = true;
 }
 
@@ -316,22 +318,22 @@ void TickerTask::delay(uint32_t delay){
 	_updated = true; // indicate we already updated the scheduling properties
 };
 
-bool TickerTask::replace(task_fp f){
+void TickerTask::replace(task_fp f){
 	return replaceDelayed(f, 0);
 };
 
-bool TickerTask::replace(task_fp f, void *t_arg){
+void TickerTask::replace(task_fp f, void *t_arg){
 	// continue next time with new callback function
 	__LOG("replace task "); __LOGLN(name);
 	Callback = f;
 	task_arg = t_arg;
 };
 
-bool TickerTask::replaceDelayed(task_fp f, uint32_t delay){
+void TickerTask::replaceDelayed(task_fp f, uint32_t delay){
 	return replaceDelayed(f, 0, delay);
 };
 
-bool TickerTask::replaceDelayed(task_fp f, void *t_arg, uint32_t delay){
+void TickerTask::replaceDelayed(task_fp f, void *t_arg, uint32_t delay){
 	__LOG("replace task "); __LOG(name); __LOG(" and delay for "); __LOGLN(delay);
 	// continue next time with new callback function
 	uint32_t unow = TickerSchedlr::getTickTime() + delay;

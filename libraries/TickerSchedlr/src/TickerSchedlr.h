@@ -94,11 +94,11 @@ public:
 	String name = "";
 	int tasktype = NOOP;  // no operation is the default value
 
-	bool kill();      // end task and remove from scheduler
-	bool replace(task_fp f);       // continue scheduling replacing callback with give function 
-	bool replace(task_fp f, void *t_arg); // continue scheduling replacing callback with give function 
-	bool replaceDelayed(task_fp f, uint32_t span);        // continue scheduling replacing callback with give function 
-	bool replaceDelayed(task_fp f, void *t_arg, uint32_t span); // continue scheduling replacing callback with give function 
+	void kill();      // end task and remove from scheduler
+	void replace(task_fp f);       // continue scheduling replacing callback with give function 
+	void replace(task_fp f, void *t_arg); // continue scheduling replacing callback with give function 
+	void replaceDelayed(task_fp f, uint32_t span);        // continue scheduling replacing callback with give function 
+	void replaceDelayed(task_fp f, void *t_arg, uint32_t span); // continue scheduling replacing callback with give function 
 
 	void delay(uint32_t span);
 	void trigger();   // set the task for next round of execution
@@ -106,7 +106,7 @@ public:
 	void clear();
 	void setNextTime();
 	void suspend();
-	void enable();
+	void resume();
 	inline uint32_t getNextTime() { return _next_time; };
 	inline uint32_t getDuration() { return _duration; };
 	inline uint32_t getLastTime() { return _last_time; };
@@ -117,15 +117,15 @@ typedef  TickerTask * ptrTickerTask;
 class TickerSchedlr
 {
 private:
-	uint _size;
-	uint _maxTsk = 0;
+	size_t _size;
+	size_t _maxTsk = 0;
 	TickerTask **tasks = NULL;
 	static TickerSchedlr * _schedlr;
 	static uint32_t _ticktime;
 	uint32_t _nextSchedule = 0;
 	int16_t _idlePtr = 0;
 
-	long updateTickTime();
+	uint32_t updateTickTime();
 	TickerSchedlr();
 	TickerSchedlr(uint8_t size);
 
