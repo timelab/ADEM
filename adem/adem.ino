@@ -144,6 +144,7 @@ TickerTask *battery_task = NULL;
 TickerTask *gps_task = NULL;
 TickerTask *humidity_task = NULL;
 TickerTask *particulate_task = NULL;
+TickerTask *upload_task = NULL;
 
 // TASKS
 void accelerometer_run(void *) {
@@ -180,6 +181,17 @@ void particulate_run(void *) {
   particulate.read();
   buffer.write((char *)particulate.dataToBuffer(), particulate.dataBufferSize());
   __LOGLN(particulate.report());
+}
+
+void upload(void *){
+	// here we have to peek the sensor ID and nack the peek
+	// depending on the sensor ID we peek the buffer for databufferSize bytes and send the off to the sensor::bufferReport
+	// which returns the json string
+	// then we send off this data to the server over the WIFI
+	// when succesfully posted we can acknowledge the buffer and move on to the next buffered item
+	// by running this as an idle task it will almost constantly process the buffer as long as there is buffered data
+	// for debug purposes we could log the WIFI postings
+	// if done sending data we suspend this task. The state machine will resume the task when needed
 }
 
 
@@ -259,12 +271,18 @@ void wifitest_state() {
 
 void upload_state() {
 
+	if (not upload_task)
+		upload_task = TickerTask::createIdle(&upload);
+	else
+	upload_task->resume();
+
   // Upload action finishes successfully or times out
   // Create JSON of X records
   // Send to server
   // Empty datastore
 
   if (buffer.empty()) {
+	upload_task->suspend();
     next_state = STATE_WIFITEST;
   }
 }
