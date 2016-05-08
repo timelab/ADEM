@@ -29,6 +29,7 @@
 #include <humidity_HTU21D.h>
 #include <led_NeoPixel.h>
 #include <particulate_PPD42.h>
+#include "store_And_Forward.h"
 
 #define GPS_TX_PIN 0
 #define GPS_RX_PIN 4
@@ -84,10 +85,12 @@ public:
   boolean shaken = false;
 } accelerometer;
 
-class StubBuffer {
-public:
-  boolean empty = true;
-} buffer;
+//class StubBuffer {
+//public:
+//  boolean empty = true;
+//} buffer;
+
+storeAndForwardBuf buffer(10000);
 
 class StubWifiClient {
 public:
@@ -151,26 +154,31 @@ void accelerometer_run(void *) {
 
 void barometer_run(void *) {
   barometer.read();
+  buffer.write((char *)barometer.dataToBuffer(), barometer.dataBufferSize());
   __LOGLN(barometer.report());
 }
 
 void battery_run(void *) {
   battery.read();
+  buffer.write((char *)battery.dataToBuffer(), battery.dataBufferSize());
 //  __LOGLN(battery.report());
 }
 
 void gps_run(void *) {
   gps.read();
+  buffer.write((char *)gps.dataToBuffer(), gps.dataBufferSize());
   __LOGLN(gps.report());
 }
 
 void humidity_run(void *) {
   humidity.read();
+  buffer.write((char *)humidity.dataToBuffer(), humidity.dataBufferSize());
   __LOGLN(humidity.report());
 }
 
 void particulate_run(void *) {
   particulate.read();
+  buffer.write((char *)particulate.dataToBuffer(), particulate.dataBufferSize());
   __LOGLN(particulate.report());
 }
 
@@ -198,7 +206,7 @@ void sleep_state() {
   if (accelerometer.moving or debug.moving) {
     next_state = STATE_GPSTEST;
   } else {
-    if (not buffer.empty) {
+    if (not buffer.empty()) {
       next_state = STATE_WIFITEST;
     } else if (accelerometer.shaken or debug.shaken) {
       next_state = STATE_CONFIG;
@@ -244,7 +252,7 @@ void wifitest_state() {
     next_state = STATE_UPLOAD;
   }
 
-  if (accelerometer.moving or debug.moving or buffer.empty or wificlient.timeout) {
+  if (accelerometer.moving or debug.moving or buffer.empty() or wificlient.timeout) {
     next_state = STATE_SLEEP;
   }
 }
@@ -256,7 +264,7 @@ void upload_state() {
   // Send to server
   // Empty datastore
 
-  if (buffer.empty) {
+  if (buffer.empty()) {
     next_state = STATE_WIFITEST;
   }
 }
@@ -386,6 +394,8 @@ void setup() {
   led.setcolor(led_state, colors[state]);
 
 //  buzzer.begin();
+  if (buffer.full())
+	  Serial.println("ERROR no memory to buffer data");
 
   Serial.print("Initializing scheduler... ");
   schedule = TickerSchedlr::Instance(SCHED_MAX_TASKS);

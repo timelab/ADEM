@@ -23,6 +23,8 @@
 
 #include <Arduino.h>
 #include <ESP8266WiFi.h>
+#include <..\..\Sensor\Sensor.h>
+
 
 #ifdef DEBUG_BATTERY:
 #define __LOG(msg) Serial.print(msg)
@@ -32,7 +34,7 @@
 #define __LOGLN(msg)
 #endif
 
-class LipoBattery {
+class LipoBattery : public Sensor{
 public:
     LipoBattery();
     ~LipoBattery();

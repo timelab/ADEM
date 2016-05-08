@@ -73,7 +73,7 @@ public:
 	}
 
 	inline bool full() const {
-		return wrap_if_bufend(_end + 1) == _begin;
+		return (wrap_if_bufend(_end + 1) == _begin) || (_size == 0);
 	}
 
 	int peek();

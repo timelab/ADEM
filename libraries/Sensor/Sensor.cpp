@@ -58,7 +58,7 @@ String Sensor::buildReport(sensorData *sData){
 
 }
    
-size_t Sensor::bufferedDataSize() {
+size_t Sensor::dataBufferSize() {
     return sizeof(measuredData);
 }
 
