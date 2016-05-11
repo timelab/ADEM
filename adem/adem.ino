@@ -29,7 +29,7 @@
 #include <humidity_HTU21D.h>
 #include <led_NeoPixel.h>
 #include <particulate_PPD42.h>
-#include "store_And_Forward.h"
+#include "store_and_forward.h"
 
 #define GPS_TX_PIN 0
 #define GPS_RX_PIN 4
