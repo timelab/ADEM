@@ -16,7 +16,7 @@ License along with this library; if not, write to the Free Software
 Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-#include "store_And_Forward.h"
+#include "store_and_forward.h"
 #include <ctype.h>
 
 storeAndForwardBuf::storeAndForwardBuf(size_t size) :
