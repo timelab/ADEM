@@ -85,11 +85,6 @@ public:
   boolean shaken = false;
 } accelerometer;
 
-//class StubBuffer {
-//public:
-//  boolean empty = true;
-//} buffer;
-
 storeAndForwardBuf buffer(10000);
 
 class StubWifiClient {
@@ -109,6 +104,7 @@ NeoPixelLed led = NeoPixelLed(1, NEOPIXEL_PIN, NEO_GRB + NEO_KHZ800);
 PPD42Sensor particulate;
 //WIFIap wifiap;
 //WIFIcl wificl;
+char SSID[20];
 const int SCHED_MAX_TASKS = 200;
 TickerSchedlr *schedule = NULL;
 
@@ -183,15 +179,15 @@ void particulate_run(void *) {
   __LOGLN(particulate.report());
 }
 
-void upload(void *){
-	// here we have to peek the sensor ID and nack the peek
-	// depending on the sensor ID we peek the buffer for databufferSize bytes and send the off to the sensor::bufferReport
-	// which returns the json string
-	// then we send off this data to the server over the WIFI
-	// when succesfully posted we can acknowledge the buffer and move on to the next buffered item
-	// by running this as an idle task it will almost constantly process the buffer as long as there is buffered data
-	// for debug purposes we could log the WIFI postings
-	// if done sending data we suspend this task. The state machine will resume the task when needed
+void upload_run(void *) {
+  // here we have to peek the sensor ID and nack the peek
+  // depending on the sensor ID we peek the buffer for databufferSize bytes and send the off to the sensor::bufferReport
+  // which returns the json string
+  // then we send off this data to the server over the WIFI
+  // when succesfully posted we can acknowledge the buffer and move on to the next buffered item
+  // by running this as an idle task it will almost constantly process the buffer as long as there is buffered data
+  // for debug purposes we could log the WIFI postings
+  // if done sending data we suspend this task. The state machine will resume the task when needed
 }
 
 
@@ -214,6 +210,7 @@ void start_state() {
 }
 
 void sleep_state() {
+  delay(500);
 
   if (accelerometer.moving or debug.moving) {
     next_state = STATE_GPSTEST;
@@ -271,18 +268,12 @@ void wifitest_state() {
 
 void upload_state() {
 
-	if (not upload_task)
-		upload_task = TickerTask::createIdle(&upload);
-	else
-	upload_task->resume();
-
   // Upload action finishes successfully or times out
   // Create JSON of X records
   // Send to server
   // Empty datastore
 
   if (buffer.empty()) {
-	upload_task->suspend();
     next_state = STATE_WIFITEST;
   }
 }
@@ -299,9 +290,11 @@ void start_to_sleep() {
 
   Serial.print("Turning WiFi off... ");
 //  wifi_set_sleep_type(LIGHT_SLEEP_T);
+  WiFi.disconnect();
   WiFi.mode(WIFI_OFF);
   WiFi.forceSleepBegin();
   Serial.println("OK");
+  __LOGLN("Device entered sleep state, waiting for action !");
 }
 
 void sleep_to_config() {
@@ -311,10 +304,10 @@ void sleep_to_config() {
   // Resume wifiap task
   //wifiap.begin();
 
-  Serial.print("Starting WiFi as Access Point... ");
+  __LOG("Starting WiFi in AP mode using SSID "); __LOG(SSID); __LOG("... ");
   WiFi.forceSleepWake();
   WiFi.mode(WIFI_AP);
-  WiFi.softAP("IK-ADEM");
+  WiFi.softAP(SSID);
   delay(50);
   Serial.println("OK");
 
@@ -329,9 +322,11 @@ void config_to_sleep() {
   //wifiap.end();
   Serial.print("Turning WiFi off... ");
 //  wifi_set_sleep_type(LIGHT_SLEEP_T);
+  WiFi.disconnect();
   WiFi.mode(WIFI_OFF);
   WiFi.forceSleepBegin();
   Serial.println("OK");
+  __LOGLN("Device entered sleep state, waiting for action !");
 }
 
 void sleep_to_gpstest() {
@@ -347,6 +342,7 @@ void gpstest_to_sleep() {
   // Suspend gps task
   gps_task->clear();
   gps.end();
+  __LOGLN("Device entered sleep state, waiting for action !");
 }
 
 void gpstest_to_collect() {
@@ -387,14 +383,25 @@ void wifitest_to_sleep() {
   // Suspend wificlient task
   //wificlient_task->clear();
   //wificlient.end();
+  __LOGLN("Device entered sleep state, waiting for action !");
 }
 
 void wifitest_to_upload() {
+  if (not upload_task) {
+    upload_task = TickerTask::createIdle(&upload_run);
+  }
+  upload_task->resume();
 }
 
 void upload_to_wifitest() {
+  upload_task->suspend();
 }
 
+void debug_help() {
+  __LOGLN();
+  __LOGLN("Press \"g\" for gpsfix, \"m\" for moving, \"r\" to restart, \"s\" to shake, \"w\" for wifi and \"h\" for help.");
+  __LOGLN();
+}
 
 void setup() {
   state = STATE_START;
@@ -405,19 +412,22 @@ void setup() {
 
   __LOGLN();
   __LOGLN("Setup started in DEBUG mode.");
-  __LOGLN("Press \"g\" for gpsfix, \"m\" for moving, \"r\" to restart, \"s\" to shake and \"w\" for wifi.");
-  __LOGLN();
+  debug_help();
 
   led.begin();
   led.setcolor(led_state, colors[state]);
 
 //  buzzer.begin();
-  if (buffer.full())
-	  Serial.println("ERROR no memory to buffer data");
+  if (buffer.full()) {
+    Serial.println("ERROR no memory to buffer data");
+  }
 
   Serial.print("Initializing scheduler... ");
   schedule = TickerSchedlr::Instance(SCHED_MAX_TASKS);
   Serial.println("OK");
+
+  sprintf(SSID, "ADEM #%d", ESP.getChipId());
+  __LOG("Set WIFI SSID to: "); __LOGLN(SSID);
 }
 
 
@@ -524,6 +534,10 @@ void loop() {
         case 'w':
           debug.wifi = not debug.wifi;
           __LOG("debug.wifi is "); __LOGLN(debug.wifi?"on.":"off.");
+          break;
+        case 'h':
+        case '?':
+          debug_help();
           break;
         default:
           __LOGLN("No action.");
