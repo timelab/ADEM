@@ -193,4 +193,4 @@ During testing we discovered some constraints to used pins.
 
 NOTE: TODO: Describe the known issues here ? (Lieven)
 
-image::https://github.com/timelab/ADEM/blob/master/docs/images/adem_logo.svg[alt="ADEM logo", link="http://ik-adem.be/", align="right", float]
+image::http://timelab.github.io/ADEM-Logos/svg/adem_logo-txt_stroke.svg[alt="ADEM logo", link="http://ik-adem.be/", align="right", float]
