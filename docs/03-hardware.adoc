@@ -66,4 +66,4 @@ http://www.atmel.com/devices/AT24C512C.aspx[link]
 
 |=================================================================================================================
 
-image::http://ik-adem.be/wp-content/themes/adem/assets/images/adem_logo.svg[alt="ADEM logo", link="http://ik-adem.be/", align="right"]
+image::https://github.com/timelab/ADEM/blob/master/docs/images/adem_logo.svg[alt="ADEM logo", link="http://ik-adem.be/", align="right", float]

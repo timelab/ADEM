@@ -65,4 +65,4 @@ We already established that sensor-records will be stored in memory in binary fo
 
 This ensures efficient use of scarce memory, while retaining augmented information to the back-end.
 
-image::http://ik-adem.be/wp-content/themes/adem/assets/images/adem_logo.svg[alt="ADEM logo", link="http://ik-adem.be/", align="right"]
+image::https://github.com/timelab/ADEM/blob/master/docs/images/adem_logo.svg[alt="ADEM logo", link="http://ik-adem.be/", align="right", float]
