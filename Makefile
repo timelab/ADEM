@@ -13,7 +13,7 @@ SKETCH = adem/adem.ino
 BOARD = esp8266:esp8266:thing
 HWTYPE = esp8266
 
-ESPTOOL = $(ARDUINO15_PATH)/packages/$(HWTYPE)/tools/esptool/0.4.8/esptool
+ESPTOOL = $(ARDUINO15_PATH)/packages/$(HWTYPE)/tools/esptool/0.4.9/esptool
 CTAGS = $(ARDUINO_PATH)/tools-builder/ctags/5.8-arduino10
 
 CXX_FLAGS := -DDEBUG
