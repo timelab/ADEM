@@ -7,15 +7,10 @@
 
 #pragma once
 
-#include "../Configuration.hpp"
-
-namespace ArduinoJson {
-namespace Internals {
-
-#if ARDUINOJSON_USE_DOUBLE
-typedef double JsonFloat;
+#ifdef _MSC_VER
+#define FORCE_INLINE __forceinline
+#define NO_INLINE __declspec(noinline)
 #else
-typedef float JsonFloat;
+#define FORCE_INLINE __attribute__((always_inline))
+#define NO_INLINE __attribute__((noinline))
 #endif
-}
-}

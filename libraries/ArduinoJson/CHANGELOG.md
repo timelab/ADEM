@@ -1,6 +1,45 @@
 ArduinoJson: change log
 =======================
 
+v5.6.2
+------
+
+* Fixed build when another lib does `#undef isnan` (issue #284)
+
+v5.6.1
+------
+
+* Added missing `#pragma once` (issue #310)
+
+v5.6.0
+------
+
+* ArduinoJson is now a header-only library (issue #199)
+
+v5.5.1
+------
+
+* Fixed compilation error with Intel Galileo (issue #299)
+
+v5.5.0
+------
+
+* Added `JsonVariant::success()` (issue #279)
+* Renamed `JsonVariant::invalid<T>()` to `JsonVariant::defaultValue<T>()`
+
+v5.4.0
+------
+
+* Changed `::String` to `ArduinoJson::String` (issue #275)
+* Changed `::Print` to `ArduinoJson::Print` too
+
+v5.3.0
+------
+
+* Added custom implementation of `ftoa` (issues #266, #267, #269 and #270)
+* Added `JsonVariant JsonBuffer::parse()` (issue #265)
+* Fixed `unsigned long` printed as `signed long` (issue #170)
+
 v5.2.0
 ------
 

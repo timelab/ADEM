@@ -7,14 +7,18 @@
 
 #pragma once
 
-#include "JsonObjectKey.hpp"
-#include "JsonVariant.hpp"
+#include "Configuration.hpp"
+
+#if ARDUINOJSON_USE_ARDUINO_STRING
+
+#include <WString.h>
+
+#else
+
+#include <string>
 
 namespace ArduinoJson {
-
-// A key value pair for JsonObject.
-struct JsonPair {
-  const char* key;
-  JsonVariant value;
-};
+typedef std::string String;
 }
+
+#endif
