@@ -14,6 +14,7 @@ before_install:
   - sudo mv arduino-$ARDUINO_VERSION /usr/local/share/arduino
   - sudo ln -s /usr/local/share/arduino/arduino /usr/local/bin/arduino
 #  - export PATH="$PWD/arduino-$ARDUINO_VERSION:$PATH"
+install:
   # Ensure we use the current directory to include library/
   - arduino --pref sketchbook.path=. --save-prefs
   # Add the ESP8266 board to the Board Manager (fails on 1.6.6 - 1.6.8)
@@ -21,7 +22,6 @@ before_install:
   # Enable minimum warning level
   - arduino --pref compiler.warning_level=none --save-prefs
 #  - arduino --pref compiler.warning_level=all --save-prefs
-install:
   # Install our ESP8266 board
   - arduino --install-boards esp8266:esp8266
   - arduino --board esp8266:esp8266:generic --save-prefs
