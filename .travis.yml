@@ -1,29 +1,28 @@
 language: c
 env:
-  - ARDUINO_VERSION="1.6.9"
+  global:
+    - ARDUINO_VERSION="1.6.9"
+    - DISPLAY=":1.0"
 before_install:
   # Ensure we have a DISPLAY for the Arduino IDE [WORKAROUND]
   - "/sbin/start-stop-daemon --start --quiet --pidfile /tmp/custom_xvfb_1.pid --make-pidfile --background --exec /usr/bin/Xvfb -- :1 -ac -screen 0 1280x1024x16"
-  - sleep 3
-  - export DISPLAY=:1.0
-  # Download and install Arduino
-  - echo "Installing Arduino version $ARDUINO_VERSION"
+#  - sleep 3
+#  - export DISPLAY=":1.0"
+  # Download and extract Arduino
   - wget -nv http://downloads.arduino.cc/arduino-$ARDUINO_VERSION-linux64.tar.xz
   - tar -xJf arduino-$ARDUINO_VERSION-linux64.tar.xz
-  # Move Arduino into the known PATH [WORKAROUND]
+  # Install Arduino into the known PATH [WORKAROUND]
   - sudo mv arduino-$ARDUINO_VERSION /usr/local/share/arduino
   - sudo ln -s /usr/local/share/arduino/arduino /usr/local/bin/arduino
-#  - export PATH="$PWD/arduino-$ARDUINO_VERSION:$PATH"
+#  - export PATH="$PATH:$PWD/arduino-$ARDUINO_VERSION"
 install:
   # Ensure we use the current directory to include library/
-  - arduino --pref sketchbook.path=. --save-prefs
-  # Add the ESP8266 board to the Board Manager (fails on 1.6.6 - 1.6.8)
-  - arduino --pref boardsmanager.additional.urls=http://arduino.esp8266.com/stable/package_esp8266com_index.json --save-prefs
-  # Enable minimum warning level
-  - arduino --pref compiler.warning_level=none --save-prefs
-#  - arduino --pref compiler.warning_level=all --save-prefs
-  # Install our ESP8266 board
-  - arduino --install-boards esp8266:esp8266
-  - arduino --board esp8266:esp8266:generic --save-prefs
+  - >
+    arduino
+    --pref sketchbook.path=.
+    --pref boardsmanager.additional.urls=http://arduino.esp8266.com/stable/package_esp8266com_index.json
+    --pref compiler.warning_level=none
+    --install-boards esp8266:esp8266
+    --save-prefs
 script:
   - arduino --verify --board esp8266:esp8266:thing $PWD/adem/adem.ino
