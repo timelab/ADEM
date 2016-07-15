@@ -18,7 +18,6 @@
  *
  */
 
-#include <ESP8266WiFi.h>
 #include <TickerSchedlr.h>
 
 //#include <accelerator_MPU6050.h>
@@ -29,6 +28,7 @@
 #include <humidity_HTU21D.h>
 #include <led_NeoPixel.h>
 #include <particulate_PPD42.h>
+#include <wifi_WiFiManager.h>
 #include "store_and_forward.h"
 
 #define GPS_TX_PIN 0
@@ -40,6 +40,8 @@
 #ifdef DEBUG
 #define __LOG(msg) Serial.print(msg)
 #define __LOGLN(msg) Serial.println(msg)
+// Define for internal ESP libraries when DEBUG is set
+#define DEBUG_OUTPUT Serial
 #else
 #define __LOG(msg)
 #define __LOGLN(msg)
@@ -87,12 +89,6 @@ public:
 
 storeAndForwardBuf buffer(10000);
 
-class StubWifiClient {
-public:
-  boolean fix = false;
-  boolean timeout = true;
-} wificlient;
-
 // Objects for all the sensor libraries
 //MPU6050Sensor accelerometer;
 BMP085Sensor barometer;
@@ -102,11 +98,10 @@ SwSerialGPS gps = SwSerialGPS(GPS_RX_PIN, GPS_TX_PIN, GPS_BAUD);
 HTU21DFSensor humidity;
 NeoPixelLed led = NeoPixelLed(1, NEOPIXEL_PIN, NEO_GRB + NEO_KHZ800);
 PPD42Sensor particulate;
-//WIFIap wifiap;
-//WIFIcl wificl;
 char SSID[20];
 const int SCHED_MAX_TASKS = 200;
 TickerSchedlr *schedule = NULL;
+WiFiManagerWifi wifi;
 
 // FIXME: Since brightness does not seem to work, use "darker" colors
 // Colors
@@ -206,6 +201,8 @@ void start_state() {
   battery_task = TickerTask::createPeriodic(&battery_run, 60000);
   battery_task->name = "battery";
 
+  wifi.begin();
+
   next_state = STATE_SLEEP;
 }
 
@@ -257,11 +254,13 @@ void collect_state() {
 
 void wifitest_state() {
 
-  if (wificlient.fix or debug.wifi) {
+  wifi.start_client();
+
+  if (wifi.connected or debug.wifi) {
     next_state = STATE_UPLOAD;
   }
 
-  if (accelerometer.moving or debug.moving or buffer.empty() or wificlient.timeout) {
+  if (accelerometer.moving or debug.moving or buffer.empty() or not wifi.connected) {
     next_state = STATE_SLEEP;
   }
 }
@@ -288,12 +287,8 @@ void start_to_sleep() {
 
 //  buzzer.start_sound();
 
-  Serial.print("Turning WiFi off... ");
-//  wifi_set_sleep_type(LIGHT_SLEEP_T);
-  WiFi.disconnect();
-  WiFi.mode(WIFI_OFF);
-  WiFi.forceSleepBegin();
-  Serial.println("OK");
+  wifi.sleep();
+
   __LOGLN("Device entered sleep state, waiting for action !");
 }
 
@@ -301,31 +296,18 @@ void sleep_to_config() {
 
 //  buzzer.config_sound();
 
-  // Resume wifiap task
-  //wifiap.begin();
-
   __LOG("Starting WiFi in AP mode using SSID "); __LOG(SSID); __LOG("... ");
-  WiFi.forceSleepWake();
-  WiFi.mode(WIFI_AP);
-  WiFi.softAP(SSID);
-  delay(50);
-  Serial.println("OK");
+  wifi.start_ap(SSID);
 
   // Disable for now, it's our temporary switch to go in and out of config
-  //debug.shaken = false;
-
+  debug.shaken = false;
 }
 
 void config_to_sleep() {
 
   // Suspend wifiap task
-  //wifiap.end();
-  Serial.print("Turning WiFi off... ");
-//  wifi_set_sleep_type(LIGHT_SLEEP_T);
-  WiFi.disconnect();
-  WiFi.mode(WIFI_OFF);
-  WiFi.forceSleepBegin();
-  Serial.println("OK");
+  wifi.sleep();
+
   __LOGLN("Device entered sleep state, waiting for action !");
 }
 
@@ -374,15 +356,15 @@ void collect_to_gpstest() {
 
 void sleep_to_wifitest() {
 
-  //wificlient.begin();
   // Resume wificlient task
+
 }
 
 void wifitest_to_sleep() {
 
   // Suspend wificlient task
-  //wificlient_task->clear();
-  //wificlient.end();
+  wifi.sleep();
+
   __LOGLN("Device entered sleep state, waiting for action !");
 }
 
