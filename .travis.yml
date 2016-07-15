@@ -6,8 +6,6 @@ env:
 before_install:
   # Ensure we have a DISPLAY for the Arduino IDE [WORKAROUND]
   - "/sbin/start-stop-daemon --start --quiet --pidfile /tmp/custom_xvfb_1.pid --make-pidfile --background --exec /usr/bin/Xvfb -- :1 -ac -screen 0 1280x1024x16"
-#  - sleep 3
-#  - export DISPLAY=":1.0"
   # Download and extract Arduino
   - wget -nv http://downloads.arduino.cc/arduino-$ARDUINO_VERSION-linux64.tar.xz
   - tar -xJf arduino-$ARDUINO_VERSION-linux64.tar.xz
