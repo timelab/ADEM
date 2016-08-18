@@ -20,7 +20,7 @@
 
 #include <TickerSchedlr.h>
 
-//#include <accelerator_MPU6050.h>
+#include <accelero_MPU6050.h>
 #include <barometer_BMP085.h>
 #include <battery_lipo.h>
 #include <buzzer_passive.h>
@@ -81,16 +81,16 @@ public:
   boolean wifi = false;
 } debug;
 
-class StubAccelerometer {
-public:
-  boolean moving = false;
-  boolean shaken = false;
-} accelerometer;
+//class StubAccelerometer {
+//public:
+//  boolean moving = false;
+//  boolean shaken = false;
+//} accelerometer;
 
 storeAndForwardBuf buffer(10000);
 
 // Objects for all the sensor libraries
-//MPU6050Sensor accelerometer;
+MPU6050Sensor accelerometer;
 BMP085Sensor barometer;
 LipoBattery battery;
 PassiveBuzzer buzzer;
@@ -140,8 +140,17 @@ TickerTask *upload_task = NULL;
 // TASKS
 void accelerometer_run(void *) {
   //LOGLN(":accelerometer: -> Check moving/shaken");
-  //accelerometer.read();
-  // Serial.println(accelerometer.report());
+  accelerometer.read();
+   Serial.println(accelerometer.report());
+
+  // process normal accel data in logging.
+  // MPU will store data internally in its FIFO so we have to loop
+   while (accelerometer.hasData())
+  {
+      accelerometer.read();
+      buffer.write((char *)accelerometer.dataToBuffer(), accelerometer.dataBufferSize());
+      __LOGLN(accelerometer.report());
+  }
 }
 
 void barometer_run(void *) {
@@ -174,15 +183,57 @@ void particulate_run(void *) {
   __LOGLN(particulate.report());
 }
 
-void upload_run(void *) {
-  // here we have to peek the sensor ID and nack the peek
-  // depending on the sensor ID we peek the buffer for databufferSize bytes and send the off to the sensor::bufferReport
-  // which returns the json string
-  // then we send off this data to the server over the WIFI
-  // when succesfully posted we can acknowledge the buffer and move on to the next buffered item
-  // by running this as an idle task it will almost constantly process the buffer as long as there is buffered data
-  // for debug purposes we could log the WIFI postings
-  // if done sending data we suspend this task. The state machine will resume the task when needed
+void upload_run(void *){
+    // here we have to peek the sensor ID and nack the peek
+    // depending on the sensor ID we peek the buffer for databufferSize bytes and send the off to the sensor::bufferReport
+    // which returns the json string
+    // then we send off this data to the server over the WIFI
+    // when succesfully posted we can acknowledge the buffer and move on to the next buffered item
+    // by running this as an idle task it will almost constantly process the buffer as long as there is buffered data
+    // for debug purposes we could log the WIFI postings
+    // if done sending data we suspend this task. The state machine will resume the task when needed
+    char lbuf[40];
+    int lID;
+    int s = 0;
+    String strReport;
+    Sensor * pSens = NULL;
+    __LOG("buffered report : #")
+    if (~ buffer.empty()){
+        lID = buffer.peek();
+        buffer.nack();
+        switch (lID){
+        case BAROMETER_BMP085:
+            pSens = &barometer;
+            break;
+        case HUMIDITY_HTU21D:
+            pSens = &humidity;
+            break;
+        case PARTICULATE_PPD42:
+            pSens = &particulate;
+            break;
+        case GPS_SWSERIAL:
+            pSens = &gps;
+            break;
+        case ACCELERO_MPU6050:
+            pSens = &accelerometer;
+            break;
+/// TODO : what if ID is not recognized ? How to recover from corrupt data ?
+            
+        }
+
+        s = buffer.peek(&lbuf[0], pSens->dataBufferSize());
+        if (s)
+            strReport = pSens->bufferedReport((uint8_t *)&lbuf[0]);
+        __LOG(strReport);
+        __LOGLN("#");
+        // send off strReport to datastore
+        // if ACK of storage then ack buffer
+        boolean success = true;
+        if (success)
+            buffer.ack();
+        else
+            buffer.nack();
+    }
 }
 
 
