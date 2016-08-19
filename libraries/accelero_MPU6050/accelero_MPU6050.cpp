@@ -22,7 +22,7 @@
   MPU6050Sensor.cpp - Skeleton library for ADEM MPU6050Sensors.
 */
 
-#include "Accelero_MPU6050.h"
+#include "accelero_MPU6050.h"
 
 // static member initialisation
 volatile bool MPU6050Sensor::_dataReady = false;
