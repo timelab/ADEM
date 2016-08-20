@@ -197,7 +197,7 @@ void upload_run(void *){
     int s = 0;
     String strReport;
     Sensor * pSens = NULL;
-    __LOG("buffered report : #")
+    __LOG("buffered report : #");
     if (~ buffer.empty()){
         lID = buffer.peek();
         buffer.nack();
