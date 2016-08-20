@@ -39,7 +39,7 @@
         
 #define I2C_GPS_GROUND_SPEED                        31   // GPS ground speed in m/s*100 (uint16_t)      (Read Only)
 #define I2C_GPS_ALTITUDE                            33   // GPS altitude in meters (uint16_t)           (Read Only)
-#define I2C_GPS_GROUND_COURSE                       35   // GPS ground course (uint16_t)
+#define I2C_GPS_GROUND_COURSE			    35   // GPS ground course (uint16_t)
 #define I2C_GPS_RES1                                37   // reserved for future use (uint16_t)
 #define I2C_GPS_TIME                                39   // UTC Time from GPS in hhmmss.sss * 100 (uint32_t)(unneccesary precision) (Read Only)
 
