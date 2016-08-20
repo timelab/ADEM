@@ -18,7 +18,8 @@
 #include <TinyGPS.h>
 #include <SoftwareSerial.h>
 #include <Time.h>
-
+#include "I2GPS.h"
+/*
 #define N_DATA_BYTE 32
 #define I2GPS_SLAVE_SELECT 6
 #define I2GPS_I2C_ADDR 48
@@ -46,6 +47,8 @@
 #define I2GPS_ERROR_ADDR 0x67
 #define I2GPS_FILENAME_ADDR 0x2f
 #define I2GPS_FILE_ENABLE 0x02
+*/
+
 // globals
 const int  LED1 = 4;
 const int  LED2 = 7; 
