@@ -37,6 +37,7 @@ https://s3.amazonaws.com/linksprite/Arduino_kits/advanced_sensors_kit/KY006+code
 
 | Fine Dust Meter           | PPD42                     |                   |
 http://sca-shinyei.com/pdf/PPD42NS.pdf[datasheet]
+http://www.takingspace.org/wp-content/uploads/ShinyeiPPD42NS_Deconstruction_TracyAllen.pdf[info]
 http://www.howmuchsnow.com/arduino/airquality/grovedust/[tutorial]
 
 | GPS                       | XM37-1612 / GY-NEO6MV2    | (11.66€ banggood) |
