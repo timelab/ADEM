@@ -13,41 +13,15 @@
  */
 
 #include <inttypes.h>
-#include <SD.h>
 #include <Wire.h>
 #include <TinyGPS.h>
 #include <SoftwareSerial.h>
 #include <Time.h>
 #include "I2GPS.h"
-/*
-#define N_DATA_BYTE 32
-#define I2GPS_SLAVE_SELECT 6
-#define I2GPS_I2C_ADDR 48
 
-#define I2GPS_LAT_ADDR 0x04
-#define I2GPS_LON_ADDR 0x08
-#define I2GPS_ALT_ADDR 0x0c 
-#define I2GPS_SPEED_ADDR 0x10
-#define I2GPS_COURSE_ADDR 0x14
-#define I2GPS_FIX_AGE_ADDR 0x18
-#define I2GPS_YEAR_ADDR 0x1c
-#define I2GPS_MONTH_ADDR 0x1d
-#define I2GPS_DAY_ADDR 0x1e
-#define I2GPS_HOUR_ADDR 0x1f
-#define I2GPS_MINUTE_ADDR 0x20
-#define I2GPS_SECOND_ADDR 0x21
-
-#define I2GPS_FILESTAT_ADDR 0x41
-#define I2GPS_FILE_ERROR 0x67
-#define I2GPS_TELL_ADDR 0x42
-#define I2GPS_SEEK_ADDR 0x42
-#define I2GPS_DIGITAL_DIR_ADDR 0x26
-#define I2GPS_DIGITAL_RW_ADDR 0x27
-#define I2GPS_FILE_DATA_ADDR 0x2f
-#define I2GPS_ERROR_ADDR 0x67
-#define I2GPS_FILENAME_ADDR 0x2f
-#define I2GPS_FILE_ENABLE 0x02
-*/
+#ifdef SD_SUPPORT
+#include <SD.h>
+#endif
 
 // globals
 const int  LED1 = 4;
@@ -63,8 +37,9 @@ union converter_t {
 converter_t converter;
 time_t next_log_time = 0;
 
+#ifdef SD_SUPPORT
 File file;
-
+#endif
 uint8_t address = 0;
 uint8_t gps_data[N_DATA_BYTE];
 unsigned int *log_interval_p = (unsigned int *)gps_data + 0x22;
@@ -81,6 +56,7 @@ void setup(){
   Serial.println("I2GPS Slave v1.0");
   Serial.println("Copyright WyoLum, LLC 2012");
   sws.begin(9600);
+#ifdef SD_SUPPORT  
   pinMode(I2GPS_SLAVE_SELECT, OUTPUT);
   if(!SD.begin(I2GPS_SLAVE_SELECT)){
     Serial.println("Cannot open SD card");
@@ -91,6 +67,7 @@ void setup(){
   if(!SD.open("00N.BIN")){
     Serial.println("Cannot open SD file 00N.BIN");
   }
+#endif
   Wire.begin(I2GPS_I2C_ADDR);
   Wire.onReceive(I2GPS_onReceive);
   Wire.onRequest(I2GPS_onRequest);
@@ -183,12 +160,15 @@ void loop(){
 // log additional data into SD file 
 //----------------------------------
 void log_data(){
+#ifdef SD_SUPPORT
+ 
   if(file_enabled() && (get_filemode() == FILE_WRITE)){
     // GPS date
     // GPS fix
     // Digital pins
     // Analog pins
   }
+#endif
   next_log_time = now() + *log_interval_p;
 }
 
@@ -216,7 +196,7 @@ void get_filename(char* out){
 //----------------------------------
 uint8_t get_filemode(){
   uint8_t out;
-
+#ifdef SD_SUPPORT
   if((gps_data[I2GPS_FILESTAT_ADDR]) & 1){
     out = FILE_WRITE;
   }
@@ -224,6 +204,10 @@ uint8_t get_filemode(){
     out = FILE_READ;
   }
   return out;
+#else
+  return 0;
+#endif
+  
 }
 
 //----------------------------------
@@ -232,10 +216,12 @@ uint8_t get_filemode(){
 //----------------------------------
 void read_filedata(){
   uint8_t i = 0;
+#ifdef SD_SUPPORT  
   if(file_enabled){
     file.read(gps_data + I2GPS_FILE_DATA_ADDR, 32);
     *((unsigned long*)(gps_data + I2GPS_TELL_ADDR)) = file.position(); // tell data
   }
+#endif
 }
 
 // read as much data as is available.
@@ -259,31 +245,32 @@ void I2GPS_onReceive(int n_byte){
     gps_data[address + data_idx] = Wire.read();
     data_idx++;
   }
+#ifdef SD_SUPPORT  
   if((address == I2GPS_FILESTAT_ADDR)){
     if(file_enabled()){
       // This is the trigger to open the file
       filemode = get_filemode();
       get_filename(filename);
       if(filemode == FILE_READ){
-  if(SD.exists(filename)){
-    file = SD.open(filename, FILE_READ);
-    read_filedata();
-  }
-  else{
-    gps_data[I2GPS_ERROR_ADDR] = I2GPS_FILE_ERROR;
-    Serial.println("FILE DOES NOT EXIST");
-    Serial.println(filename);
-  }
+        if(SD.exists(filename)){
+          file = SD.open(filename, FILE_READ);
+          read_filedata();
+        }
+        else{
+          gps_data[I2GPS_ERROR_ADDR] = I2GPS_FILE_ERROR;
+          Serial.println("FILE DOES NOT EXIST");
+          Serial.println(filename);
+        }
       }
       else{
-  file = SD.open(filename, FILE_WRITE);
+        file = SD.open(filename, FILE_WRITE);
       }
       if(!file){
-  Serial.println("BAD");
-  Serial.println(filename);
-  Serial.print("read? ");
-  Serial.println(filemode==FILE_READ);
-  error(I2GPS_FILE_ERROR);
+        Serial.println("BAD");
+        Serial.println(filename);
+        Serial.print("read? ");
+        Serial.println(filemode==FILE_READ);
+        error(I2GPS_FILE_ERROR);
       }
     }
     else{
@@ -298,7 +285,7 @@ void I2GPS_onReceive(int n_byte){
     }
 #endif
     *((unsigned long*)(gps_data + I2GPS_TELL_ADDR)) = file.position(); // tell data
-  }
+  }  
   else if(((address == I2GPS_SEEK_ADDR) && (data_idx == 4))){
     for(int ii=0; ii<4; ii++){
       converter.byte_dat[ii] = gps_data[I2GPS_SEEK_ADDR + ii];
@@ -308,7 +295,9 @@ void I2GPS_onReceive(int n_byte){
       read_filedata();
     }
   }
-  else if((address == I2GPS_DIGITAL_DIR_ADDR) && (data_idx == 1)){
+  else
+#endif  
+  if((address == I2GPS_DIGITAL_DIR_ADDR) && (data_idx == 1)){
     // reconfigure digital pins
     uint8_t dir = gps_data[I2GPS_DIGITAL_DIR_ADDR];
     for(int ii=0; ii<8; ii++){
@@ -341,11 +330,13 @@ void I2GPS_onRequest(){
     n_byte = N_DATA_BYTE - address;
   }
   Wire.write(gps_data + address, n_byte);
+#ifdef SD_SUPPORT  
   if((address == I2GPS_FILE_DATA_ADDR)){
     if(file_enabled() && (get_filemode() == FILE_READ)){
       read_filedata(); // reload!
     }
   }
+#endif  
 }
 
 bool feedgps(){
