@@ -173,7 +173,7 @@ All external libraries we depend upon for the firmware are included in the repos
 The following external libraries are currently being used:
 
 Adafruit NeoPixel::
-  - Version: 1.0.5
+  - Version: 1.0.6
   - License: LGPL v3
   - URL: https://github.com/adafruit/Adafruit_NeoPixel
 
