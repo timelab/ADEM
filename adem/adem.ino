@@ -459,7 +459,7 @@ void setup() {
   schedule = TickerSchedlr::Instance(SCHED_MAX_TASKS);
   Serial.println("OK");
 
-  sprintf(SSID, "ADEM #%d", ESP.getChipId());
+  sprintf(SSID, "ADEM-%d", ESP.getChipId());
   __LOG("Set WIFI SSID to: "); __LOGLN(SSID);
 }
 

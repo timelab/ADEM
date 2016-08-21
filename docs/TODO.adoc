@@ -39,10 +39,10 @@ completed and still on-going.
 | - Serial input to state machine (debug)  | alpha   | Completed             | Dag
 | - Code conformity                        | beta    | Ongoing               | Dag
 | WiFi integration                         |         |                       |
-| - Wi-Fi Client (upload)                  | alpha   | Ongoing               | Marco
+| - Wi-Fi Client (upload)                  | alpha   | Ongoing               | Marco / Dag
 | - Upload code                            | alpha   | Ongoing               |
-| - Wi-Fi AP (setup)                       | beta?   | TBD                   | Marco
-| - Config website                         | beta?   | TBD                   |
+| - Wi-Fi AP (setup)                       | beta?   | Ongoing               | Marco / Dag
+| - Config website                         | beta?   | Ongoing               | Marco / Dag
 | - OTA firmware updates                   | beta?   | TBD                   |
 | Datastore                                |         |                       |
 | - Internal memory                        | alpha   | Ongoing               | Koen
@@ -50,6 +50,8 @@ completed and still on-going.
 | - Filesystem                             | beta?   | TBD                   |
 | Shaking/moving detection                 | alpha   | Ongoing               | Koen
 | Power management                         | beta    | TBD                   |
+| - Disable on-board power LED             | beta    | TBD                   |
+| - Deepsleep implementation               | beta    | TBD                   |
 | Troubleshoot existing FIXMEs             | beta?   | TBD                   | You ?
 |============================================================================================
 

@@ -177,28 +177,43 @@ class JsonVariant : public JsonVariantBase<JsonVariant> {
   //
   // JsonArray& as<JsonArray> const;
   // JsonArray& as<JsonArray&> const;
-  // JsonArray& as<const JsonArray&> const;
   template <typename T>
   typename TypeTraits::EnableIf<
-      TypeTraits::IsSame<
-          typename TypeTraits::RemoveConst<
-              typename TypeTraits::RemoveReference<T>::type>::type,
-          JsonArray>::value,
+      TypeTraits::IsSame<typename TypeTraits::RemoveReference<T>::type,
+                         JsonArray>::value,
       JsonArray &>::type
+  as() const {
+    return asArray();
+  }
+  //
+  // const JsonArray& as<const JsonArray&> const;
+  template <typename T>
+  typename TypeTraits::EnableIf<
+      TypeTraits::IsSame<typename TypeTraits::RemoveReference<T>::type,
+                         const JsonArray>::value,
+      const JsonArray &>::type
   as() const {
     return asArray();
   }
   //
   // JsonObject& as<JsonObject> const;
   // JsonObject& as<JsonObject&> const;
+  template <typename T>
+  typename TypeTraits::EnableIf<
+      TypeTraits::IsSame<typename TypeTraits::RemoveReference<T>::type,
+                         JsonObject>::value,
+      JsonObject &>::type
+  as() const {
+    return asObject();
+  }
+  //
+  // JsonObject& as<const JsonObject> const;
   // JsonObject& as<const JsonObject&> const;
   template <typename T>
   typename TypeTraits::EnableIf<
-      TypeTraits::IsSame<
-          typename TypeTraits::RemoveConst<
-              typename TypeTraits::RemoveReference<T>::type>::type,
-          JsonObject>::value,
-      JsonObject &>::type
+      TypeTraits::IsSame<typename TypeTraits::RemoveReference<T>::type,
+                         const JsonObject>::value,
+      const JsonObject &>::type
   as() const {
     return asObject();
   }
@@ -281,12 +296,17 @@ class JsonVariant : public JsonVariantBase<JsonVariant> {
 
   // Value returned if the variant has an incompatible type
   template <typename T>
-  static T defaultValue() {
+  static typename Internals::JsonVariantAs<T>::type defaultValue() {
     return T();
   }
 
+  // DEPRECATED: use as<char*>() instead
   const char *asString() const;
+
+  // DEPRECATED: use as<JsonArray>() instead
   JsonArray &asArray() const;
+
+  // DEPRECATED: use as<JsonObject>() instead
   JsonObject &asObject() const;
 
  private:
@@ -309,7 +329,9 @@ class JsonVariant : public JsonVariantBase<JsonVariant> {
     return _type == Internals::JSON_OBJECT;
   }
   bool isString() const {
-    return _type == Internals::JSON_STRING;
+    return _type == Internals::JSON_STRING ||
+           _type == Internals::JSON_UNPARSED && _content.asString &&
+               !strcmp("null", _content.asString);
   }
 
   // The current type of the variant

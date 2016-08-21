@@ -1,7 +1,7 @@
 language: c
 env:
   global:
-    - ARDUINO_VERSION="1.6.9"
+    - ARDUINO_VERSION="1.6.11"
     - DISPLAY=":1.0"
 before_install:
   # Ensure we have a DISPLAY for the Arduino IDE [WORKAROUND]
