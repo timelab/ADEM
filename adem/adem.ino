@@ -140,8 +140,8 @@ TickerTask *upload_task = NULL;
 // TASKS
 void accelerometer_run(void *) {
   //LOGLN(":accelerometer: -> Check moving/shaken");
-  accelerometer.read();
-   Serial.println(accelerometer.report());
+  //accelerometer.read();
+  //erial.println(accelerometer.report());
 
   // process normal accel data in logging.
   // MPU will store data internally in its FIFO so we have to loop
@@ -260,7 +260,7 @@ void start_state() {
 void sleep_state() {
   delay(500);
 
-  if (accelerometer.moving or debug.moving) {
+  if (accelerometer.isMoving() or debug.moving) {
     next_state = STATE_GPSTEST;
   } else {
     if (not buffer.empty()) {
@@ -284,7 +284,7 @@ void gpstest_state() {
 
   //gps.read();
 
-  if (accelerometer.moving or debug.moving) {
+  if (accelerometer.isMoving() or debug.moving) {
     if (gps.ready or debug.gpsready) {
       next_state = STATE_COLLECT;
     }
@@ -298,7 +298,7 @@ void collect_state() {
   // Sensor tasks should be reporting on their own
   //LOGLN("Collecting...");
 
-  if ( not (accelerometer.moving or debug.moving) or not (gps.ready or debug.gpsready) ) {
+  if ( not (accelerometer.isMoving() or debug.moving) or not (gps.ready or debug.gpsready) ) {
     next_state = STATE_GPSTEST;
   }
 }
@@ -311,7 +311,7 @@ void wifitest_state() {
     next_state = STATE_UPLOAD;
   }
 
-  if (accelerometer.moving or debug.moving or buffer.empty() or not wifi.connected) {
+  if (accelerometer.isMoving() or debug.moving or buffer.empty() or not wifi.connected) {
     next_state = STATE_SLEEP;
   }
 }

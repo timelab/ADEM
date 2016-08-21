@@ -66,18 +66,26 @@ void MPU6050Sensor::end () {
 
 void MPU6050Sensor::read() {
   if(_dataReady){
-    dmp_read_fifo(gyro, accel, quat, &sensor_timestamp, &sensors, &more);
+    dmp_read_fifo(gyro, accel, quat, &_sensorTimestamp, &sensors, &more);
     if(sensors & INV_XYZ_ACCEL)
     {
         measuredData._accel_X = accel[1]/accel_sens;
         measuredData._accel_Y = accel[1]/accel_sens;
         measuredData._accel_Z = accel[1]/accel_sens;
+        // calculate the total acceleration. 
+        // No square root taken for speed reason
+        // We only need this value to compare to a threshold so we can live with the square value
+        measuredData._accel_T = measuredData._accel_X * measuredData._accel_X + 
+                                measuredData._accel_Y * measuredData._accel_Y + 
+                                measuredData._accel_Z * measuredData._accel_Z;
+        _measured = true;
     }
     else
     {
         measuredData._accel_X = 0;
         measuredData._accel_Y = 0;
         measuredData._accel_Z = 0;
+        measuredData._accel_T = 0;
     }
     
     if(sensors & INV_XYZ_GYRO)
@@ -85,6 +93,7 @@ void MPU6050Sensor::read() {
         measuredData._gyro_X = gyro[1]/gyro_sens;
         measuredData._gyro_Y = gyro[1]/gyro_sens;
         measuredData._gyro_Z = gyro[1]/gyro_sens;
+        _measured = true;
     }
     else
     {
@@ -92,11 +101,30 @@ void MPU6050Sensor::read() {
         measuredData._gyro_Y = 0;
         measuredData._gyro_Z = 0;
     }
-    measuredData._timestamp = sensor_timestamp;
-    
+    measuredData._timestamp = _sensorTimestamp;
+    // check if we are moving
+    if (measuredData._accel_T > movingThreshold) {
+        _movingTimestamp = _sensorTimestamp;
+    }
     _dataReady = more;
-    _measured = true;
+    
   }
+}
+
+bool MPU6050Sensor::isMoving()
+{
+    long now = measuredData._timestamp;
+    if ((now - _movingTimestamp) > notmovingDelay) 
+        return false;
+    else
+        if (now > _movingTimestamp)
+            return true;
+        else // we have wrapped around (can it happen ?)
+        {
+            // quick and dirty fix. 
+            // if we wrapped around assume lastmoving = now
+            _movingTimestamp = now;
+        }
 }
 
 bool MPU6050Sensor::hasData()

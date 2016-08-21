@@ -47,6 +47,7 @@ struct MPU6050SensorData : sensorData {
     float _accel_X;
     float _accel_Y;
     float _accel_Z;
+    float _accel_T;
     float _gyro_X;
     float _gyro_Y;
     float _gyro_Z;
@@ -75,9 +76,10 @@ class MPU6050Sensor : public Sensor{
     uint8_t * dataToBuffer();
     bool hasData();
     void enableLowPower(bool status);
-    bool moving = false;
+    bool isMoving();
     bool shaken = false;
-
+    float movingThreshold = 1.001;
+    long  notmovingDelay = 20000L;
     //MPU6050Sensor ();
   protected:
     
@@ -88,7 +90,8 @@ class MPU6050Sensor : public Sensor{
     float gyro_sens;
     unsigned short accel_sens;
     long quat[4];
-    unsigned long sensor_timestamp;
+    unsigned long _sensorTimestamp;
+    unsigned long _movingTimestamp;
     
      // Static methods and variables for the interrupt functions
     static void mpu_interrupt();
