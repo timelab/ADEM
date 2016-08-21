@@ -81,7 +81,7 @@ class JsonWriter {
     }
   }
 
-  void writeFloat(JsonFloat value, int digits = 2) {
+  void writeFloat(JsonFloat value, uint8_t digits = 2) {
     if (Polyfills::isNaN(value)) return writeRaw("NaN");
 
     if (value < 0.0) {
@@ -98,11 +98,8 @@ class JsonWriter {
       powersOf10 = 0;
     }
 
-    // Round correctly so that print(1.999, 2) prints as "2.00"
-    JsonFloat rounding = 0.5;
-    for (uint8_t i = 0; i < digits; ++i) rounding /= 10.0;
-
-    value += rounding;
+    // Round up last digit (so that print(1.999, 2) prints as "2.00")
+    value += getRoundingBias(digits);
 
     // Extract the integer part of the value and print it
     JsonUInt int_part = static_cast<JsonUInt>(value);
@@ -116,10 +113,13 @@ class JsonWriter {
 
     // Extract digits from the remainder one at a time
     while (digits-- > 0) {
+      // Extract digit
       remainder *= 10.0;
-      JsonUInt toPrint = JsonUInt(remainder);
-      writeInteger(JsonUInt(remainder));
-      remainder -= static_cast<JsonFloat>(toPrint);
+      char currentDigit = char(remainder);
+      remainder -= static_cast<JsonFloat>(currentDigit);
+
+      // Print
+      writeRaw(char('0' + currentDigit));
     }
 
     if (powersOf10 < 0) {
@@ -135,16 +135,15 @@ class JsonWriter {
 
   void writeInteger(JsonUInt value) {
     char buffer[22];
+    char *ptr = buffer + sizeof(buffer) - 1;
 
-    uint8_t i = 0;
+    *ptr = 0;
     do {
-      buffer[i++] = static_cast<char>(value % 10 + '0');
+      *--ptr = static_cast<char>(value % 10 + '0');
       value /= 10;
     } while (value);
 
-    while (i > 0) {
-      writeRaw(buffer[--i]);
-    }
+    writeRaw(ptr);
   }
 
   void writeRaw(const char *s) {
@@ -160,6 +159,26 @@ class JsonWriter {
 
  private:
   JsonWriter &operator=(const JsonWriter &);  // cannot be assigned
+
+  static JsonFloat getLastDigit(uint8_t digits) {
+    // Designed as a compromise between code size and speed
+    switch (digits) {
+      case 0:
+        return 1e-0;
+      case 1:
+        return 1e-1;
+      case 2:
+        return 1e-2;
+      case 3:
+        return 1e-3;
+      default:
+        return getLastDigit(uint8_t(digits - 4)) * 1e-4;
+    }
+  }
+
+  FORCE_INLINE static JsonFloat getRoundingBias(uint8_t digits) {
+    return 0.5 * getLastDigit(digits);
+  }
 };
 }
 }

@@ -178,7 +178,7 @@ Adafruit NeoPixel::
   - URL: https://github.com/adafruit/Adafruit_NeoPixel
 
 ArduinoJson::
-  - Version: 5.6.2
+  - Version: 5.6.5
   - License: MIT
   - URL: https://github.com/bblanchon/ArduinoJson
 

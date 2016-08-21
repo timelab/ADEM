@@ -1,6 +1,23 @@
 ArduinoJson: change log
 =======================
 
+v5.6.5
+------
+
+* `as<char*>()` now returns `true` when input is `null` (issue #330)
+
+v5.6.4
+------
+
+* Fixed error in float serialization (issue #324)
+
+v5.6.3
+------
+
+* Improved speed of float serialization (about twice faster)
+* Added `as<JsonArray>()` as a synonym for `as<JsonArray&>()`... (issue #291)
+* Fixed `call of overloaded isinf(double&) is ambiguous` (issue #284)
+
 v5.6.2
 ------
 
@@ -105,7 +122,7 @@ v5.0.3
 v5.0.2
 ------
 
-* Fixed segmentation fault in `parseObject(String)` and `parseArray(String)`, when the 
+* Fixed segmentation fault in `parseObject(String)` and `parseArray(String)`, when the
   `StaticJsonBuffer` is too small to hold a copy of the string
 * Fixed Clang warning "register specifier is deprecated" (issue #102)
 * Fixed GCC warning "declaration shadows a member" (issue #103)
@@ -221,14 +238,14 @@ v3.1
 
 Old generator API:
 
-	JsonObject<3> root; 
+	JsonObject<3> root;
     root.add("sensor", "gps");
     root.add("time", 1351824120);
     root.add("data", array);
 
 New generator API:
 
-	JsonObject<3> root; 
+	JsonObject<3> root;
     root["sensor"] = "gps";
     root["time"] = 1351824120;
     root["data"] = array;
@@ -285,7 +302,7 @@ v1.1
 * Example: changed `char* json` into `char[] json` so that the bytes are not write protected
 * Fixed parsing bug when the JSON contains multi-dimensional arrays
 
-v1.0 
+v1.0
 ----
 
 Initial release
