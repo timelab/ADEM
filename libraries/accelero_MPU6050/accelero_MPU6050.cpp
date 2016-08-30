@@ -24,6 +24,9 @@
 
 #include "accelero_MPU6050.h"
 
+#define __LOG(msg) Serial.print(msg)
+#define __LOGLN(msg) Serial.println(msg)
+
 // static member initialisation
 volatile bool MPU6050Sensor::_dataReady = false;
 
@@ -41,6 +44,7 @@ void MPU6050Sensor::begin () {
   params.pin = INTERRUPT_PIN;
   params.cb =  mpu_interrupt;
   mpu_init(&params);
+  // check on return code for success !!!!
   mpu_set_sensors(INV_XYZ_GYRO | INV_XYZ_ACCEL);
   mpu_configure_fifo(INV_XYZ_GYRO | INV_XYZ_ACCEL);
   mpu_set_sample_rate(DEFAULT_MPU_HZ);
@@ -51,7 +55,6 @@ void MPU6050Sensor::begin () {
   dmp_set_tap_thresh(1,10);
   dmp_set_tap_thresh(2,20);
   dmp_set_tap_thresh(3,30);
-  
   dmp_load_motion_driver_firmware();
   dmp_enable_feature(DMP_FEATURE_TAP | DMP_FEATURE_SEND_RAW_ACCEL | DMP_FEATURE_SEND_CAL_GYRO | DMP_FEATURE_GYRO_CAL);
   dmp_set_fifo_rate(DEFAULT_MPU_HZ);
@@ -59,19 +62,29 @@ void MPU6050Sensor::begin () {
   
   mpu_get_gyro_sens(&gyro_sens);
   mpu_get_accel_sens(&accel_sens);
+  
 }
 
 void MPU6050Sensor::end () {
 }
 
 void MPU6050Sensor::read() {
+  if (_dataReady)
+    __LOGLN("interrupt true 1111111111111111111111");
+  else
+    __LOGLN("interrupt false 000000000000000000000");
   if(_dataReady){
+    __LOGLN("before dmp_read");
     dmp_read_fifo(gyro, accel, quat, &_sensorTimestamp, &sensors, &more);
+    __LOG("before dmp_read ");
+    __LOG(_sensorTimestamp);
+    __LOG(" sensors ");
+    __LOG(sensors);
     if(sensors & INV_XYZ_ACCEL)
     {
         measuredData._accel_X = accel[1]/accel_sens;
-        measuredData._accel_Y = accel[1]/accel_sens;
-        measuredData._accel_Z = accel[1]/accel_sens;
+        measuredData._accel_Y = accel[2]/accel_sens;
+        measuredData._accel_Z = accel[3]/accel_sens;
         // calculate the total acceleration. 
         // No square root taken for speed reason
         // We only need this value to compare to a threshold so we can live with the square value
@@ -91,8 +104,8 @@ void MPU6050Sensor::read() {
     if(sensors & INV_XYZ_GYRO)
     {
         measuredData._gyro_X = gyro[1]/gyro_sens;
-        measuredData._gyro_Y = gyro[1]/gyro_sens;
-        measuredData._gyro_Z = gyro[1]/gyro_sens;
+        measuredData._gyro_Y = gyro[2]/gyro_sens;
+        measuredData._gyro_Z = gyro[3]/gyro_sens;
         _measured = true;
     }
     else
@@ -128,8 +141,10 @@ bool MPU6050Sensor::isMoving()
 }
 
 bool MPU6050Sensor::hasData()
-{
-    return _dataReady;
+{ 
+    if (_dataReady) 
+        Serial.println (" Accelero has data !!!!!!!!!!!!!!!!!!!!!!");
+    return _dataReady; 
 }
 
 void MPU6050Sensor::write() {
