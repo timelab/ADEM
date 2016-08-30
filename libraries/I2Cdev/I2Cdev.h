@@ -71,7 +71,7 @@ THE SOFTWARE.
 // -----------------------------------------------------------------------------
 // Arduino-style "Serial.print" debug constant (uncomment to enable)
 // -----------------------------------------------------------------------------
-#define I2CDEV_SERIAL_DEBUG
+//#define I2CDEV_SERIAL_DEBUG
 
 #ifdef ARDUINO
     #if ARDUINO < 100
