@@ -31,11 +31,13 @@
 #include <wifi_WiFiManager.h>
 #include "store_and_forward.h"
 
-#define GPS_TX_PIN 0
+#define GPS_TX_PIN 16
 #define GPS_RX_PIN 4
 #define GPS_BAUD 9600
-#define NEOPIXEL_PIN 5
+#define NEOPIXEL_PIN 0
 #define SERIAL_BAUD 74880
+
+#define DEBUG
 
 #ifdef DEBUG
 #define __LOG(msg) Serial.print(msg)
@@ -86,6 +88,8 @@ public:
 //  boolean moving = false;
 //  boolean shaken = false;
 //} accelerometer;
+
+volatile bool interrupt_flag;
 
 storeAndForwardBuf buffer(10000);
 
@@ -139,8 +143,8 @@ TickerTask *upload_task = NULL;
 
 // TASKS
 void accelerometer_run(void *) {
-  //LOGLN(":accelerometer: -> Check moving/shaken");
-  //accelerometer.read();
+  __LOGLN(":accelerometer: -> Check moving/shaken");
+  accelerometer.read();
   //erial.println(accelerometer.report());
 
   // process normal accel data in logging.
@@ -239,10 +243,14 @@ void upload_run(void *){
 
 // STATES
 void start_state() {
-//  accelerator.begin()
+  // TODO
+  // I2C scanner based on address we call the proper sensor begin
+  // address should be identical to the device ID in the sensorIDs.h file
+  accelerometer.begin();
   battery.begin();
   humidity.begin();
   // FIXME: Moving barometer.begin() up, calibration hangs forever ??
+  // only got it due to a wiring problem on the breadboard
   barometer.begin();
   particulate.begin();
 
@@ -438,6 +446,8 @@ void debug_help() {
 
 void setup() {
   state = STATE_START;
+  Wire.begin();
+  Wire.setClock(100000);
 
   Serial.begin(SERIAL_BAUD);
   Serial.println();
@@ -458,11 +468,9 @@ void setup() {
   Serial.print("Initializing scheduler... ");
   schedule = TickerSchedlr::Instance(SCHED_MAX_TASKS);
   Serial.println("OK");
-
   sprintf(SSID, "ADEM-%d", ESP.getChipId());
   __LOG("Set WIFI SSID to: "); __LOGLN(SSID);
 }
-
 
 // Main loop takes care of state and transition management
 void loop() {
