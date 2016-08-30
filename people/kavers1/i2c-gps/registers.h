@@ -10,12 +10,12 @@
         #define I2C_GPS_STATUS_NUMSATS        0xF0      // Number of sats in view
 
 #define I2C_GPS_COMMAND                              01 // (write only)
-        #define I2C_GPS_COMMAND_1             0x01      
-        #define I2C_GPS_COMMAND_2             0x02      
-        #define I2C_GPS_COMMAND_3             0x03      
-        #define I2C_GPS_COMMAND_4             0x04      
-        #define I2C_GPS_COMMAND_5             0x05      
-        #define I2C_GPS_COMMAND_6             0x06      
+        #define I2C_GPS_COMMAND__1            0x01      
+        #define I2C_GPS_COMMAND__2            0x02      
+        #define I2C_GPS_COMMAND__3            0x03      
+        #define I2C_GPS_COMMAND__4            0x04      
+        #define I2C_GPS_COMMAND__5            0x05      
+        #define I2C_GPS_COMMAND__6            0x06      
         #define I2C_GPS_COMMAND__7            0x07
         #define I2C_GPS_COMMAND__8            0x08      
         #define I2C_GPS_COMMAND__9            0x09
@@ -33,15 +33,15 @@
 #define I2C_GPS_REG_RES4                            06   // reserved for future use (uint8_t)
 
 
-#define I2C_GPS_LOCATION                            07   // current location 8 byte (lat, lon) int32_t
-#define I2C_GPS_NAV_LAT                             15   // Desired banking towards north/south int16_t
-#define I2C_GPS_NAV_LON                             17   // Desired banking toward east/west    int16_t
-        
-#define I2C_GPS_GROUND_SPEED                        31   // GPS ground speed in m/s*100 (uint16_t)      (Read Only)
-#define I2C_GPS_ALTITUDE                            33   // GPS altitude in meters (uint16_t)           (Read Only)
-#define I2C_GPS_GROUND_COURSE			    35   // GPS ground course (uint16_t)
-#define I2C_GPS_RES1                                37   // reserved for future use (uint16_t)
-#define I2C_GPS_TIME                                39   // UTC Time from GPS in hhmmss.sss * 100 (uint32_t)(unneccesary precision) (Read Only)
+#define I2C_GPS_TIME                                07   // UTC Time from GPS in hhmmss.sss * 100 (uint32_t)(unneccesary precision) (Read Only)
+#define I2C_GPS_LOCATION                            11   // current location 8 byte (lat, lon) int32_t
+#define I2C_GPS_LAT                                 11   // 
+#define I2C_GPS_LON                                 15   // 
+#define I2C_GPS_ALTITUDE                            19   // GPS altitude in meters (uint16_t)           (Read Only)
+#define I2C_GPS_GROUND_SPEED                        23   // GPS ground speed in m/s*100 (uint16_t)      (Read Only)
+#define I2C_GPS_GROUND_COURSE			                  27   // GPS ground course (uint16_t)
+#define I2C_GPS_FIX_AGE                             31   // GPS fix age 0.001 sec resolution
+#define I2C_GPS_RES1                                33   // reserved for future use (uint16_t)
 
 
 

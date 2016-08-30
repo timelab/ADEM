@@ -41,10 +41,6 @@
 #define LON  1
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-// Which command I got from the host ? in GPSMode variable
-#define GPSMODE_NONAV 0        // no navigation
-#define GPSMODE_HOLD  1        // pos hold
-#define GPSMODE_WP    2        // wp navigation
 
 // Convert deg*100 to radians
 #define RADX100                    0.000174532925  
@@ -685,10 +681,13 @@ restart:
 // I2C handlers
 // Handler for requesting data
 //
+
+// read data from I2C_RAG_MAP and send back
 void requestEvent()
 {
- if (receivedCommands[0] >= I2C_GPS_GROUND_SPEED) i2c_dataset.status.new_data = 0;        //Accessing gps data, switch new_data_flag;
+ if (receivedCommands[0] >= I2C_GPS_RES1) i2c_dataset.status.new_data = 0;        //Accessing gps data, switch new_data_flag;
  //Write data from the requested data register position
+ // TODO shouldn't we limit the data written to sizeof(i2c_dataset) - receivedCommands[0] ?
  Wire.write((uint8_t *)&i2c_dataset+receivedCommands[0],32);                    //Write up to 32 byte, since master is responsible for reading and sending NACK
  //32 byte limit is in the Wire library, we have to live with it unless writing our own wire library
 
@@ -700,6 +699,7 @@ void requestEvent()
 // else it is a command we have to execute
 void receiveEvent(int bytesReceived)
 {
+     // read all received bytes and store up to MAX_SENT_BYTES in receivedCommands
      uint8_t  *ptr;
      for (int a = 0; a < bytesReceived; a++) {
           if (a < MAX_SENT_BYTES) {
@@ -709,8 +709,10 @@ void receiveEvent(int bytesReceived)
           }
      }
 
-    if (receivedCommands[0] == I2C_GPS_COMMAND) { new_command = receivedCommands[1]; return; }  //Just one byte, ignore all others
+     // if the first byte received is I2C_GPS_COMMAND then the next byte is the actual command
+     if (receivedCommands[0] == I2C_GPS_COMMAND) { new_command = receivedCommands[1]; return; }  //Just one byte, ignore all others
 
+     // if we just received 1 bytes then this is a read command and the first byte is the offset in the I2C_REG_MAP
      if(bytesReceived == 1 && (receivedCommands[0] < REG_MAP_SIZE)) { return; }        //read command from a given register
      if(bytesReceived == 1 && (receivedCommands[0] >= REG_MAP_SIZE)){                  //Addressing over the reg_map fallback to first byte
           receivedCommands[0] = 0x00;
@@ -957,11 +959,11 @@ if (_watchdog_timer != 0)
     _command = _command & 0x0F;                                               //empty 4MSB bits
 
    switch (_command) {
-     case I2C_GPS_COMMAND_1:
+     case I2C_GPS_COMMAND__1:
      // set update frequency
           i2c_dataset.status.new_data = 0;                                    //invalidate current dataset
      break;         
-     case I2C_GPS_COMMAND_2:
+     case I2C_GPS_COMMAND__2:
      // goto low power mode
           i2c_dataset.status.new_data = 0;                                    //invalidate current dataset
       break;          
