@@ -95,6 +95,7 @@ class MPU6050Sensor : public Sensor{
     
      // Static methods and variables for the interrupt functions
     static void mpu_interrupt();
+    static void tap_cb(unsigned char, unsigned char);
     static volatile bool _dataReady;
 };
 

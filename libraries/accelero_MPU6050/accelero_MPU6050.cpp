@@ -49,7 +49,7 @@ void MPU6050Sensor::begin () {
   mpu_configure_fifo(INV_XYZ_GYRO | INV_XYZ_ACCEL);
   mpu_set_sample_rate(DEFAULT_MPU_HZ);
   
-  //dmp_register_tap_cb(tap_cb);
+  dmp_register_tap_cb(tap_cb);
 
   dmp_set_tap_axes(7); // all axis X,Y,Z
   dmp_set_tap_thresh(1,10);
@@ -69,22 +69,23 @@ void MPU6050Sensor::end () {
 }
 
 void MPU6050Sensor::read() {
-  if (_dataReady)
-    __LOGLN("interrupt true 1111111111111111111111");
-  else
-    __LOGLN("interrupt false 000000000000000000000");
+ 
   if(_dataReady){
-    __LOGLN("before dmp_read");
-    dmp_read_fifo(gyro, accel, quat, &_sensorTimestamp, &sensors, &more);
     __LOG("before dmp_read ");
-    __LOG(_sensorTimestamp);
+    dmp_read_fifo(gyro, accel, quat, &_sensorTimestamp, &sensors, &more);
+    __LOGLN(_sensorTimestamp);
     __LOG(" sensors ");
-    __LOG(sensors);
+    __LOGLN(sensors);
     if(sensors & INV_XYZ_ACCEL)
     {
+    __LOGLN("accel data ");
         measuredData._accel_X = accel[1]/accel_sens;
         measuredData._accel_Y = accel[2]/accel_sens;
         measuredData._accel_Z = accel[3]/accel_sens;
+        __LOGLN(measuredData._accel_X);
+        __LOGLN(measuredData._accel_Y);
+        __LOGLN(measuredData._accel_Z);
+        
         // calculate the total acceleration. 
         // No square root taken for speed reason
         // We only need this value to compare to a threshold so we can live with the square value
@@ -103,9 +104,13 @@ void MPU6050Sensor::read() {
     
     if(sensors & INV_XYZ_GYRO)
     {
+    __LOGLN("gyro data");
         measuredData._gyro_X = gyro[1]/gyro_sens;
         measuredData._gyro_Y = gyro[2]/gyro_sens;
         measuredData._gyro_Z = gyro[3]/gyro_sens;
+        __LOGLN(measuredData._gyro_X);
+        __LOGLN(measuredData._gyro_Y);
+        __LOGLN(measuredData._gyro_Z);
         _measured = true;
     }
     else
@@ -142,8 +147,6 @@ bool MPU6050Sensor::isMoving()
 
 bool MPU6050Sensor::hasData()
 { 
-    if (_dataReady) 
-        Serial.println (" Accelero has data !!!!!!!!!!!!!!!!!!!!!!");
     return _dataReady; 
 }
 
@@ -154,6 +157,9 @@ void MPU6050Sensor::mpu_interrupt() {
  _dataReady = true;
 }
 
+void MPU6050Sensor::tap_cb(unsigned char i, unsigned char k) {
+    __LOGLN("tap detected ........... keep on going");
+}
 void MPU6050Sensor::process() {
 }
 
