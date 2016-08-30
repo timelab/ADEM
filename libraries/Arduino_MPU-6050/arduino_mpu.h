@@ -41,6 +41,7 @@ static inline void get_ms(unsigned long *count){
 }
 
 static inline void reg_int_cb(struct int_param_s *int_param){
+    pinMode(int_param->pin, INPUT);
 	attachInterrupt(digitalPinToInterrupt(int_param->pin), int_param->cb, RISING);
 }
 //#ifndef ARDUINO_ARCH_ESP8266

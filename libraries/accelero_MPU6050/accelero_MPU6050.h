@@ -41,7 +41,7 @@
 
 #define DEFAULT_MPU_HZ 4
 
-#define INTERRUPT_PIN 2
+#define INTERRUPT_PIN 5
 
 struct MPU6050SensorData : sensorData {
     float _accel_X;

@@ -69,7 +69,8 @@ String BMP085Sensor::buildReport(sensorData * sData)  {
     bmp085Data *tmpData = reinterpret_cast <bmp085Data*>(sData);
 	root["Sensor"] = "BMP085/BMP180";
 	root["Temperature"] = (float)tmpData->_temperature/10.0;
-	root["Pressure"] = (float)tmpData->_pressure/100.0;
+	//root["Pressure"] = (float)tmpData->_pressure/100.0;
+    root["Pressure"] = tmpData->_pressure / 100; //mbar
 	root.printTo(response, sizeof(response));
 	return response;
 }
@@ -159,18 +160,22 @@ char BMP085Sensor::ReadBMP(unsigned char address)
 // Second byte will be from 'address'+1
 int BMP085Sensor::ReadInt(unsigned char address)
 {
-	unsigned char msb, lsb;
-
+	unsigned char msb = 0, lsb = 0;
+//    Serial.print("read int :");
+//    Serial.print(address,HEX);
 	Wire.beginTransmission(_sensor_address);
 	Wire.write(address);
 	Wire.endTransmission();
 
 	Wire.requestFrom(_sensor_address, 2);
-	while (Wire.available()<2)
-		;
+	//while (Wire.available()<2)
+	//	;
 	msb = Wire.read();
 	lsb = Wire.read();
-
+//    Serial.print (" result:");
+//    Serial.print (msb,HEX);
+//    Serial.print (":");
+//    Serial.println(lsb,HEX);
 	return (int)msb << 8 | lsb;
 }
 
