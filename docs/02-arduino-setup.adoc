@@ -99,13 +99,13 @@ On Linux you can do this
 
   $ cd /path/to/git/clone/ADEM
   $ ln -sf "/path/to/your/arduino-1.6.8" ./Arduino
-  $ ln -sf "~/.arduino15" ./arduino15
+  $ ln -sf ~"/.arduino15" ./arduino15
 
 On MacOSX you can do the following:
 
   $ cd /path/to/git/clone/ADEM
   $ ln -sf "/path/to/your/Arduino 1.6.8.app/Contents/Java" ./Arduino
-  $ ln -sf "~/Library/Arduino15" ./arduino15
+  $ ln -sf ~"/Library/Arduino15" ./arduino15
 
 Now you can start building the source code by doing:
 
