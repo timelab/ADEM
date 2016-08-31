@@ -16,7 +16,7 @@ HWTYPE = esp8266
 ESPTOOL = $(ARDUINO15_PATH)/packages/$(HWTYPE)/tools/esptool/0.4.9/esptool
 CTAGS = $(ARDUINO_PATH)/tools-builder/ctags/5.8-arduino10
 
-CXX_FLAGS := -DDEBUG
+CXX_FLAGS := -DDEBUG  -DDEBUG_OUTPUT=Serial
 PREFS = --prefs=build.debug_level="$(CXX_FLAGS)" --prefs=tools.ctags.path="$(CTAGS)"
 
 SKETCHES = $(find $(CURDIR) -name *.ino)
