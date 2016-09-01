@@ -20,7 +20,7 @@
 
 #include "gps_SwSerial.h"
 
-#ifdef DEBUG_GPS:
+#ifdef DEBUG_GPS
 #define __LOG(msg) Serial.print(msg)
 #define __LOGLN(msg) Serial.println(msg)
 #else

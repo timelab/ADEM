@@ -26,7 +26,7 @@
 #include <../../Sensor/Sensor.h>
 
 
-#ifdef DEBUG_BATTERY:
+#ifdef DEBUG_BATTERY
 #define __LOG(msg) Serial.print(msg)
 #define __LOGLN(msg) Serial.println(msg)
 #else
