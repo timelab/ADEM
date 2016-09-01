@@ -10,16 +10,17 @@ before_install:
   - wget -nv http://downloads.arduino.cc/arduino-$ARDUINO_VERSION-linux64.tar.xz
   - tar -xJf arduino-$ARDUINO_VERSION-linux64.tar.xz
   # Install Arduino into the known PATH [WORKAROUND]
-  - sudo mv arduino-$ARDUINO_VERSION /usr/local/share/arduino
-  - sudo ln -s /usr/local/share/arduino/arduino /usr/local/bin/arduino
+  - sudo mv $PWD/arduino-$ARDUINO_VERSION /usr/local/share/arduino
+  - sudo ln -snf /usr/local/share/arduino/arduino /usr/local/bin/arduino
 #  - export PATH="$PATH:$PWD/arduino-$ARDUINO_VERSION"
 install:
   # Ensure we use the current directory to include library/
   - >
     arduino
-    --pref sketchbook.path=.
     --pref boardsmanager.additional.urls=http://arduino.esp8266.com/stable/package_esp8266com_index.json
-    --pref compiler.warning_level=none
+    --pref build.verbose=false
+    --pref compiler.warning_level=error
+    --pref sketchbook.path=.
     --install-boards esp8266:esp8266
     --save-prefs
 script:
