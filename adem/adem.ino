@@ -37,13 +37,9 @@
 #define NEOPIXEL_PIN 0
 #define SERIAL_BAUD 74880
 
-#define DEBUG
-
 #ifdef DEBUG
 #define __LOG(msg) Serial.print(msg)
 #define __LOGLN(msg) Serial.println(msg)
-// Define for internal ESP libraries when DEBUG is set
-#define DEBUG_OUTPUT Serial
 #else
 #define __LOG(msg)
 #define __LOGLN(msg)
