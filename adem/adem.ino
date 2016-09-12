@@ -48,6 +48,7 @@
 // Different states of the program
 enum state_t {
   STATE_START,
+  STATE_DEMO,
   STATE_SLEEP,
   STATE_CONFIG,
   STATE_GPSTEST,
@@ -58,6 +59,7 @@ enum state_t {
 };
 char *states[] {
   "START",
+  "DEMO",
   "SLEEP",
   "CONFIG",
   "GPSTEST",
@@ -68,7 +70,12 @@ char *states[] {
 };
 state_t prev_state = STATE_START;
 state_t state = STATE_START;
+
+#ifdef DEMO
+state_t next_state = STATE_DEMO;
+#else
 state_t next_state = STATE_SLEEP;
+#endif
 
 // DEBUG input
 class Debug {
@@ -78,12 +85,6 @@ public:
   boolean shaken = false;
   boolean wifi = false;
 } debug;
-
-//class StubAccelerometer {
-//public:
-//  boolean moving = false;
-//  boolean shaken = false;
-//} accelerometer;
 
 volatile bool interrupt_flag;
 
@@ -117,6 +118,7 @@ uint32_t purple = led.Color(63, 0, 127);
 
 uint32_t colors[] = {
   red,
+  light_blue,
   black,
   yellow,
   orange,
@@ -141,15 +143,14 @@ TickerTask *upload_task = NULL;
 void accelerometer_run(void *) {
   __LOGLN(":accelerometer: -> Check moving/shaken");
   accelerometer.read();
-  //erial.println(accelerometer.report());
+  //Serial.println(accelerometer.report());
 
   // process normal accel data in logging.
   // MPU will store data internally in its FIFO so we have to loop
-   while (accelerometer.hasData())
-  {
+  while (accelerometer.hasData()) {
       accelerometer.read();
       buffer.write((char *)accelerometer.dataToBuffer(), accelerometer.dataBufferSize());
-      __LOGLN(accelerometer.report());
+//      __LOGLN(accelerometer.report());
   }
 }
 
@@ -242,23 +243,24 @@ void start_state() {
   // TODO
   // I2C scanner based on address we call the proper sensor begin
   // address should be identical to the device ID in the sensorIDs.h file
-  accelerometer.begin();
-  battery.begin();
-  humidity.begin();
+//  accelerometer.begin();
+//  battery.begin();
+//  humidity.begin();
   // FIXME: Moving barometer.begin() up, calibration hangs forever ??
-  // only got it due to a wiring problem on the breadboard
-  barometer.begin();
-  particulate.begin();
+//  barometer.begin();
+//  particulate.begin();
 
   accelerometer_task = TickerTask::createPeriodic(&accelerometer_run, 1000);
   accelerometer_task->name = "accelerometer";
 
-  battery_task = TickerTask::createPeriodic(&battery_run, 60000);
+  battery_task = TickerTask::createPeriodic(&battery_run, 300000);
   battery_task->name = "battery";
 
   wifi.begin();
+}
 
-  next_state = STATE_SLEEP;
+void demo_state() {
+
 }
 
 void sleep_state() {
@@ -338,6 +340,23 @@ void reset_state() {
 
 
 // TRANSITIONS
+void start_to_demo() {
+  __LOGLN("Booting into DEMO mode.");
+
+  accelerometer_task->clear();
+  accelerometer.end();
+
+  barometer.begin();
+  barometer_task = TickerTask::createPeriodic(&barometer_run, 60000);
+  barometer_task->name = "barometer";
+  humidity.begin();
+  humidity_task = TickerTask::createPeriodic(&humidity_run, 60000);
+  humidity_task->name = "humidity";
+  particulate.begin();
+  particulate_task = TickerTask::createPeriodic(&particulate_run, 60000);
+  particulate_task->name = "particulate";
+}
+
 void start_to_sleep() {
 
 //  buzzer.start_sound();
@@ -473,6 +492,7 @@ void loop() {
 
   switch(state) {
     case STATE_START:     start_state(); break;
+    case STATE_DEMO:      demo_state(); break;
     case STATE_SLEEP:     sleep_state(); break;
     case STATE_CONFIG:    config_state(); break;
     case STATE_GPSTEST:   gpstest_state(); break;
@@ -480,7 +500,7 @@ void loop() {
     case STATE_WIFITEST:  wifitest_state(); break;
     case STATE_UPLOAD:    upload_state(); break;
     case STATE_RESET:     reset_state(); break;
-    default:              start_state(); break;
+    default:              reset_state(); break;
   }
 
   if (state != next_state) {
@@ -491,6 +511,12 @@ void loop() {
       case STATE_START:
         switch(next_state) {
           case STATE_SLEEP:     start_to_sleep(); break;
+          case STATE_DEMO:      start_to_demo(); break;
+          default:              next_state = STATE_RESET;
+        }; break;
+
+      case STATE_DEMO:
+        switch(next_state) {
           default:              next_state = STATE_RESET;
         }; break;
 
@@ -552,6 +578,10 @@ void loop() {
     if (c != '\n' and c != '\r') {
       __LOG("Key "); __LOG(c); __LOG(" is pressed. ");
       switch (c) {
+        case 'd':
+          __LOGLN("Entering DEMO mode.");
+          next_state = STATE_DEMO;
+          break;
         case 'g':
           debug.gpsready = not debug.gpsready;
           __LOG("debug.gpsready is "); __LOGLN(debug.gpsready?"on.":"off.");
