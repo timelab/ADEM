@@ -417,6 +417,47 @@ void _update_checksum(uint8_t *data, uint8_t len, uint8_t &ck_a, uint8_t &ck_b)
 	}
 }
 
+bool UBLOX_parse_gps(void)
+{
+
+    switch (_msg_id) {
+    case MSG_POSLLH:
+        i2c_dataset.time	        = _buffer.posllh.time;
+        GPS_read[LON]	                = _buffer.posllh.longitude;
+        GPS_read[LAT]	                = _buffer.posllh.latitude;
+        i2c_dataset.altitude  	        = _buffer.posllh.altitude_msl / 10 /100;      //alt in m
+	      i2c_dataset.status.gps3dfix	= next_fix;
+	      _new_position = true;
+  	    break;
+    case MSG_STATUS:
+        next_fix	= (_buffer.status.fix_status & NAV_STATUS_FIX_VALID) && (_buffer.status.fix_type == FIX_3D);
+	      if (!next_fix) i2c_dataset.status.gps3dfix = false;
+        break;
+    case MSG_SOL:
+        next_fix	= (_buffer.solution.fix_status & NAV_STATUS_FIX_VALID) && (_buffer.solution.fix_type == FIX_3D);
+      	if (!next_fix) i2c_dataset.status.gps3dfix = false;
+        i2c_dataset.status.numsats	= _buffer.solution.satellites;
+        //GPS_hdop		= _buffer.solution.position_DOP;
+        //debug[3] = GPS_hdop;
+    case MSG_VELNED:
+        //speed_3d	= _buffer.velned.speed_3d;				// cm/s
+        i2c_dataset.ground_speed = _buffer.velned.speed_2d;				// cm/s
+        i2c_dataset.ground_course = (uint16_t)(_buffer.velned.heading_2d / 10000);	// Heading 2D deg * 100000 rescaled to deg * 10
+      	_new_speed = true;
+        break;
+    default:
+        return false;
+    }
+
+	// we only return true when we get new position and speed data
+	// this ensures we don't use stale data
+	if (_new_position && _new_speed) {
+		_new_speed = _new_position = false;
+		return true;
+	}
+	return false;
+}
+
 bool GPS_UBLOX_newFrame(uint8_t data)
 {
        bool parsed = false;
@@ -477,47 +518,6 @@ bool GPS_UBLOX_newFrame(uint8_t data)
  	    if (UBLOX_parse_gps())  { parsed = true; }
         } //end switch
    return parsed;
-}
-
-bool UBLOX_parse_gps(void)
-{
-
-    switch (_msg_id) {
-    case MSG_POSLLH:
-        i2c_dataset.time	        = _buffer.posllh.time;
-        GPS_read[LON]	                = _buffer.posllh.longitude;
-        GPS_read[LAT]	                = _buffer.posllh.latitude;
-        i2c_dataset.altitude  	        = _buffer.posllh.altitude_msl / 10 /100;      //alt in m
-	      i2c_dataset.status.gps3dfix	= next_fix;
-	      _new_position = true;
-  	    break;
-    case MSG_STATUS:
-        next_fix	= (_buffer.status.fix_status & NAV_STATUS_FIX_VALID) && (_buffer.status.fix_type == FIX_3D);
-	      if (!next_fix) i2c_dataset.status.gps3dfix = false;
-        break;
-    case MSG_SOL:
-        next_fix	= (_buffer.solution.fix_status & NAV_STATUS_FIX_VALID) && (_buffer.solution.fix_type == FIX_3D);
-      	if (!next_fix) i2c_dataset.status.gps3dfix = false;
-        i2c_dataset.status.numsats	= _buffer.solution.satellites;
-        //GPS_hdop		= _buffer.solution.position_DOP;
-        //debug[3] = GPS_hdop;
-    case MSG_VELNED:
-        //speed_3d	= _buffer.velned.speed_3d;				// cm/s
-        i2c_dataset.ground_speed = _buffer.velned.speed_2d;				// cm/s
-        i2c_dataset.ground_course = (uint16_t)(_buffer.velned.heading_2d / 10000);	// Heading 2D deg * 100000 rescaled to deg * 10
-      	_new_speed = true;
-        break;
-    default:
-        return false;
-    }
-
-	// we only return true when we get new position and speed data
-	// this ensures we don't use stale data
-	if (_new_position && _new_speed) {
-		_new_speed = _new_position = false;
-		return true;
-	}
-	return false;
 }
 
 
