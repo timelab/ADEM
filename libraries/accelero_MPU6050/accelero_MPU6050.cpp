@@ -24,8 +24,13 @@
 
 #include "accelero_MPU6050.h"
 
+#ifdef DEBUG_MPU6050
 #define __LOG(msg) Serial.print(msg)
 #define __LOGLN(msg) Serial.println(msg)
+#else
+#define __LOG(msg)
+#define __LOGLN(msg)
+#endif
 
 // static member initialisation
 volatile bool MPU6050Sensor::_dataReady = false;
