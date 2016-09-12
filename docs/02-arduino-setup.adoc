@@ -155,15 +155,22 @@ The default serial port for monitoring is `/dev/ttyUSB0` and the default baud ra
 
 We also provide a way to enable debugging for your build.
 
-  $ make CXX_FLAGS=-DDEBUG
+  $ make CFLAGS=-DDEBUG
 
 This incidentally is also the default compilation flag. However some libraries have their own debugging flag.
 
-  $ make CXX_FLAGS="-DDEBUG_SCHED -DDEBUG_GPS"
+  $ make CFLAGS="-DDEBUG_SCHED -DDEBUG_GPS"
 
 If you want to build without DEBUG mode, you can simply do:
 
-  $ make CXX_FLAGS=
+  $ make CFLAGS=
+
+
+=== Building with DEMO mode
+
+There is a demonstration mode that is enabled by doing:
+
+  $ make CFLAGS="-DDEMO"
 
 
 == External libraries
