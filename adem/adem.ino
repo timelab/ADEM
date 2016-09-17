@@ -72,10 +72,12 @@ state_t prev_state = STATE_START;
 state_t state = STATE_START;
 
 #ifdef DEMO
+#include "demo.h"
+ESP8266WebServer server(80);
 state_t next_state = STATE_DEMO;
-#else
+#else // DEMO
 state_t next_state = STATE_SLEEP;
-#endif
+#endif // DEMO
 
 // DEBUG input
 class Debug {
@@ -219,7 +221,7 @@ void upload_run(void *){
             pSens = &accelerometer;
             break;
 /// TODO : what if ID is not recognized ? How to recover from corrupt data ?
-            
+
         }
 
         s = buffer.peek(&lbuf[0], pSens->dataBufferSize());
@@ -243,25 +245,16 @@ void start_state() {
   // TODO
   // I2C scanner based on address we call the proper sensor begin
   // address should be identical to the device ID in the sensorIDs.h file
-//  accelerometer.begin();
-//  battery.begin();
-//  humidity.begin();
-  // FIXME: Moving barometer.begin() up, calibration hangs forever ??
-//  barometer.begin();
-//  particulate.begin();
-
-  accelerometer_task = TickerTask::createPeriodic(&accelerometer_run, 1000);
-  accelerometer_task->name = "accelerometer";
 
   battery_task = TickerTask::createPeriodic(&battery_run, 300000);
   battery_task->name = "battery";
-
-  wifi.begin();
 }
 
+#ifdef DEMO
 void demo_state() {
-
+  server.handleClient();
 }
+#else // DEMO
 
 void sleep_state() {
   delay(500);
@@ -333,6 +326,7 @@ void upload_state() {
     next_state = STATE_WIFITEST;
   }
 }
+#endif // DEMO
 
 void reset_state() {
   ESP.reset();
@@ -340,26 +334,60 @@ void reset_state() {
 
 
 // TRANSITIONS
+#ifdef DEMO
 void start_to_demo() {
-  __LOGLN("Booting into DEMO mode.");
-
-  accelerometer_task->clear();
-  accelerometer.end();
-
   barometer.begin();
-  barometer_task = TickerTask::createPeriodic(&barometer_run, 60000);
+  barometer_task = TickerTask::createPeriodic(&barometer_run, 15000);
   barometer_task->name = "barometer";
   humidity.begin();
-  humidity_task = TickerTask::createPeriodic(&humidity_run, 60000);
+  humidity_task = TickerTask::createPeriodic(&humidity_run, 15000);
   humidity_task->name = "humidity";
   particulate.begin();
   particulate_task = TickerTask::createPeriodic(&particulate_run, 60000);
   particulate_task->name = "particulate";
+  WiFi.mode(WIFI_AP);
+  WiFi.softAP(SSID);
+
+  server.on("/", []() {
+    server.send(200, "text/html", demo_html);
+  });
+
+  server.on("/barometer.json", []() {
+    server.send(200, "application/json", barometer.report());
+  });
+
+  server.on("/humidity.json", []() {
+    server.send(200, "application/json", humidity.report());
+  });
+
+  server.on("/particulate.json", []() {
+    server.send(200, "application/json", particulate.report());
+  });
+
+  server.on("/hello.txt", []() {
+    server.send(200, "text/plain", "Hello World!");
+  });
+
+  __LOG("Initializing server...");
+  server.begin();
+  __LOGLN(" OK");
+
+  Serial.println();
+  Serial.print("=> Please connect to SSID: ");
+  Serial.println(SSID);
+  Serial.print("=> And surf to: http://");
+  Serial.print(WiFi.softAPIP());
+  Serial.println("/");
+  Serial.println();
 }
+#else // DEMO
 
 void start_to_sleep() {
 
 //  buzzer.start_sound();
+
+  accelerometer_task = TickerTask::createPeriodic(&accelerometer_run, 1000);
+  accelerometer_task->name = "accelerometer";
 
   wifi.sleep();
 
@@ -371,6 +399,7 @@ void sleep_to_config() {
 //  buzzer.config_sound();
 
   __LOG("Starting WiFi in AP mode using SSID "); __LOG(SSID); __LOG("... ");
+  wifi.begin();
   wifi.start_ap(SSID);
 
   // Disable for now, it's our temporary switch to go in and out of config
@@ -455,9 +484,11 @@ void upload_to_wifitest() {
 
 void debug_help() {
   __LOGLN();
-  __LOGLN("Press \"g\" for gpsfix, \"m\" for moving, \"r\" to restart, \"s\" to shake, \"w\" for wifi and \"h\" for help.");
+  __LOGLN("=> Press \"g\" for gpsfix, \"m\" for moving, \"r\" to restart,");
+  __LOGLN("=>       \"s\" to shake, \"w\" for wifi and \"h\" for help.");
   __LOGLN();
 }
+#endif // DEMO
 
 void setup() {
   state = STATE_START;
@@ -470,7 +501,9 @@ void setup() {
 
   __LOGLN();
   __LOGLN("Setup started in DEBUG mode.");
+#ifndef DEMO
   debug_help();
+#endif // DEMO
 
   led.begin();
   led.setcolor(led_state, colors[state]);
@@ -483,8 +516,8 @@ void setup() {
   Serial.print("Initializing scheduler... ");
   schedule = TickerSchedlr::Instance(SCHED_MAX_TASKS);
   Serial.println("OK");
+
   sprintf(SSID, "ADEM-%d", ESP.getChipId());
-  __LOG("Set WIFI SSID to: "); __LOGLN(SSID);
 }
 
 // Main loop takes care of state and transition management
@@ -492,7 +525,9 @@ void loop() {
 
   switch(state) {
     case STATE_START:     start_state(); break;
+#ifdef DEMO
     case STATE_DEMO:      demo_state(); break;
+#else // DEMO
     case STATE_SLEEP:     sleep_state(); break;
     case STATE_CONFIG:    config_state(); break;
     case STATE_GPSTEST:   gpstest_state(); break;
@@ -500,6 +535,7 @@ void loop() {
     case STATE_WIFITEST:  wifitest_state(); break;
     case STATE_UPLOAD:    upload_state(); break;
     case STATE_RESET:     reset_state(); break;
+#endif // DEMO
     default:              reset_state(); break;
   }
 
@@ -510,15 +546,20 @@ void loop() {
 
       case STATE_START:
         switch(next_state) {
-          case STATE_SLEEP:     start_to_sleep(); break;
+#ifdef DEMO
           case STATE_DEMO:      start_to_demo(); break;
+#else // DEMO
+          case STATE_SLEEP:     start_to_sleep(); break;
+#endif // DEMO
           default:              next_state = STATE_RESET;
         }; break;
 
+#ifdef DEMO
       case STATE_DEMO:
         switch(next_state) {
           default:              next_state = STATE_RESET;
         }; break;
+#else // DEMO
 
       case STATE_SLEEP:
         switch(next_state) {
@@ -559,7 +600,7 @@ void loop() {
           case STATE_WIFITEST:  upload_to_wifitest(); break;
           default:              next_state = STATE_RESET;
         }; break;
-
+#endif // DEMO
     }
 
     prev_state = state;
@@ -572,16 +613,13 @@ void loop() {
 
   schedule->tick();
 
+#ifndef DEMO
 #ifdef DEBUG
   if (Serial.available() > 0) {
     char c = Serial.read();
     if (c != '\n' and c != '\r') {
       __LOG("Key "); __LOG(c); __LOG(" is pressed. ");
       switch (c) {
-        case 'd':
-          __LOGLN("Entering DEMO mode.");
-          next_state = STATE_DEMO;
-          break;
         case 'g':
           debug.gpsready = not debug.gpsready;
           __LOG("debug.gpsready is "); __LOGLN(debug.gpsready?"on.":"off.");
@@ -611,8 +649,8 @@ void loop() {
       }
     }
   }
-#endif
-
+#endif // DEBUG
+#endif // DEMO
 }
 
 // vim:syntax=cpp

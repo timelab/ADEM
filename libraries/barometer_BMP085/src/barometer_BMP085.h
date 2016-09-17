@@ -35,7 +35,6 @@ struct bmp085Data : sensorData {
     long _pressure;
 };
 
-
 //abstract class Sensor
 class BMP085Sensor : public Sensor{
 public:
@@ -50,7 +49,7 @@ public:
 	//Sensor ();
 	BMP085Sensor();
 	void begin(uint8_t address);
-    
+
 private:
 		
 	const unsigned char OSS = 1;  // Oversampling Setting

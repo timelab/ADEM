@@ -21,8 +21,10 @@
 /*
   Ppd42.cpp - Library for ADEM PPD42 dust sensor.
 
-  Connect PPD42 PM10 pin to Arduino pin 12
-  Connect PPD42 PM25 pin to Arduino pin 13
+  Connect PPD42 PM1.0 pin to Arduino pin 12
+  Connect PPD42 PM2.5 pin to Arduino pin 13
+
+  XXX: This device does not measure PM10, but PM1.0 !!
 */
 
 #include <Arduino.h>
@@ -46,6 +48,7 @@ PPD42Sensor::PPD42Sensor(){
 
 void PPD42Sensor::begin() {
 	Serial.print("Initializing particulate sensor... ");
+	_measured = false;
 
 	// initialization for the dust sensor
 	_readMillisPM10 = millis(); //Fetch the current time
@@ -131,7 +134,6 @@ void PPD42Sensor::process() {
 String PPD42Sensor::report()  {
     if (!_measured)
         read();
-    _measured = false;
     return buildReport(&measuredData);
 }
 
@@ -141,8 +143,8 @@ String PPD42Sensor::buildReport(sensorData *sData)  {
     char response[200];
     PPD42Data * ppd42Data = reinterpret_cast <PPD42Data*>(sData);
     root["Sensor"] = "PPD42";
-    root["PM25"] = ppd42Data->PM25Ppm;
-    root["PM10"] = ppd42Data->PM10Ppm;
+    root["PM2.5"] = ppd42Data->PM25Ppm;
+    root["PM1.0"] = ppd42Data->PM10Ppm;
     root.printTo(response,sizeof(response));
     return response;
 }
