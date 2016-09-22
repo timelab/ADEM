@@ -52,6 +52,7 @@ struct HTU21DData : sensorData {
     float temperature;
     float humidity;
 };
+
 //abstract class Sensor
 class HTU21DFSensor : public Sensor {
 public:
@@ -63,7 +64,7 @@ public:
 	virtual void process();
 	virtual String report();
     virtual String buildReport(sensorData *sData);
-    
+
 	//Sensor ();
 	HTU21DFSensor();
 	void begin(uint8_t address);

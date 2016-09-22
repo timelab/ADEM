@@ -33,6 +33,7 @@ void BMP085Sensor::begin() {
 }
 
 void BMP085Sensor::begin(uint8_t address) {
+	_measured = false;
 	_sensor_address = address;
 	Calibration();
 }
@@ -58,7 +59,6 @@ void BMP085Sensor::process() {
 String BMP085Sensor::report()  {
     if (!_measured)
         read();
-    _measured = false;
     return buildReport(&measuredData);
 }
 
@@ -68,9 +68,8 @@ String BMP085Sensor::buildReport(sensorData * sData)  {
 	char response[200];
     bmp085Data *tmpData = reinterpret_cast <bmp085Data*>(sData);
 	root["Sensor"] = "BMP085/BMP180";
-	root["Temperature"] = (float)tmpData->_temperature/10.0;
-	//root["Pressure"] = (float)tmpData->_pressure/100.0;
-    root["Pressure"] = tmpData->_pressure / 100; //mbar
+	root["Temperature"] = (float)tmpData->_temperature;
+	root["Pressure"] = (float)tmpData->_pressure;
 	root.printTo(response, sizeof(response));
 	return response;
 }
@@ -97,13 +96,14 @@ void BMP085Sensor::Calibration()
 // Value returned will be in units of 0.1 deg C
 short BMP085Sensor::GetTemperature(unsigned int ut)
 {
-	long x1, x2;
+	long x1, x2, p;
 
 	x1 = (((long)ut - (long)ac6)*(long)ac5) >> 15;
 	x2 = ((long)mc << 11) / (x1 + md);
 	b5 = x1 + x2;
+	p = ((b5 + 8) >> 4);
 
-	return ((b5 + 8) >> 4);
+	return p / 10.0;
 }
 // Calculate pressure given up
 // calibration values must be known
@@ -138,7 +138,7 @@ long BMP085Sensor::GetPressure(unsigned long up)
 	x2 = (-7357 * p) >> 16;
 	p += (x1 + x2 + 3791) >> 4;
 
-	return p;
+	return p / 100.0;
 }
 
 // Read 1 byte from the BMP085 at 'address'
@@ -168,8 +168,8 @@ int BMP085Sensor::ReadInt(unsigned char address)
 	Wire.endTransmission();
 
 	Wire.requestFrom(_sensor_address, 2);
-	//while (Wire.available()<2)
-	//	;
+	while (Wire.available()<2)
+		;
 	msb = Wire.read();
 	lsb = Wire.read();
 //    Serial.print (" result:");
@@ -211,6 +211,7 @@ unsigned long BMP085Sensor::ReadUP()
 	Wire.write(0xF4);
 	Wire.write(0x34 + (OSS << 6));
 	Wire.endTransmission();
+//    Serial.println("Discover TWI slaves...");
 
 	// Wait for conversion, delay time dependent on OSS
 	delay(2 + (3 << OSS));

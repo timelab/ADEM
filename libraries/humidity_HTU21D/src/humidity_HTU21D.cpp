@@ -45,6 +45,7 @@ HTU21DFSensor::HTU21DFSensor() {
 }
 
 void HTU21DFSensor::begin(void) {
+	_measured = false;
 	Serial.print("Initializing humidity sensor... ");
 	begin(HTU21DF_I2CADDR);
 	Serial.println("OK");
@@ -139,7 +140,6 @@ void HTU21DFSensor::read() {
 String HTU21DFSensor::report()  {
     if (!_measured)
         read();
-    _measured = false;
     return buildReport(&measuredData);
 }
 

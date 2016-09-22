@@ -41,8 +41,8 @@ LipoBattery::~LipoBattery() {
 }
 
 void LipoBattery::begin() {
-	Serial.print("Initializing battery sensor... ");
-	Serial.println("OK");
+  Serial.print("Initializing battery sensor... ");
+  Serial.println("OK");
 }
 
 void LipoBattery::end () {
@@ -50,11 +50,9 @@ void LipoBattery::end () {
 
 void LipoBattery::read() {
   vcc = ESP.getVcc();
-  __LOG("Battery currently at ");
-  __LOG((float) vcc / 1024.0);
-  __LOG("V (");
-  __LOG(vcc);
-  __LOGLN(")");
+
+  __LOG("{\"Sensor\":\"Battery\",\"VCC\":"); __LOG(vcc);
+  __LOG(",\"Voltage\":"); __LOG((float) vcc / 1024.0); __LOGLN("}");
   if (vcc < 2900) {
     empty = true;
     __LOGLN("Battery is empty.");
@@ -63,7 +61,7 @@ void LipoBattery::read() {
     __LOGLN("Battery is low.");
   } else if (vcc >= 4000) {
     full =true;
-//    __LOGLN("Battery is full.");
+    __LOGLN("Battery is full.");
   } else {
     empty = false;
     low = false;
