@@ -19,6 +19,9 @@
  */
 
 #include <TickerSchedlr.h>
+#include <DNSServer.h>
+#include <ESP8266WebServer.h>
+#include <ESP8266mDNS.h>
 
 #include <accelero_MPU6050.h>
 #include <barometer_BMP085.h>
@@ -72,8 +75,10 @@ state_t prev_state = STATE_START;
 state_t state = STATE_START;
 
 #ifdef DEMO
-#include "demo.h"
-ESP8266WebServer server(80);
+const char *mdnsname = "adem";  // Used by mDNS. Try http://adem.local/
+DNSServer dnsserver;
+ESP8266WebServer webserver(80);
+IPAddress apIP(192, 168, 4, 1);
 state_t next_state = STATE_DEMO;
 #else // DEMO
 state_t next_state = STATE_SLEEP;
@@ -252,7 +257,8 @@ void start_state() {
 
 #ifdef DEMO
 void demo_state() {
-  server.handleClient();
+  dnsserver.processNextRequest();
+  webserver.handleClient();
 }
 #else // DEMO
 
@@ -345,39 +351,34 @@ void start_to_demo() {
   particulate.begin();
   particulate_task = TickerTask::createPeriodic(&particulate_run, 60000);
   particulate_task->name = "particulate";
+
   WiFi.mode(WIFI_AP);
   WiFi.softAP(SSID);
 
-  server.on("/", []() {
-    server.send(200, "text/html", demo_html);
-  });
+  Serial.print("Initializing dns server...");
+  dnsserver.setErrorReplyCode(DNSReplyCode::NoError);
+  dnsserver.start(53, "*", apIP);
+  Serial.println(" OK");
 
-  server.on("/barometer.json", []() {
-    server.send(200, "application/json", barometer.report());
-  });
+  Serial.print("Initializing mdns responder...");
+  MDNS.begin(mdnsname);
+  MDNS.addService("http", "tcp", 80);
+  Serial.println(" OK");
 
-  server.on("/humidity.json", []() {
-    server.send(200, "application/json", humidity.report());
-  });
-
-  server.on("/particulate.json", []() {
-    server.send(200, "application/json", particulate.report());
-  });
-
-  server.on("/hello.txt", []() {
-    server.send(200, "text/plain", "Hello World!");
-  });
-
-  __LOG("Initializing server...");
-  server.begin();
-  __LOGLN(" OK");
+  Serial.print("Initializing web server...");
+  webserver.on("/", website);
+  webserver.on("/sensors.json", sensors);
+  // Android and Microsoft captive portal handled by onNotFound handler below
+//  webserver.on("/generate_204", website);
+//  webserver.on("/fwlink", website);
+  webserver.onNotFound(website);
+  webserver.begin();
+  Serial.println(" OK");
 
   Serial.println();
   Serial.print("=> Please connect to SSID: ");
   Serial.println(SSID);
-  Serial.print("=> And surf to: http://");
-  Serial.print(WiFi.softAPIP());
-  Serial.println("/");
+  Serial.print("=> And surf to: http://adem.local/");
   Serial.println();
 }
 #else // DEMO
