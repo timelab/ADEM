@@ -1,3 +1,5 @@
+extern ESP8266WebServer webserver;
+
 static const char *demo_html =
 "<!DOCTYPE html>\n"
 "<html>\n"
