@@ -34,6 +34,8 @@
 #include <wifi_WiFiManager.h>
 #include "store_and_forward.h"
 
+#define PM10_PIN 12
+#define PM25_PIN 13
 #define GPS_TX_PIN 16
 #define GPS_RX_PIN 4
 #define GPS_BAUD 9600
@@ -105,7 +107,7 @@ PassiveBuzzer buzzer;
 SwSerialGPS gps = SwSerialGPS(GPS_RX_PIN, GPS_TX_PIN, GPS_BAUD);
 HTU21DFSensor humidity;
 NeoPixelLed led = NeoPixelLed(1, NEOPIXEL_PIN, NEO_GRB + NEO_KHZ800);
-PPD42Sensor particulate;
+PPD42Sensor particulate(PM10_PIN, PM25_PIN);
 char SSID[20];
 const int SCHED_MAX_TASKS = 200;
 TickerSchedlr *schedule = NULL;
@@ -378,7 +380,7 @@ void start_to_demo() {
   Serial.println();
   Serial.print("=> Please connect to SSID: ");
   Serial.println(SSID);
-  Serial.print("=> And surf to: http://adem.local/");
+  Serial.println("=> And surf to: http://adem.local/");
   Serial.println();
 }
 #else // DEMO

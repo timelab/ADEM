@@ -51,10 +51,10 @@ class PPD42Sensor : public Sensor {
     void write();
     static void interrupt(); // interrupt functions must be static
     void process();
-    PPD42Sensor();
+    PPD42Sensor(int, int);
     String report(); // should report a JSON string
     virtual String buildReport(sensorData *sData);
-    
+
     unsigned long readPM10Ppm(); // returns the time (in ppm) the sensor triggered
     unsigned long readPM25Ppm();
 
