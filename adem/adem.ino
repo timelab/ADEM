@@ -370,8 +370,11 @@ void start_to_demo() {
   Serial.print("Initializing web server...");
   webserver.on("/", website);
   webserver.on("/sensors.json", sensors);
-  // Android and Microsoft captive portal handled by onNotFound handler below
-//  webserver.on("/generate_204", website);
+  // Android gets http://clients3.google.com/generate_204 and expects 204
+  webserver.on("/generate_204", generate_204);
+  // Other variations get http://www.google.com/blank.html and expect 200
+  webserver.on("/blank.html", generate_200);
+  // Microsoft captive portal handled by onNotFound handler below
 //  webserver.on("/fwlink", website);
   webserver.onNotFound(website);
   webserver.begin();

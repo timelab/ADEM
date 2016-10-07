@@ -20,15 +20,15 @@ completed and still on-going.
 | Task                                     | Release | Status                | Owner
 | Component / libraries                    |         |                       |
 | - Scheduler                              | alpha   | Completed             | Koen
-| - Datastore                              | alpha   | Ongoing               | Koen
 | - GPS library (SwSerial)                 | alpha   | Completed             | Dag / Lieven
 | - Dust meter (PPD42)                     | alpha   | Completed             | Lieven
 | - Temperature / Humidity (HTU21D)        | alpha   | Completed             | Koen
 | - Barometer (BMP180)                     | alpha   | Completed             | Koen
-| - Accelerometer (MPU6050)                | alpha   | Ongoing               | Koen
 | - LED (NeoPixel)                         | alpha   | Completed             | Stijn / Dag
-| - Battery (Lipo)                         | alpha   | Ongoing               | Dag
-| - Buzzer                                 | beta    | Completed             | Dag
+| - Accelerometer (MPU6050)                | alpha   | Ongoing               | Koen
+| - I2C GPS                                | alpha   | Ongoing               | Koen
+| - Battery (Lipo)                         | beta    | Ongoing               | Dag
+| - Buzzer                                 | beta    | Ongoing               | Dag
 | Code integration                         |         |                       |
 | - Modularity                             | alpha   | Completed             | Koen / Lieven
 | - Pseudo-code                            | alpha   | Completed             | Lieven / Dag
@@ -37,6 +37,7 @@ completed and still on-going.
 | - State machine                          | alpha   | Completed             | Lieven / Dag / Koen
 | - DEBUG mode                             | alpha   | Completed             | Dag
 | - Serial input to state machine (debug)  | alpha   | Completed             | Dag
+| - PlatformIO support                     | beta    | Completed             | Dag
 | - Code conformity                        | beta    | Ongoing               | Dag
 | WiFi integration                         |         |                       |
 | - Wi-Fi Client (upload)                  | alpha   | Ongoing               | Marco / Dag
@@ -45,13 +46,17 @@ completed and still on-going.
 | - Config website                         | beta?   | Ongoing               | Marco / Dag
 | - OTA firmware updates                   | beta?   | TBD                   |
 | Datastore                                |         |                       |
-| - Internal memory                        | alpha   | Ongoing               | Koen
+| - Internal memory                        | alpha   | Completed             | Koen
 | - I2C memory                             | beta    | TBD                   |
 | - Filesystem                             | beta?   | TBD                   |
 | Shaking/moving detection                 | alpha   | Ongoing               | Koen
 | Power management                         | beta    | TBD                   |
 | - Disable on-board power LED             | beta    | TBD                   |
 | - Deepsleep implementation               | beta    | TBD                   |
+| DEMO mode                                |         |                       |
+| - JSON support                           | alpha   | Completed             | Dag
+| - Captive portal                         | alpha   | Completed             | Dag
+| - Fancy web interface                    | alpha   | TBD                   | Arnaud
 | Troubleshoot existing FIXMEs             | beta?   | TBD                   | You ?
 |============================================================================================
 
