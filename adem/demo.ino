@@ -64,6 +64,14 @@ void website() {
   }
 }
 
+void generate_200() {
+    webserver.send(200, "text/html", "");
+}
+
+void generate_204() {
+    webserver.send(204, "text/html", "");
+}
+
 void sensors() {
   StaticJsonBuffer<256> jsonBuffer;
   JsonObject& root = jsonBuffer.createObject();
