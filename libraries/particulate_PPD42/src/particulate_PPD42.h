@@ -55,13 +55,13 @@ class PPD42Sensor : public Sensor {
     String report(); // should report a JSON string
     virtual String buildReport(sensorData *sData);
 
-    unsigned long readPM10Ppm(); // returns the time (in ppm) the sensor triggered
-    unsigned long readPM25Ppm();
+    uint32_t readPM10Ppm(); // returns the time (in ppm) the sensor triggered
+    uint32_t readPM25Ppm();
 
   private:
     boolean _activated = false;
-    unsigned long _readMillisPM10;
-    unsigned long _readMillisPM25;
+    uint32_t _readMillisPM10;
+    uint32_t _readMillisPM25;
     PPD42Data measuredData;
 
     static int _PPD_PM10_PIN;
@@ -69,11 +69,11 @@ class PPD42Sensor : public Sensor {
 
     // Static methods and variables for the interrupt functions
     static void _handleInterruptPM10();
-    static volatile unsigned long _triggerStartMicrosPM10;
-    static volatile unsigned long _triggeredTotalMicrosPM10;
+    static volatile uint32_t _triggerStartMicrosPM10;
+    static volatile uint32_t _triggeredTotalMicrosPM10;
     static void _handleInterruptPM25();
-    static volatile unsigned long _triggerStartMicrosPM25;
-    static volatile unsigned long _triggeredTotalMicrosPM25;
+    static volatile uint32_t _triggerStartMicrosPM25;
+    static volatile uint32_t _triggeredTotalMicrosPM25;
 };
 
 #endif

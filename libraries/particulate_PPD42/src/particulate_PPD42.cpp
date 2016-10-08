@@ -28,17 +28,17 @@
 #include <particulate_PPD42.h>
 
 /*
-    instantiate and initialize the static variables that are used in 
-    the static interrupt functions that handle the hardware interrupts 
+    instantiate and initialize the static variables that are used in
+    the static interrupt functions that handle the hardware interrupts
     triggered by the PPD42 dust sensor
 */
 
 int PPD42Sensor::_PPD_PM10_PIN = 12;
 int PPD42Sensor::_PPD_PM25_PIN = 13;
-volatile unsigned long PPD42Sensor::_triggerStartMicrosPM10 = 0;
-volatile unsigned long PPD42Sensor::_triggerStartMicrosPM25 = 0;
-volatile unsigned long PPD42Sensor::_triggeredTotalMicrosPM25 = 0;
-volatile unsigned long PPD42Sensor::_triggeredTotalMicrosPM10 = 0;
+volatile uint32_t PPD42Sensor::_triggerStartMicrosPM10 = 0;
+volatile uint32_t PPD42Sensor::_triggerStartMicrosPM25 = 0;
+volatile uint32_t PPD42Sensor::_triggeredTotalMicrosPM25 = 0;
+volatile uint32_t PPD42Sensor::_triggeredTotalMicrosPM10 = 0;
 
 PPD42Sensor::PPD42Sensor(int PM10_PIN, int PM25_PIN){
     _PPD_PM10_PIN = PM10_PIN;
@@ -56,8 +56,8 @@ void PPD42Sensor::begin() {
     _triggeredTotalMicrosPM10 = 0;
     _triggeredTotalMicrosPM25 = 0;
 
-    pinMode(_PPD_PM10_PIN, INPUT);
-    pinMode(_PPD_PM25_PIN, INPUT);
+    pinMode(_PPD_PM10_PIN, INPUT_PULLUP);
+    pinMode(_PPD_PM25_PIN, INPUT_PULLUP);
     _activated = true;
 
     // Attach interrupts handlers to hardware pins
@@ -80,11 +80,11 @@ void PPD42Sensor::read() {
     _measured = true;
 }
 
-unsigned long PPD42Sensor::readPM10Ppm() {
+uint32_t PPD42Sensor::readPM10Ppm() {
     if (_activated) {
-        unsigned long _currentMillis = millis(); 
-        unsigned long _sampledMillis = _currentMillis - _readMillisPM10;
-        unsigned long _triggeredTotalMicros = _triggeredTotalMicrosPM10;
+        uint32_t _currentMillis = millis();
+        uint32_t _sampledMillis = _currentMillis - _readMillisPM10;
+        uint32_t _triggeredTotalMicros = _triggeredTotalMicrosPM10;
         _readMillisPM10 = _currentMillis;
         _triggeredTotalMicrosPM10 = 0;
         return 1000 * _triggeredTotalMicros / _sampledMillis;
@@ -93,11 +93,11 @@ unsigned long PPD42Sensor::readPM10Ppm() {
         return 0;
 }
 
-unsigned long PPD42Sensor::readPM25Ppm() {
+uint32_t PPD42Sensor::readPM25Ppm() {
     if (_activated) {
-        unsigned long _currentMillis = millis(); 
-        unsigned long _sampledMillis = _currentMillis - _readMillisPM25;
-        unsigned long _triggeredTotalMicros = _triggeredTotalMicrosPM25;
+        uint32_t _currentMillis = millis();
+        uint32_t _sampledMillis = _currentMillis - _readMillisPM25;
+        uint32_t _triggeredTotalMicros = _triggeredTotalMicrosPM25;
         _readMillisPM25 = _currentMillis;
         _triggeredTotalMicrosPM25 = 0;
         return 1000 * _triggeredTotalMicros / _sampledMillis;
