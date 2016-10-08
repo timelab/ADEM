@@ -11,47 +11,53 @@ Listed prices are individual prices, not volume prices.
 === Mandatory components
 [options="header"]
 |=================================================================================================================
-| Function                  | Component / Chip          | Price indication  | Datasheet / Tutorial / Info / Example
+| Function                  | Component / Chip          | Price indication  |   Typical Power Draw - On / (deep sleep)  | Datasheet / Tutorial / Info / Example
 
 | Microcontroller           | SparkFun ESP8266 Thing    | (15.95€ sparkfun) |
-https://cdn.sparkfun.com/datasheets/Wireless/WiFi/ESP8266ThingV1.pdf[datasheet]
+https://www.hackster.io/fablabeu/esp8266-thing-by-sparkfun-982bc6[100+mA]  (8mA) | https://cdn.sparkfun.com/datasheets/Wireless/WiFi/ESP8266ThingV1.pdf[datasheet]
 https://www.sparkfun.com/products/13231[link] /
 https://learn.sparkfun.com/tutorials/esp8266-thing-hookup-guide/all[tutorial]
 
-| Accelerometer             | GY-521 / MPU6050          | (2.83€ banggood)  |
+| Accelerometer             | GY-521 / MPU6050          | (2.83€ banggood)  | 500uA (10uA) |
 http://store.invensense.com/datasheets/invensense/MPU-6050_DataSheet_V3%204.pdf[datasheet]
 http://playground.arduino.cc/Main/MPU-6050[arduino]
 
-| Barometer                 | BMP180                    | (2.04 € banggood) |
+| Barometer                 | BMP180                    | (2.04 € banggood) | 5uA |
 https://www.adafruit.com/datasheets/BST-BMP180-DS000-09.pdf[datasheet]
 
-| Battery                   |                           |                   |
+| Battery                   |                           |                   ||
 EACHINE 3.7V 500mAh 25C
 
-| Buzzer                    | KY-006                    | (1.44€ banggood)  |
+| Buzzer                    | KY-006                    | (1.44€ banggood)  ||
 Xinda active (?) buzzer
 https://tkkrlab.nl/wiki/Arduino_KY-006_Small_passive_buzzer_module[info]
 http://learn.linksprite.com/arduino/sensors-kit-for-arduino/ky006-buzzer-module/[tutorial]
 https://s3.amazonaws.com/linksprite/Arduino_kits/advanced_sensors_kit/KY006+code.pdf[example]
 
 
-| Fine Dust Meter           | PPD42                     |                   |
+| Fine Dust Meter           | PPD42                     | ($15.90 seeed)                  | http://www.davidholstius.com/tag/ppd42ns/[90mA] |
 http://sca-shinyei.com/pdf/PPD42NS.pdf[datasheet]
 http://www.takingspace.org/wp-content/uploads/ShinyeiPPD42NS_Deconstruction_TracyAllen.pdf[info]
 http://www.howmuchsnow.com/arduino/airquality/grovedust/[tutorial]
+http://www.davidholstius.com/2012/06/12/this-side-up/[tips]
 
-| GPS                       | XM37-1612 / GY-NEO6MV2    | (11.66€ banggood) |
+| GPS                       | XM37-1612 / GY-NEO6MV2    | (11.66€ banggood) | http://www.resistorpark.com/arduino-gps-gy-neo6mv2/[45uA] (0.02uA) |
 https://www.iprototype.nl/docs/gps-LS20031-datasheet-gyneo6mv2.pdf[datasheet]
 https://www.u-blox.com/sites/default/files/products/documents/NEO-6_ProductSummary_%28GPS.G6-HW-09003%29.pdf[product sheet]
 https://www.u-blox.com/sites/default/files/products/documents/LEA-NEO-MAX-6_HIM_%28UBX-14054794%29.pdf[product family sheet]
 https://www.u-blox.com/sites/default/files/products/documents/u-blox6_ReceiverDescrProtSpec_%28GPS.G6-SW-10018%29_Public.pdf[protocol spec]
 https://www.u-blox.com/sites/default/files/products/documents/u6-PowerMgt_AppNote_%28GPS.G6-X-10014%29.pdf[power management]
 
-| Humidity + Temperature    | HTU21D                    | (4.35€ banggood)  |
 https://www.adafruit.com/datasheets/1899_HTU21D.pdf[datasheet]
 
-| RGB Led                   | NeoPixel WS2812 8xled     | (2.40€ banggood)  |
+| RGB Led                   | NeoPixel WS2812 8xled     | (2.40€ banggood)  | https://learn.adafruit.com/adafruit-neopixel-uberguide/power[<60mA] |
 High Density Neopixel 8x LED
+
+| Helper microcontroller | Arduino Pro Mini 3.3V | (11.79€ banggood)  |
+http://www.whizzy.org/2015/06/howto-very-low-power-usage-on-pro-mini-v2-arduino-clone/[7mA-] http://forum.arduino.cc/index.php?topic=141759.0[9mA]|https://www.arduino.cc/en/Main/ArduinoBoardProMini[info]
+|
+
+TOTAL (est.) | | 64.01€ | >200mA | with 500mAh batt -> autonomy: 2,5hrs
 
 |=================================================================================================================
 
@@ -59,7 +65,7 @@ High Density Neopixel 8x LED
 [options="header"]
 |=================================================================================================================
 | Function                  | Component / Chip          | Price indication  | Datasheet / Tutorial / Info
-| Bluethooth                | HC05 / BC417              | (4.91€ banggood)  |
+| Bluetooth                | HC05 / BC417              | (4.91€ banggood)  |
 https://www.olimex.com/Products/Components/RF/BLUETOOTH-SERIAL-HC-06/resources/hc06.pdf[datasheet]
 
 | Memory I2C                | AT24C512C                 | (0.8€ digikey)    |
