@@ -39,7 +39,7 @@ volatile uint32_t PPD42Sensor::_triggerStartMicrosPM10 = 0;
 volatile uint32_t PPD42Sensor::_triggerStartMicrosPM25 = 0;
 volatile uint32_t PPD42Sensor::_triggeredTotalMicrosPM25 = 0;
 volatile uint32_t PPD42Sensor::_triggeredTotalMicrosPM10 = 0;
-#ifdef DEBUG
+#ifdef DEBUG_PPD42
 volatile uint32_t PPD42Sensor::_totalInterruptsPM10;
 volatile uint32_t PPD42Sensor::_totalInterruptsPM25;
 #endif
@@ -59,12 +59,12 @@ void PPD42Sensor::begin() {
     _readMillisPM25 = millis(); //Fetch the current time
     _triggeredTotalMicrosPM10 = 0;
     _triggeredTotalMicrosPM25 = 0;
-#ifdef DEBUG
+#ifdef DEBUG_PPD42
     _totalInterruptsPM10 = 0;
     _totalInterruptsPM25 = 0;
 #endif
-    pinMode(_PPD_PM10_PIN, INPUT_PULLUP);
-    pinMode(_PPD_PM25_PIN, INPUT_PULLUP);
+    pinMode(_PPD_PM10_PIN, INPUT);
+    pinMode(_PPD_PM25_PIN, INPUT);
     _activated = true;
 
     // Attach interrupts handlers to hardware pins
@@ -93,14 +93,15 @@ uint32_t PPD42Sensor::readPM10Ppm() {
         uint32_t _sampledMillis = _currentMillis - _readMillisPM10;
         uint32_t _triggeredTotalMicros = _triggeredTotalMicrosPM10;
         _readMillisPM10 = _currentMillis;
-#ifdef DEBUG
+#ifdef DEBUG_PPD42
         measuredData.triggeredTotalMicrosPM10 = _triggeredTotalMicrosPM10;
         measuredData.sampledMillisPM10 = _sampledMillis;
         measuredData.totalInterruptsPM10 = _totalInterruptsPM10;
         _totalInterruptsPM10 = 0;
 #endif
         _triggeredTotalMicrosPM10 = 0;
-        return 1000 * _triggeredTotalMicros / _sampledMillis;
+        // We avoid floating point arithmetic and accept the inaccuracy
+        return 1000 * (_triggeredTotalMicros / _sampledMillis);
     }
     else
         return 0;
@@ -112,14 +113,15 @@ uint32_t PPD42Sensor::readPM25Ppm() {
         uint32_t _sampledMillis = _currentMillis - _readMillisPM25;
         uint32_t _triggeredTotalMicros = _triggeredTotalMicrosPM25;
         _readMillisPM25 = _currentMillis;
-#ifdef DEBUG
+#ifdef DEBUG_PPD42
         measuredData.triggeredTotalMicrosPM25 = _triggeredTotalMicrosPM25;
         measuredData.sampledMillisPM25 = _sampledMillis;
         measuredData.totalInterruptsPM25 = _totalInterruptsPM25;
         _totalInterruptsPM25 = 0;
 #endif
         _triggeredTotalMicrosPM25 = 0;
-        return 1000 * _triggeredTotalMicros / _sampledMillis;
+        // We avoid floating point arithmetic and accept the inaccuracy
+        return 1000 * (_triggeredTotalMicros / _sampledMillis);
     }
     else
         return 0;
@@ -137,7 +139,7 @@ void PPD42Sensor::_handleInterruptPM10() {
         _triggerStartMicrosPM10 = micros();
     else    // not LOW, thus end of the trigger
         _triggeredTotalMicrosPM10 += (micros() - _triggerStartMicrosPM10);
-#ifdef DEBUG
+#ifdef DEBUG_PPD42
     _totalInterruptsPM10++;
 #endif
 }
@@ -148,7 +150,7 @@ void PPD42Sensor::_handleInterruptPM25() {
         _triggerStartMicrosPM25 = micros();
     else    // not LOW, thus end of the trigger
         _triggeredTotalMicrosPM25 += (micros() - _triggerStartMicrosPM25);
-#ifdef DEBUG
+#ifdef DEBUG_PPD42
     _totalInterruptsPM25++;
 #endif
 }
@@ -168,15 +170,15 @@ String PPD42Sensor::buildReport(sensorData *sData)  {
     char response[200];
     PPD42Data * ppd42Data = reinterpret_cast <PPD42Data*>(sData);
     root["Sensor"] = "PPD42";
-    root["PM2.5"] = ppd42Data->PM25Ppm;
     root["PM1.0"] = ppd42Data->PM10Ppm;
-#ifdef DEBUG
-    root["PM1.0totMic"] = ppd42Data->triggeredTotalMicrosPM10;
-    root["PM1.0samMil"] = ppd42Data->sampledMillisPM10;
+    root["PM2.5"] = ppd42Data->PM25Ppm;
+#ifdef DEBUG_PPD42
     root["PM1.0ints"] = ppd42Data->totalInterruptsPM10;
-    root["PM2.5totMic"] = ppd42Data->triggeredTotalMicrosPM25;
-    root["PM2.5samMil"] = ppd42Data->sampledMillisPM25;
     root["PM2.5ints"] = ppd42Data->totalInterruptsPM25;
+    root["PM1.0totMic"] = ppd42Data->triggeredTotalMicrosPM10;
+    root["PM2.5totMic"] = ppd42Data->triggeredTotalMicrosPM25;
+    root["PM1.0samMil"] = ppd42Data->sampledMillisPM10;
+    root["PM2.5samMil"] = ppd42Data->sampledMillisPM25;
 #endif
     root.printTo(response,sizeof(response));
     return response;
