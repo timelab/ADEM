@@ -41,6 +41,14 @@
 struct PPD42Data : sensorData {
     long PM10Ppm;
     long PM25Ppm;
+#ifdef DEBUG
+    uint32_t triggeredTotalMicrosPM10;
+    uint32_t triggeredTotalMicrosPM25;
+    uint32_t sampledMillisPM10;
+    uint32_t sampledMillisPM25;
+    uint32_t totalInterruptsPM10;
+    uint32_t totalInterruptsPM25;
+#endif
 };
 
 class PPD42Sensor : public Sensor {
@@ -60,20 +68,23 @@ class PPD42Sensor : public Sensor {
 
   private:
     boolean _activated = false;
-    uint32_t _readMillisPM10;
-    uint32_t _readMillisPM25;
     PPD42Data measuredData;
-
     static int _PPD_PM10_PIN;
     static int _PPD_PM25_PIN;
+    uint32_t _readMillisPM10;
+    uint32_t _readMillisPM25;
 
     // Static methods and variables for the interrupt functions
     static void _handleInterruptPM10();
-    static volatile uint32_t _triggerStartMicrosPM10;
-    static volatile uint32_t _triggeredTotalMicrosPM10;
     static void _handleInterruptPM25();
+    static volatile uint32_t _triggerStartMicrosPM10;
     static volatile uint32_t _triggerStartMicrosPM25;
+    static volatile uint32_t _triggeredTotalMicrosPM10;
     static volatile uint32_t _triggeredTotalMicrosPM25;
+#ifdef DEBUG
+    static volatile uint32_t _totalInterruptsPM10;
+    static volatile uint32_t _totalInterruptsPM25;
+#endif
 };
 
 #endif
