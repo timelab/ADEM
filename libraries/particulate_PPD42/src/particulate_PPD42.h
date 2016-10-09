@@ -35,13 +35,15 @@
 #ifndef Ppd42_h
 #define Ppd42_h
 
+//#define DEBUG_PPD42 1
+
 #include <Sensor.h> // - Skeleton Library for ADEM sensors.
 #include <ArduinoJson.h>
 #include <Arduino.h>
 struct PPD42Data : sensorData {
     long PM10Ppm;
     long PM25Ppm;
-#ifdef DEBUG
+#ifdef DEBUG_PPD42
     uint32_t triggeredTotalMicrosPM10;
     uint32_t triggeredTotalMicrosPM25;
     uint32_t sampledMillisPM10;
@@ -81,7 +83,7 @@ class PPD42Sensor : public Sensor {
     static volatile uint32_t _triggerStartMicrosPM25;
     static volatile uint32_t _triggeredTotalMicrosPM10;
     static volatile uint32_t _triggeredTotalMicrosPM25;
-#ifdef DEBUG
+#ifdef DEBUG_PPD42
     static volatile uint32_t _totalInterruptsPM10;
     static volatile uint32_t _totalInterruptsPM25;
 #endif
