@@ -18,11 +18,25 @@
  *
  */
 
+#define DEBUG_PPD42 1
+
 #include <particulate_PPD42.h>
 
-#define SERIAL_BAUD 57600
+#if ARDUINO_ARCH_AVR
+#define SERIAL_BAUD 38400
+#define PM10_PIN 2
+#define PM25_PIN 3
+#elif ARDUINO_ARCH_ESP8266
+#define SERIAL_BAUD 74880
+#define PM10_PIN 12
+#define PM25_PIN 13
+#else
+#define SERIAL_BAUD 38400
+#define PM10_PIN 12
+#define PM25_PIN 13
+#endif
 
-PPD42Sensor particulate(2, 3);
+PPD42Sensor particulate(PM10_PIN, PM25_PIN);
 
 void setup() {
     Serial.begin(SERIAL_BAUD);
