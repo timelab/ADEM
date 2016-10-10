@@ -68,8 +68,8 @@ String BMP085Sensor::buildReport(sensorData * sData)  {
 	char response[200];
     bmp085Data *tmpData = reinterpret_cast <bmp085Data*>(sData);
 	root["Sensor"] = "BMP085/BMP180";
-	root["Temperature"] = (float)tmpData->_temperature;
-	root["Pressure"] = (float)tmpData->_pressure;
+	root["Temperature"] = tmpData->_temperature;
+	root["Pressure"] = double_with_n_digits((float) tmpData->_pressure, 3);
 	root.printTo(response, sizeof(response));
 	return response;
 }
@@ -94,7 +94,7 @@ void BMP085Sensor::Calibration()
 
 // Calculate temperature given ut.
 // Value returned will be in units of 0.1 deg C
-short BMP085Sensor::GetTemperature(unsigned int ut)
+float BMP085Sensor::GetTemperature(unsigned int ut)
 {
 	long x1, x2, p;
 
