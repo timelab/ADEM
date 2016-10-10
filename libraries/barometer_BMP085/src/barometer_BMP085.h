@@ -31,7 +31,7 @@
 #define BMP085_ADDRESS 0x77  // I2C address of BMP085
 
 struct bmp085Data : sensorData {
-    short _temperature;
+    float _temperature;
     long _pressure;
 };
 
@@ -78,7 +78,7 @@ private:
 	const float p0 = 101325;     // Pressure at sea level (Pa)
 	float altitude;
 	void Calibration();
-	short GetTemperature(unsigned int ut);
+	float GetTemperature(unsigned int ut);
 	long GetPressure(unsigned long up);
 	char ReadBMP(unsigned char address);
 	int	ReadInt(unsigned char address);
