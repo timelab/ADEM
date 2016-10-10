@@ -101,7 +101,8 @@ uint32_t PPD42Sensor::readPM10Ppm() {
 #endif
         _triggeredTotalMicrosPM10 = 0;
         // We avoid floating point arithmetic and accept the inaccuracy
-        return 1000 * (_triggeredTotalMicros / _sampledMillis);
+        return 1000 * (uint64_t) _triggeredTotalMicros / _sampledMillis;
+//        return 1000.0 * _triggeredTotalMicros / _sampledMillis;
     }
     else
         return 0;
@@ -121,7 +122,8 @@ uint32_t PPD42Sensor::readPM25Ppm() {
 #endif
         _triggeredTotalMicrosPM25 = 0;
         // We avoid floating point arithmetic and accept the inaccuracy
-        return 1000 * (_triggeredTotalMicros / _sampledMillis);
+        return 1000 * (uint64_t) _triggeredTotalMicros / _sampledMillis;
+//        return 1000.0 * _triggeredTotalMicros / _sampledMillis;
     }
     else
         return 0;
