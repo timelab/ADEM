@@ -61,13 +61,14 @@ void MPU6050Sensor::begin () {
   dmp_set_tap_thresh(2,20);
   dmp_set_tap_thresh(3,30);
   dmp_load_motion_driver_firmware();
-  dmp_enable_feature(DMP_FEATURE_TAP | DMP_FEATURE_SEND_RAW_ACCEL | DMP_FEATURE_SEND_CAL_GYRO | DMP_FEATURE_GYRO_CAL);
+  dmp_enable_feature(DMP_FEATURE_TAP | DMP_FEATURE_SEND_RAW_ACCEL | DMP_FEATURE_SEND_RAW_GYRO | DMP_FEATURE_GYRO_CAL);
   dmp_set_fifo_rate(DEFAULT_MPU_HZ);
   mpu_set_dmp_state(1);
   
   mpu_get_gyro_sens(&gyro_sens);
+  __LOG("MPU: ");__LOG("gyro sens ");__LOGLN(gyro_sens);
   mpu_get_accel_sens(&accel_sens);
-  
+  __LOG("MPU: ");__LOG("accel sens ");__LOGLN(accel_sens);
 }
 
 void MPU6050Sensor::end () {
@@ -76,20 +77,20 @@ void MPU6050Sensor::end () {
 void MPU6050Sensor::read() {
  
   if(_dataReady){
-    __LOG("before dmp_read ");
+    __LOG("MPU: ");__LOG("before dmp_read ");
     dmp_read_fifo(gyro, accel, quat, &_sensorTimestamp, &sensors, &more);
     __LOGLN(_sensorTimestamp);
-    __LOG(" sensors ");
+    __LOG("MPU: ");__LOG(" sensors ");
     __LOGLN(sensors);
     if(sensors & INV_XYZ_ACCEL)
     {
-    __LOGLN("accel data ");
-        measuredData._accel_X = accel[1]/accel_sens;
-        measuredData._accel_Y = accel[2]/accel_sens;
-        measuredData._accel_Z = accel[3]/accel_sens;
-        __LOGLN(measuredData._accel_X);
-        __LOGLN(measuredData._accel_Y);
-        __LOGLN(measuredData._accel_Z);
+    __LOG("MPU: ");__LOGLN("accel data ");
+        measuredData._accel_X = (float)accel[1]/accel_sens;
+        measuredData._accel_Y = (float)accel[2]/accel_sens;
+        measuredData._accel_Z = (float)accel[3]/accel_sens;
+        __LOG("MPU: ");__LOGLN(accel[1]);
+        __LOG("MPU: ");__LOGLN(accel[2]);
+        __LOG("MPU: ");__LOGLN(accel[3]);
         
         // calculate the total acceleration. 
         // No square root taken for speed reason
@@ -109,13 +110,13 @@ void MPU6050Sensor::read() {
     
     if(sensors & INV_XYZ_GYRO)
     {
-    __LOGLN("gyro data");
+    __LOG("MPU: ");__LOGLN("gyro data");
         measuredData._gyro_X = gyro[1]/gyro_sens;
         measuredData._gyro_Y = gyro[2]/gyro_sens;
         measuredData._gyro_Z = gyro[3]/gyro_sens;
-        __LOGLN(measuredData._gyro_X);
-        __LOGLN(measuredData._gyro_Y);
-        __LOGLN(measuredData._gyro_Z);
+        __LOG("MPU: ");__LOGLN(gyro[1]);
+        __LOG("MPU: ");__LOGLN(gyro[2]);
+        __LOG("MPU: ");__LOGLN(gyro[3]);
         _measured = true;
     }
     else
@@ -126,7 +127,9 @@ void MPU6050Sensor::read() {
     }
     measuredData._timestamp = _sensorTimestamp;
     // check if we are moving
+     __LOG("MPU: accel total ");__LOG(measuredData._accel_T);__LOG(" >? ");__LOGLN(movingThreshold);
     if (measuredData._accel_T > movingThreshold) {
+        __LOG("MPU: we are moving ");
         _movingTimestamp = _sensorTimestamp;
     }
     _dataReady = more;
@@ -163,7 +166,9 @@ void MPU6050Sensor::mpu_interrupt() {
 }
 
 void MPU6050Sensor::tap_cb(unsigned char i, unsigned char k) {
-    __LOGLN("tap detected ........... keep on going");
+    __LOG("MPU: ");__LOGLN("==============================================================");
+    __LOG("MPU: ");__LOGLN(">>>>>>>>>>>>>tap detected ............. keep on going<<<<<<<<<");
+    __LOG("MPU: ");__LOGLN("==============================================================");
 }
 void MPU6050Sensor::process() {
 }

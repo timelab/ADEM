@@ -621,7 +621,7 @@ int8_t mpu_read_reg(unsigned char reg, unsigned char *data)
 int8_t mpu_init(struct int_param_s *int_param)
 {
     unsigned char data[6];
-
+    
     /* Reset device. */
     data[0] = BIT_RESET;
     if (i2c_write(st.hw->addr, st.reg->pwr_mgmt_1, 1, data))
@@ -680,7 +680,7 @@ int8_t mpu_init(struct int_param_s *int_param)
 
     if (int_param)
         reg_int_cb(int_param);
-
+ 
 #ifdef AK89xx_SECONDARY
     setup_compass();
     if (mpu_set_compass_sample_rate(10))

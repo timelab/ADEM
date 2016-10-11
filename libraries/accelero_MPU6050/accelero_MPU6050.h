@@ -78,7 +78,7 @@ class MPU6050Sensor : public Sensor{
     void enableLowPower(bool status);
     bool isMoving();
     bool shaken = false;
-    float movingThreshold = 1.001;
+    float movingThreshold = 0.78;
     long  notmovingDelay = 20000L;
     //MPU6050Sensor ();
   protected:
