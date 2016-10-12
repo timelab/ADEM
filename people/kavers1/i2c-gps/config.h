@@ -7,7 +7,10 @@
 #define GPS_LEAD_FILTER
 
 /* Serial speed of the GPS */
-#define GPS_SERIAL_SPEED 57600
+#define GPS_SERIAL_SPEED 9600
+#define GPS_RX_PIN 4
+#define GPS_TX_PIN 5
+
 
 /* GPS protocol
  * NMEA         - Standard NMEA protocol GGA, GSA and RMC  sentences are needed
@@ -19,9 +22,9 @@
  *
  */
 
-//#define NMEA
-#define UBLOX
- #define UBLOX_CONFIG_ALL_PORTS
+#define NMEA
+//#define UBLOX
+// #define UBLOX_CONFIG_ALL_PORTS
 //#define MTK_BINARY16
 //#define MTK_BINARY19
 //#define INIT_MTK_GPS

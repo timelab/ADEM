@@ -26,7 +26,7 @@
  * General Public License for more details.
 ***********************************************************************************************************************************/
 
-#define VERSION 32                                                         //Software version for cross checking
+#define VERSION 33                                                         //Software version for cross checking
 
 
 #include "WireMW.h"
@@ -232,13 +232,45 @@ bool GPS_NMEA_newFrame(char c) {
                      }
                    break;
                    //************* GPGSA FRAME parsing
+                   // eg2. $GPRMC,225446,A,4916.45,N,12311.12,W,000.5,054.7,191194,020.3,E*68
+                   //
+                   //                225446       Time of fix 22:54:46 UTC
+                   //                A            Navigation receiver warning A = Valid position, V = Warning
+                   //                4916.45,N    Latitude 49 deg. 16.45 min. North
+                   //                12311.12,W   Longitude 123 deg. 11.12 min. West
+                   //                000.5        Speed over ground, Knots
+                   //                054.7        Course Made Good, degrees true
+                   //                191194       UTC Date of fix, 19 November 1994
+                   //                020.3,E      Magnetic variation, 20.3 deg. East
+                   //                *68          mandatory checksum
+                   //
+                   // $GPRMC,hhmmss.ss,A,llll.ll,a,yyyyy.yy,a,x.x,x.x,ddmmyy,x.x,a,m*hh
+                   //     Field #
+                   //     1    = UTC time of fix
+                   //     2    = Data status (A=Valid position, V=navigation receiver warning)
+                   //     3    = Latitude of fix
+                   //     4    = N or S of longitude
+                   //     5    = Longitude of fix
+                   //     6    = E or W of longitude
+                   //     7    = Speed over ground in knots
+                   //     8    = Track made good in degrees True
+                   //     9    = UTC date of fix
+                   //     10   = Magnetic variation degrees (Easterly var. subtracts from true course)
+                   //     11   = E or W of magnetic variation
+                   //     12   = Mode indicator, (A=Autonomous, D=Differential, E=Estimated, N=Data not valid)
+                   //     13   = Checksum
                    case GPRMC_FRAME:
                      switch(param)
                      {
                        case 7: i2c_dataset.ground_speed = (atof(string)*0.5144444)*10;      //convert to m/s*100
                        break; 
-	                     case 8: i2c_dataset.ground_course = (atof(string)*10);				//Convert to degrees *10 (.1 precision)
-							         break;
+                       case 8: i2c_dataset.ground_course = (atof(string)*10);				//Convert to degrees *10 (.1 precision)
+                       break;
+                       case 9: int tmp = atoi(string);
+                                i2c_dataset.day = tmp / 10000;
+                                i2c_dataset.month = (tmp/100)%100;
+                                i2c_dataset.year = (tmp % 100);
+                       break; 
                      }
                    break;                   
                    //************* GPZDA FRAME parsing
