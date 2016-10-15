@@ -18,24 +18,34 @@
  *
  */
 
-#ifndef _gps_I2C_h
-#define _gps_I2C_h
+#ifndef _I2CGps_h
+#define _I2CGps_h
 #include <Arduino.h>
 #include <Sensor.h>
 #include <ArduinoJson.h>
-#include <wire.h>
+#include <I2Cdev.h>
 
 #include "i2c_gps_registers.h"                 //Register definitions
 
 #define GPS_ADDRESS 20
 
+struct I2CGPSData : sensorData{
+    uint8_t day;
+    uint8_t month;
+    uint8_t year;
+    uint32_t time;
+    GPS_COORDINATES location;
+    uint8_t satellites;
+    uint16_t altitude;
+    uint16_t speed;
+};
 
 //abstract class Sensor
-class GPS_I2C : public Sensor {
+class I2CGps : public Sensor {
 public:
-    GPS_I2C(int rx=4, int tx=0, int bd=9600);
-    GPS_I2C();
-    ~GPS_I2C();
+    I2CGps(int rx=4, int tx=0, int bd=9600);
+    I2CGps();
+    ~I2CGps();
 
     //virtual function must be implemented
     virtual void begin();
@@ -52,7 +62,8 @@ private:
     StaticJsonBuffer<200> jsonBuffer;
     
     I2CGPSData measuredData;
-    String FormatDateTime(uint32_t time);
+    String FormatDateTime(I2CGPSData *data);
+    int i2cGpsAddress = GPS_ADDRESS;
 
 };
 
