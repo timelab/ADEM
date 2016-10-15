@@ -180,9 +180,9 @@ bool GPS_NMEA_newFrame(char c) {
   static uint8_t param = 0, offset = 0, parity = 0;
   static char string[15];
   static uint8_t checksum_param, gps_frame = NO_FRAME;
-
+//  Serial.print(c); 
   switch (c) {
-    case '$': param = 0; offset = 0; parity = 0; 
+    case '$': param = 0; offset = 0; parity = 0;
               break;
     case ',':
     case '*':  string[offset] = 0;
@@ -266,7 +266,7 @@ bool GPS_NMEA_newFrame(char c) {
                        break; 
                        case 8: i2c_dataset.ground_course = (atof(string)*10);				//Convert to degrees *10 (.1 precision)
                        break;
-                       case 9: int tmp = atoi(string);
+                       case 9: long tmp = atol(string);
                                 i2c_dataset.day = tmp / 10000;
                                 i2c_dataset.month = (tmp/100)%100;
                                 i2c_dataset.year = (tmp % 100);
@@ -710,17 +710,17 @@ void requestEvent()
  if (receivedCommands[0] >= I2C_GPS_RES1) i2c_dataset.status.new_data = 0;        //Accessing gps data, switch new_data_flag;
  //Write data from the requested data register position
  // TODO shouldn't we limit the data written to sizeof(i2c_dataset) - receivedCommands[0] ?
- Serial.print("Send data :");Serial.println(receivedCommands[0]);
+ // Serial.print("Send data :");Serial.println(receivedCommands[0]);
  int8_t* ptr = 0;
  ptr =(int8_t *)&i2c_dataset;
- for(int i = 0;i <= 32 ; i++)
- {
-    int8_t  j = ptr[i];
-    
-    Serial.print("SD ");Serial.print(i);Serial.print(":");Serial.print((char) j,HEX); Serial.println("");
- }
- Serial.println("");
- Wire.write((uint8_t *)&i2c_dataset+receivedCommands[0],32);                    //Write up to 32 byte, since master is responsible for reading and sending NACK
+ //for(int i = 0;i <= 32 ; i++)
+ //{
+ //   int8_t  j = ptr[i];
+ //   
+ //   Serial.print("SD ");Serial.print(i);Serial.print(":");Serial.print((char) j,HEX); Serial.println("");
+ //}
+ //Serial.println("");
+ Wire.write((uint8_t *)&i2c_dataset+receivedCommands[0],32-receivedCommands[0]);                    //Write up to 32 byte, since master is responsible for reading and sending NACK
  //32 byte limit is in the Wire library, we have to live with it unless writing our own wire library
 
 }
@@ -826,9 +826,9 @@ void blink_update()
   void GPS_SerialInit() {
   swSerial = new SoftwareSerial(GPS_RX_PIN, GPS_TX_PIN);
   swSerial->begin(GPS_SERIAL_SPEED);
-  Serial.begin(GPS_SERIAL_SPEED);  
+  //Serial.begin(GPS_SERIAL_SPEED);  
   delay(1000);
-  Serial.println("Serial initialized");
+  //Serial.println("Serial initialized");
 
 #if defined(UBLOX)
 	//Set speed
@@ -954,18 +954,18 @@ void loop() {
        // only, and strip the full degrees part. This means that we have to disable the filter if we are very close to a degree line
        i2c_dataset.gps_loc.lat = GPS_read[LAT];
        i2c_dataset.gps_loc.lon = GPS_read[LON];
-       Serial.print("LAT : ");Serial.print(i2c_dataset.gps_loc.lat);
-       Serial.print(" LON : ");Serial.println(i2c_dataset.gps_loc.lon);
-       Serial.print("GPS data : ");;
- int8_t* ptr = 0;
-  ptr = (int8_t *)(&i2c_dataset);
- for(int i = 0;i <= 32 ; i++)
- {
-    int8_t  j = ptr[i];
-    
-   Serial.print(i);Serial.print(":");Serial.print((char) j,HEX);Serial.print(" ");
- }
- Serial.println("");
+//       Serial.print("LAT : ");Serial.print(i2c_dataset.gps_loc.lat);
+//       Serial.print(" LON : ");Serial.println(i2c_dataset.gps_loc.lon);
+//       Serial.print("GPS data : ");;
+// int8_t* ptr = 0;
+//  ptr = (int8_t *)(&i2c_dataset);
+// for(int i = 0;i <= 32 ; i++)
+// {
+//    int8_t  j = ptr[i];
+//    
+//   Serial.print(i);Serial.print(":");Serial.print((char) j,HEX);Serial.print(" ");
+// }
+// Serial.println("");
  
        if (i2c_dataset.status.gps3dfix == 1 && i2c_dataset.status.numsats >= 5) {
           
