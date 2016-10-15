@@ -11,4 +11,4 @@ install:
 
 script:
     - platformio run
-    - platformio run -d people/kavers1/i2c-gps
+    - platformio run -d ArduinoCode/i2c-gps
