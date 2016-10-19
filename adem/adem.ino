@@ -259,6 +259,7 @@ void start_state() {
 
 #ifdef DEMO
 void demo_state() {
+  delay(50);
   dnsserver.processNextRequest();
   webserver.handleClient();
 }
@@ -355,6 +356,7 @@ void start_to_demo() {
   particulate_task->name = "particulate";
 
   WiFi.mode(WIFI_AP);
+  WiFi.softAPConfig(apIP, apIP, IPAddress(255, 255, 255, 0));
   WiFi.softAP(SSID);
 
   Serial.print("Initializing dns server...");
