@@ -3,26 +3,40 @@ ARDUINO15_PATH = $(CURDIR)/arduino15
 BUILD_PATH = $(CURDIR)/Build
 
 SKETCH = adem/adem.ino
+SKETCH_DIR = $(shell dirname $(SKETCH))
 
 SERIAL_BAUD := 38400
 CFLAGS := -DDEBUG
 
+### Set hardware type based on SKETCH
+ifeq ($(SKETCH_DIR),i2c-slave)
+HWTYPE := atmega328
+else ifeq ($(SKETCH_DIR),people/kavers1/i2c-gps-nav)
+HWTYPE := atmega328
+else
+HWTYPE := esp8266
+endif
+
 ### Sparkfun ESP8266 Thing
+ifeq ($(HWTYPE),esp8266)
 BOARD = esp8266:esp8266:thing
 HWTYPE = esp8266
 SERIAL_PORT := /dev/ttyUSB0
 FLASH_BAUD := 921600
 BUILD_IMAGE = "$(BUILD_PATH)/$(shell basename $(SKETCH)).bin"
 UPLOAD_CMD = "$(ARDUINO15_PATH)/packages/$(HWTYPE)/tools/esptool/0.4.9/esptool" -v -cd nodemcu -cb $(FLASH_BAUD) -cp $(SERIAL_PORT) -ca 0x00000 -cf "$(BUILD_IMAGE)"
+endif
 
 ### Arduino UNO ATMEGA328
+ifeq ($(HWTYPE),atmega328)
 #BOARD = arduino:avr:diecimila:cpu=atmega328
-#BOARD = arduino:avr:uno:cpu=atmega328
-#SERIAL_PORT := /dev/ttyACM3
-#HWTYPE = atmega328
-#FLASH_BAUD := 115200
-#BUILD_IMAGE = "$(BUILD_PATH)/$(shell basename $(SKETCH)).hex"
-#UPLOAD_CMD = "$(ARDUINO_PATH)/hardware/tools/avr/bin/avrdude" -C $(ARDUINO_PATH)/hardware/tools/avr/etc/avrdude.conf -v -p atmega328p -c arduino -P $(SERIAL_PORT) -b $(FLASH_BAUD) -D -U flash:w:"$(BUILD_IMAGE)"
+BOARD = arduino:avr:uno:cpu=atmega328
+SERIAL_PORT := /dev/ttyACM3
+HWTYPE = atmega328
+FLASH_BAUD := 115200
+BUILD_IMAGE = "$(BUILD_PATH)/$(shell basename $(SKETCH)).hex"
+UPLOAD_CMD = "$(ARDUINO_PATH)/hardware/tools/avr/bin/avrdude" -C $(ARDUINO_PATH)/hardware/tools/avr/etc/avrdude.conf -v -p atmega328p -c arduino -P $(SERIAL_PORT) -b $(FLASH_BAUD) -D -U flash:w:"$(BUILD_IMAGE)"
+endif
 
 CTAGS = $(ARDUINO_PATH)/tools-builder/ctags/5.8-arduino10
 
@@ -46,7 +60,7 @@ build:
 		--hardware="$(ARDUINO15_PATH)/packages" \
 		--tools="$(ARDUINO_PATH)/tools" \
 		--tools="$(ARDUINO15_PATH)/packages" \
-		--libraries=./libraries \
+		--libraries=$(SKETCH_DIR)/libraries \
 		--build-path="$(BUILD_PATH)" \
 		$(SKETCH)
 
