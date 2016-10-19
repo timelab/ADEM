@@ -18,9 +18,9 @@
  *
  */
 
-#include "I2CGps.h"
+#include "I2Cgps.h"
 
-#ifdef DEBUG_GPS:
+#ifdef DEBUG_GPS
 #define __LOG(msg) Serial.print(msg)
 #define __LOGLN(msg) Serial.println(msg)
 #else
