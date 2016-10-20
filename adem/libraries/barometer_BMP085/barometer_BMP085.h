@@ -23,10 +23,10 @@
 #ifndef _BMP085SENSOR_h
 #define _BMP085SENSOR_h
 
-#include "../../Sensor/Sensor.h" // - Skeleton Library for ADEM sensors.
-#include <ArduinoJson.h>
-#include <Wire.h>
 #include <Arduino.h>
+#include <ArduinoJson.h>
+#include <Sensor.h> // - Skeleton Library for ADEM sensors.
+#include <Wire.h>
 
 #define BMP085_ADDRESS 0x77  // I2C address of BMP085
 
