@@ -200,18 +200,18 @@ Adafruit NeoPixel::
   - URL: https://github.com/adafruit/Adafruit_NeoPixel
 
 ArduinoJson::
-  - Version: 5.6.5
+  - Version: 5.6.7
   - License: MIT
   - URL: https://github.com/bblanchon/ArduinoJson
 
 espsoftwareserial::
-  - Version: 1.0
-  - License: LGPL v2.1
+  - Version: 3.1.0
+  - License: LGPL v2.1+
   - URL: https://github.com/plerup/espsoftwareserial
 
 TinyGPS++::
   - Version: 0.94b
-  - License: LGPL v2.1
+  - License: LGPL v2.1+
   - URL: https://github.com/mikalhart/TinyGPSPlus
 
 WiFiManager::
