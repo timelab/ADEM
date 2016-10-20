@@ -109,15 +109,23 @@ On MacOSX you can do the following:
 
 Now you can start building the source code by doing:
 
-  $ make
+  $ make build
 
-You can also build other test code by doing something like:
+You can also build the i2c-slave code (used for the GPS) by doing:
 
-  $ make SKETCH=people/dagwieers/gps_test/gps_test.ino
+  $ make build SKETCH=i2c-slave/i2c-slave.ino
+
+Other test code can be build as well using:
+
+  $ make build SKETCH=people/dagwieers/gps_test/gps_test.ino
 
 Once this is done, you can flash your device using:
 
   $ make flash
+
+or
+
+  $ make flash SKETCH=i2c-slave/i2c-slave.ino
 
 You can do both in one go by using the `upload` target, just like in the Arduino Sketch IDE:
 
@@ -125,13 +133,13 @@ You can do both in one go by using the `upload` target, just like in the Arduino
 
 or
 
-  $ make upload SKETCH=people/dagwieers/gps_test/gps_test.ino
+  $ make upload SKETCH=i2c-slave/i2c-slave.ino
 
 You can also influence the serial port and baud rate used for flashing:
 
   $ make upload SERIAL_PORT=/dev/ttyUSB0 FLASH_BAUD=115200
 
-The default serial port for flashing is `/dev/ttyUSB0` and the default baud rate for flashing is `921600`.
+The default serial port for flashing depends on the HWTYPE but usually is `/dev/ttyUSB0`, the default baud rate for flashing depends on the hardware.
 
 
 === Connecting to the device
@@ -171,6 +179,13 @@ If you want to build without DEBUG mode, you can simply do:
 There is a demonstration mode that is enabled by doing:
 
   $ make CFLAGS="-DDEMO"
+
+
+=== Building, flashing and monitoring
+
+Now for convenience you can do building, flashing and monitoring at once:
+
+ $ make upload monitor
 
 
 == External libraries

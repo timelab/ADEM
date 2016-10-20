@@ -3,46 +3,60 @@ ARDUINO15_PATH = $(CURDIR)/arduino15
 BUILD_PATH = $(CURDIR)/Build
 
 SKETCH = adem/adem.ino
+SKETCH_NAME = $(shell basename $(SKETCH))
 SKETCH_DIR = $(shell dirname $(SKETCH))
 
 SERIAL_BAUD := 38400
+
+### Build using debug output by default
 CFLAGS := -DDEBUG
+
+### Workaround for bug https://github.com/esp8266/Arduino/pull/2279
+CFLAGS += -DDEBUG_OUTPUT=Serial
 
 ### Set hardware type based on SKETCH
 ifeq ($(SKETCH_DIR),i2c-slave)
-HWTYPE := atmega328
+HWTYPE := uno-pro-mini
 else ifeq ($(SKETCH_DIR),people/kavers1/i2c-gps-nav)
-HWTYPE := atmega328
+HWTYPE := uno-pro-mini
 else
-HWTYPE := esp8266
+HWTYPE := sparkfun-esp8266-thing
 endif
 
 ### Sparkfun ESP8266 Thing
-ifeq ($(HWTYPE),esp8266)
+ifeq ($(HWTYPE),sparkfun-esp8266-thing)
 BOARD = esp8266:esp8266:thing
-HWTYPE = esp8266
 SERIAL_PORT := /dev/ttyUSB0
 FLASH_BAUD := 921600
-BUILD_IMAGE = "$(BUILD_PATH)/$(shell basename $(SKETCH)).bin"
-UPLOAD_CMD = "$(ARDUINO15_PATH)/packages/$(HWTYPE)/tools/esptool/0.4.9/esptool" -v -cd nodemcu -cb $(FLASH_BAUD) -cp $(SERIAL_PORT) -ca 0x00000 -cf "$(BUILD_IMAGE)"
+UPLOAD_CMD = "$(ARDUINO15_PATH)/packages/esp8266/tools/esptool/0.4.9/esptool" -v -cd nodemcu -cb $(FLASH_BAUD) -cp $(SERIAL_PORT) -ca 0x00000 -cf "$(BUILD_PATH)/$(SKETCH_NAME).bin"
+endif
+
+### Arduino UNO Pro Mini
+ifeq ($(HWTYPE),uno-pro-mini)
+BOARD = arduino:avr:pro:cpu=16MHzatmega328
+SERIAL_PORT := /dev/ttyUSB0
+FLASH_BAUD := 57600
+UPLOAD_CMD = "$(ARDUINO_PATH)/hardware/tools/avr/bin/avrdude" -C $(ARDUINO_PATH)/hardware/tools/avr/etc/avrdude.conf -v -p atmega328p -c arduino -P $(SERIAL_PORT) -b $(FLASH_BAUD) -D -U flash:w:"$(BUILD_PATH)/$(SKETCH_NAME).hex"
 endif
 
 ### Arduino UNO ATMEGA328
-ifeq ($(HWTYPE),atmega328)
+ifeq ($(HWTYPE),uno)
 #BOARD = arduino:avr:diecimila:cpu=atmega328
 BOARD = arduino:avr:uno:cpu=atmega328
 SERIAL_PORT := /dev/ttyACM3
-HWTYPE = atmega328
 FLASH_BAUD := 115200
-BUILD_IMAGE = "$(BUILD_PATH)/$(shell basename $(SKETCH)).hex"
-UPLOAD_CMD = "$(ARDUINO_PATH)/hardware/tools/avr/bin/avrdude" -C $(ARDUINO_PATH)/hardware/tools/avr/etc/avrdude.conf -v -p atmega328p -c arduino -P $(SERIAL_PORT) -b $(FLASH_BAUD) -D -U flash:w:"$(BUILD_IMAGE)"
+UPLOAD_CMD = "$(ARDUINO_PATH)/hardware/tools/avr/bin/avrdude" -C $(ARDUINO_PATH)/hardware/tools/avr/etc/avrdude.conf -v -p atmega328p -c arduino -P $(SERIAL_PORT) -b $(FLASH_BAUD) -D -U flash:w:"$(BUILD_PATH)/$(SKETCH_NAME).hex"
 endif
 
 CTAGS = $(ARDUINO_PATH)/tools-builder/ctags/5.8-arduino10
-
-# Define DEBUG_OUTPUT for internal ESP DNS library when DEBUG is set
-CFLAGS += -DDEBUG_OUTPUT=Serial
 PREFS = --prefs=build.debug_level="$(CFLAGS)" --prefs=tools.ctags.path="$(CTAGS)"
+
+### Add project custom libraries/ directory
+ifneq ($(wildcard $(SKETCH_DIR)/libraries/.*),)
+    LIBRARIES=$(SKETCH_DIR)/libraries/
+else
+    LIBRARIES=adem/libraries/
+endif
 
 SKETCHES = $(find $(CURDIR) -name *.ino)
 
@@ -60,7 +74,7 @@ build:
 		--hardware="$(ARDUINO15_PATH)/packages" \
 		--tools="$(ARDUINO_PATH)/tools" \
 		--tools="$(ARDUINO15_PATH)/packages" \
-		--libraries=$(SKETCH_DIR)/libraries \
+		--libraries="$(LIBRARIES)" \
 		--build-path="$(BUILD_PATH)" \
 		$(SKETCH)
 
@@ -78,9 +92,6 @@ clean:
 serial:
 	@echo "Serial speed is $(SERIAL_BAUD)"
 	-setserial -v $(SERIAL_PORT) spd_cust divisor $$(( 24000000 / ( 2 * $(SERIAL_BAUD) ) ))
-#	stty -F $(SERIAL_PORT) ispeed $(SERIAL_BAUD) ospeed $(SERIAL_BAUD) cs8 -cstopb parenb
-#	stty -F $(SERIAL_PORT) ispeed $(SERIAL_BAUD) ospeed $(SERIAL_BAUD)
-#	stty <$(SERIAL_PORT)
 	cat <$(SERIAL_PORT)
 #	cu --line $(SERIAL_PORT) --speed $(SERIAL_BAUD)
 
@@ -89,5 +100,5 @@ monitor:
 	-setserial -v $(SERIAL_PORT) spd_cust divisor $$(( 24000000 / ( 2 * $(SERIAL_BAUD) ) ))
 #	stty -F $(SERIAL_PORT) ispeed $(SERIAL_BAUD) ospeed $(SERIAL_BAUD) cs8 -cstopb parenb
 #	stty -F $(SERIAL_PORT) ispeed $(SERIAL_BAUD) ospeed $(SERIAL_BAUD)
-	stty <$(SERIAL_PORT)
+#	stty <$(SERIAL_PORT)
 	screen -fn $(SERIAL_PORT) $(SERIAL_BAUD),cs8,ixon,ixoff,-istrip,-ctsrts,-dsrdtr
