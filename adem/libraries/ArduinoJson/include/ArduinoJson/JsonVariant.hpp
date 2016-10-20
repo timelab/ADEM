@@ -36,6 +36,9 @@ class JsonObject;
 // - a string (const char*)
 // - a reference to a JsonArray or JsonObject
 class JsonVariant : public JsonVariantBase<JsonVariant> {
+  friend void Internals::JsonSerializer::serialize(const JsonVariant &,
+                                                   JsonWriter &);
+
  public:
   template <typename T>
   struct IsConstructibleFrom;
@@ -107,16 +110,10 @@ class JsonVariant : public JsonVariantBase<JsonVariant> {
   }
 
   // Create a JsonVariant containing a reference to an array.
-  JsonVariant(JsonArray &array) {
-    _type = Internals::JSON_ARRAY;
-    _content.asArray = &array;
-  }
+  JsonVariant(JsonArray &array);
 
   // Create a JsonVariant containing a reference to an object.
-  JsonVariant(JsonObject &object) {
-    _type = Internals::JSON_OBJECT;
-    _content.asObject = &object;
-  }
+  JsonVariant(JsonObject &object);
 
   // Get the variant as the specified type.
   //
@@ -217,6 +214,14 @@ class JsonVariant : public JsonVariantBase<JsonVariant> {
   as() const {
     return asObject();
   }
+  //
+  // JsonVariant as<JsonVariant> const;
+  template <typename T>
+  typename TypeTraits::EnableIf<TypeTraits::IsSame<T, JsonVariant>::value,
+                                T>::type
+  as() const {
+    return *this;
+  }
 
   // Tells weither the variant has the specified type.
   // Returns true if the variant has type type T, false otherwise.
@@ -272,9 +277,9 @@ class JsonVariant : public JsonVariantBase<JsonVariant> {
     return isArray();
   }
   //
-  // JsonObject& as<JsonObject> const;
-  // JsonObject& as<JsonObject&> const;
-  // JsonObject& as<const JsonObject&> const;
+  // bool is<JsonObject> const;
+  // bool is<JsonObject&> const;
+  // bool is<const JsonObject&> const;
   template <typename T>
   typename TypeTraits::EnableIf<
       TypeTraits::IsSame<
@@ -290,9 +295,6 @@ class JsonVariant : public JsonVariantBase<JsonVariant> {
   bool success() const {
     return _type != Internals::JSON_UNDEFINED;
   }
-
-  // Serialize the variant to a JsonWriter
-  void writeTo(Internals::JsonWriter &writer) const;
 
   // Value returned if the variant has an incompatible type
   template <typename T>
@@ -330,8 +332,8 @@ class JsonVariant : public JsonVariantBase<JsonVariant> {
   }
   bool isString() const {
     return _type == Internals::JSON_STRING ||
-           _type == Internals::JSON_UNPARSED && _content.asString &&
-               !strcmp("null", _content.asString);
+           (_type == Internals::JSON_UNPARSED && _content.asString &&
+            !strcmp("null", _content.asString));
   }
 
   // The current type of the variant
