@@ -61,6 +61,15 @@
   #define GPS_LAG 1.0f				//We assumes that MTK GPS has a 1 sec lag
 #endif  
 
+
+#ifdef DEBUG_I2CGPS
+#define __LOG(msg) Serial.print(msg)
+#define __LOGLN(msg) Serial.println(msg)
+#else
+#define __LOG(msg)
+#define __LOGLN(msg)
+#endif
+
 #if defined(INIT_MTK_GPS)
 
  #define MTK_SET_BINARY          "$PGCMD,16,0,0,0,0,0*6A\r\n"
@@ -180,7 +189,7 @@ bool GPS_NMEA_newFrame(char c) {
   static uint8_t param = 0, offset = 0, parity = 0;
   static char string[15];
   static uint8_t checksum_param, gps_frame = NO_FRAME;
-//  Serial.print(c); 
+  __LOG(c); 
   switch (c) {
     case '$': param = 0; offset = 0; parity = 0;
               break;
@@ -707,10 +716,10 @@ restart:
 // read data from I2C_RAG_MAP and send back
 void requestEvent()
 {
- if (receivedCommands[0] >= I2C_GPS_RES1) i2c_dataset.status.new_data = 0;        //Accessing gps data, switch new_data_flag;
+ if (receivedCommands[0] >= I2C_GPS_LST_RECEIVE) i2c_dataset.status.new_data = 0;        //Accessing gps data, switch new_data_flag;
  //Write data from the requested data register position
  // TODO shouldn't we limit the data written to sizeof(i2c_dataset) - receivedCommands[0] ?
- // Serial.print("Send data :");Serial.println(receivedCommands[0]);
+ __LOG("Send data :");__LOG(receivedCommands[0]);
  int8_t* ptr = 0;
  ptr =(int8_t *)&i2c_dataset;
  //for(int i = 0;i <= 32 ; i++)
@@ -750,7 +759,7 @@ void receiveEvent(int bytesReceived)
           receivedCommands[0] = 0x00;
           return;
      }
-//     Serial.print("Received byte : "); Serial.println(receivedCommands[0]);
+//     __LOG("Received byte : "); __LOGLN(receivedCommands[0]);
     //More than 1 byte was received, so there is definitely some data to write into a register
     //Check for writeable registers and discard data is it's not writeable
     
@@ -826,9 +835,11 @@ void blink_update()
   void GPS_SerialInit() {
   swSerial = new SoftwareSerial(GPS_RX_PIN, GPS_TX_PIN);
   swSerial->begin(GPS_SERIAL_SPEED);
-  //Serial.begin(GPS_SERIAL_SPEED);  
+#if defined(DEBUG_I2CGPS)
+  Serial.begin(GPS_SERIAL_SPEED);  
+#endif
   delay(1000);
-  //Serial.println("Serial initialized");
+  __LOGLN("Serial initialized");
 
 #if defined(UBLOX)
 	//Set speed
@@ -938,7 +949,7 @@ void loop() {
 #pragma region while serial available
 
      while (swSerial->available()) {
-
+       i2c_dataset.last_receive = millis();
 #if defined(NMEA)
        if (GPS_NMEA_newFrame(swSerial->read())) {
 #endif 
@@ -954,23 +965,14 @@ void loop() {
        // only, and strip the full degrees part. This means that we have to disable the filter if we are very close to a degree line
        i2c_dataset.gps_loc.lat = GPS_read[LAT];
        i2c_dataset.gps_loc.lon = GPS_read[LON];
-//       Serial.print("LAT : ");Serial.print(i2c_dataset.gps_loc.lat);
-//       Serial.print(" LON : ");Serial.println(i2c_dataset.gps_loc.lon);
-//       Serial.print("GPS data : ");;
-// int8_t* ptr = 0;
-//  ptr = (int8_t *)(&i2c_dataset);
-// for(int i = 0;i <= 32 ; i++)
-// {
-//    int8_t  j = ptr[i];
-//    
-//   Serial.print(i);Serial.print(":");Serial.print((char) j,HEX);Serial.print(" ");
-// }
-// Serial.println("");
+       __LOGLN("");
+       __LOG("LAT : ");__LOG(i2c_dataset.gps_loc.lat);
+       __LOG(" LON : ");__LOGLN(i2c_dataset.gps_loc.lon);
  
        if (i2c_dataset.status.gps3dfix == 1 && i2c_dataset.status.numsats >= 5) {
           
-         lastframe_time = millis();
-         _watchdog_timer = millis();  //Reset watchdog timer
+         lastframe_time = i2c_dataset.last_receive;
+         _watchdog_timer = i2c_dataset.last_receive;  //Reset watchdog timer
           
         }
         // have new data at this point anyway
