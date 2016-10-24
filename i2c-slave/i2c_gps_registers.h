@@ -44,7 +44,7 @@
 #define I2C_GPS_ALTITUDE                            25   // GPS altitude in meters (uint16_t)           (Read Only)
 #define I2C_GPS_GROUND_COURSE			                  27   // GPS ground course (uint16_t)
 #define I2C_GPS_FIX_AGE                             29   // GPS fix age 0.001 sec resolution
-#define I2C_GPS_RES1                                31   // reserved for future use (uint16_t)
+#define I2C_GPS_LST_RECEIVE                         31   // reserved for future use (uint16_t)
 
 
 typedef struct {
@@ -82,7 +82,7 @@ typedef struct {
 	int16_t               altitude;                 // 25 gps altitude
 	uint16_t              ground_course;            // 27 GPS ground course
 	uint16_t              fix_age;                  // 29 GPS fix age 0.001 sec resolution
-	uint16_t              res6;                     // 31 reserved for future use
+	uint16_t              last_receive;              // 31 reserved for future use
 
 } I2C_REGISTERS;
 

@@ -22,7 +22,7 @@ void tap_cb(unsigned char i, unsigned char k) {
     P("MPU: ");PL("==============================================================");
     P("MPU: ");P(">>>>>>>>>>>>>tap detected ");P(i);P("........."); P(k); PL(" keep on going<<<<<<<<<");
     P("MPU: ");PL("==============================================================");
-    state = 0;
+    state = 3;
     standstill = false;
 }
 
@@ -140,6 +140,10 @@ void loop() {
             break;
         case 2 :
             pixels.setPixelColor(i, pixels.Color(0,150,0)); // Moderately bright green color.
+            break;
+        case 3 :
+            pixels.setPixelColor(i, pixels.Color(0,0,150)); // Moderately bright green color.
+            delay(1000);
             break;
         }            
       }
