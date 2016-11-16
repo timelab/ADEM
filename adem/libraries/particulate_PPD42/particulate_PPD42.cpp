@@ -21,7 +21,7 @@
 /*
   Ppd42.cpp - Library for ADEM PPD42 dust sensor.
 
-  XXX: This device does not measure PM10, but PM1.0 !!
+  XXX: This device does not measure PM10, but PM1 !!
 */
 
 #include <Arduino.h>
@@ -33,19 +33,19 @@
     triggered by the PPD42 dust sensor
 */
 
-int PPD42Sensor::_PPD_PM10_PIN = 12;
+int PPD42Sensor::_PPD_PM1_PIN = 12;
 int PPD42Sensor::_PPD_PM25_PIN = 13;
-volatile uint32_t PPD42Sensor::_triggerStartMicrosPM10 = 0;
+volatile uint32_t PPD42Sensor::_triggerStartMicrosPM1 = 0;
 volatile uint32_t PPD42Sensor::_triggerStartMicrosPM25 = 0;
+volatile uint32_t PPD42Sensor::_triggeredTotalMicrosPM1 = 0;
 volatile uint32_t PPD42Sensor::_triggeredTotalMicrosPM25 = 0;
-volatile uint32_t PPD42Sensor::_triggeredTotalMicrosPM10 = 0;
 #ifdef DEBUG_PPD42
-volatile uint32_t PPD42Sensor::_totalInterruptsPM10;
+volatile uint32_t PPD42Sensor::_totalInterruptsPM1;
 volatile uint32_t PPD42Sensor::_totalInterruptsPM25;
 #endif
 
-PPD42Sensor::PPD42Sensor(int PM10_PIN, int PM25_PIN){
-    _PPD_PM10_PIN = PM10_PIN;
+PPD42Sensor::PPD42Sensor(int PM1_PIN, int PM25_PIN){
+    _PPD_PM1_PIN = PM1_PIN;
     _PPD_PM25_PIN = PM25_PIN;
     measuredData.ID = PARTICULATE_PPD42;
 }
@@ -55,20 +55,20 @@ void PPD42Sensor::begin() {
     _measured = false;
 
     // initialization for the dust sensor
-    _readMillisPM10 = millis(); //Fetch the current time
+    _readMillisPM1 = millis(); //Fetch the current time
     _readMillisPM25 = millis(); //Fetch the current time
-    _triggeredTotalMicrosPM10 = 0;
+    _triggeredTotalMicrosPM1 = 0;
     _triggeredTotalMicrosPM25 = 0;
 #ifdef DEBUG_PPD42
-    _totalInterruptsPM10 = 0;
+    _totalInterruptsPM1 = 0;
     _totalInterruptsPM25 = 0;
 #endif
-    pinMode(_PPD_PM10_PIN, INPUT);
+    pinMode(_PPD_PM1_PIN, INPUT);
     pinMode(_PPD_PM25_PIN, INPUT);
     _activated = true;
 
     // Attach interrupts handlers to hardware pins
-    attachInterrupt(digitalPinToInterrupt(_PPD_PM10_PIN), _handleInterruptPM10, CHANGE);
+    attachInterrupt(digitalPinToInterrupt(_PPD_PM1_PIN), _handleInterruptPM1, CHANGE);
     attachInterrupt(digitalPinToInterrupt(_PPD_PM25_PIN), _handleInterruptPM25, CHANGE);
 
     Serial.println("OK");
@@ -77,29 +77,29 @@ void PPD42Sensor::begin() {
 void PPD42Sensor::end() {
     _activated = false;
     // detach the interrupts
-    detachInterrupt(_PPD_PM10_PIN);
+    detachInterrupt(_PPD_PM1_PIN);
     detachInterrupt(_PPD_PM25_PIN);
 }
 
 void PPD42Sensor::read() {
-    measuredData.PM10Ppm = readPM10Ppm();
+    measuredData.PM1Ppm = readPM1Ppm();
     measuredData.PM25Ppm = readPM25Ppm();
     _measured = true;
 }
 
-uint32_t PPD42Sensor::readPM10Ppm() {
+uint32_t PPD42Sensor::readPM1Ppm() {
     if (_activated) {
         uint32_t _currentMillis = millis();
-        uint32_t _sampledMillis = _currentMillis - _readMillisPM10;
-        uint32_t _triggeredTotalMicros = _triggeredTotalMicrosPM10;
-        _readMillisPM10 = _currentMillis;
+        uint32_t _sampledMillis = _currentMillis - _readMillisPM1;
+        uint32_t _triggeredTotalMicros = _triggeredTotalMicrosPM1;
+        _readMillisPM1 = _currentMillis;
 #ifdef DEBUG_PPD42
-        measuredData.triggeredTotalMicrosPM10 = _triggeredTotalMicrosPM10;
-        measuredData.sampledMillisPM10 = _sampledMillis;
-        measuredData.totalInterruptsPM10 = _totalInterruptsPM10;
-        _totalInterruptsPM10 = 0;
+        measuredData.triggeredTotalMicrosPM1 = _triggeredTotalMicrosPM1;
+        measuredData.sampledMillisPM1 = _sampledMillis;
+        measuredData.totalInterruptsPM1 = _totalInterruptsPM1;
+        _totalInterruptsPM1 = 0;
 #endif
-        _triggeredTotalMicrosPM10 = 0;
+        _triggeredTotalMicrosPM1 = 0;
         // We avoid floating point arithmetic and accept the inaccuracy
         return 1000 * (uint64_t) _triggeredTotalMicros / _sampledMillis;
 //        return 1000.0 * _triggeredTotalMicros / _sampledMillis;
@@ -135,14 +135,14 @@ void PPD42Sensor::write() {
 void PPD42Sensor::interrupt() {
 }
 
-void PPD42Sensor::_handleInterruptPM10() {
-    if (digitalRead(_PPD_PM10_PIN) == LOW)
+void PPD42Sensor::_handleInterruptPM1() {
+    if (digitalRead(_PPD_PM1_PIN) == LOW)
         // the sensor pulls the pin low to trigger
-        _triggerStartMicrosPM10 = micros();
+        _triggerStartMicrosPM1 = micros();
     else    // not LOW, thus end of the trigger
-        _triggeredTotalMicrosPM10 += (micros() - _triggerStartMicrosPM10);
+        _triggeredTotalMicrosPM1 += (micros() - _triggerStartMicrosPM1);
 #ifdef DEBUG_PPD42
-    _totalInterruptsPM10++;
+    _totalInterruptsPM1++;
 #endif
 }
 
@@ -172,14 +172,14 @@ String PPD42Sensor::buildReport(sensorData *sData)  {
     char response[200];
     PPD42Data * ppd42Data = reinterpret_cast <PPD42Data*>(sData);
     root["Sensor"] = "PPD42";
-    root["PM1.0"] = ppd42Data->PM10Ppm;
+    root["PM1"] = ppd42Data->PM1Ppm;
     root["PM2.5"] = ppd42Data->PM25Ppm;
 #ifdef DEBUG_PPD42
-    root["PM1.0ints"] = ppd42Data->totalInterruptsPM10;
+    root["PM1ints"] = ppd42Data->totalInterruptsPM1;
     root["PM2.5ints"] = ppd42Data->totalInterruptsPM25;
-    root["PM1.0totMic"] = ppd42Data->triggeredTotalMicrosPM10;
+    root["PM1totMic"] = ppd42Data->triggeredTotalMicrosPM1;
     root["PM2.5totMic"] = ppd42Data->triggeredTotalMicrosPM25;
-    root["PM1.0samMil"] = ppd42Data->sampledMillisPM10;
+    root["PM1samMil"] = ppd42Data->sampledMillisPM1;
     root["PM2.5samMil"] = ppd42Data->sampledMillisPM25;
 #endif
     root.printTo(response,sizeof(response));

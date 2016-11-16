@@ -22,7 +22,7 @@
   Ppd42.h - Library for ADEM PPD42 sensor.
 
 	You can test this library feeding a square wave with a known
-	duty cycle into the PM10 input pin. The readPM10() function
+	duty cycle into the PM1 input pin. The readPM1() function
 	should return a value around 500000 for a 50% duty cycle
 	square wave.
 	
@@ -41,14 +41,14 @@
 #include <ArduinoJson.h>
 #include <Arduino.h>
 struct PPD42Data : sensorData {
-    long PM10Ppm;
+    long PM1Ppm;
     long PM25Ppm;
 #ifdef DEBUG_PPD42
-    uint32_t triggeredTotalMicrosPM10;
+    uint32_t triggeredTotalMicrosPM1;
     uint32_t triggeredTotalMicrosPM25;
-    uint32_t sampledMillisPM10;
+    uint32_t sampledMillisPM1;
     uint32_t sampledMillisPM25;
-    uint32_t totalInterruptsPM10;
+    uint32_t totalInterruptsPM1;
     uint32_t totalInterruptsPM25;
 #endif
 };
@@ -65,26 +65,26 @@ class PPD42Sensor : public Sensor {
     String report(); // should report a JSON string
     virtual String buildReport(sensorData *sData);
 
-    uint32_t readPM10Ppm(); // returns the time (in ppm) the sensor triggered
+    uint32_t readPM1Ppm(); // returns the time (in ppm) the sensor triggered
     uint32_t readPM25Ppm();
 
   private:
     boolean _activated = false;
     PPD42Data measuredData;
-    static int _PPD_PM10_PIN;
+    static int _PPD_PM1_PIN;
     static int _PPD_PM25_PIN;
-    uint32_t _readMillisPM10;
+    uint32_t _readMillisPM1;
     uint32_t _readMillisPM25;
 
     // Static methods and variables for the interrupt functions
-    static void _handleInterruptPM10();
+    static void _handleInterruptPM1();
     static void _handleInterruptPM25();
-    static volatile uint32_t _triggerStartMicrosPM10;
+    static volatile uint32_t _triggerStartMicrosPM1;
     static volatile uint32_t _triggerStartMicrosPM25;
-    static volatile uint32_t _triggeredTotalMicrosPM10;
+    static volatile uint32_t _triggeredTotalMicrosPM1;
     static volatile uint32_t _triggeredTotalMicrosPM25;
 #ifdef DEBUG_PPD42
-    static volatile uint32_t _totalInterruptsPM10;
+    static volatile uint32_t _totalInterruptsPM1;
     static volatile uint32_t _totalInterruptsPM25;
 #endif
 };

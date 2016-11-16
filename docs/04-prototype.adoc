@@ -72,7 +72,7 @@ image::https://drive.google.com/file/d/0B5B2OKuFeGQfWjY5S21PNXlLc1k/view?usp=sha
 - Pin D2: I2C SDA
 - Pin D4: GPS TX
 - Pin D5: NeoPixel (+ Onboard LED)
-- Pin D12: PPD42 PM10
+- Pin D12: PPD42 PM1
 - Pin D13: PPD42 PM25
 - Pin D14: I2C SCL
 - Pin D16: (Deep Sleep) -> Usable ?
@@ -113,7 +113,7 @@ image::https://drive.google.com/file/d/0B5B2OKuFeGQfWjY5S21PNXlLc1k/view?usp=sha
 | 0 (D0)    |                                         | ->NeoPixel
 | 4 (D4)    |                                         | ->GPS TX
 | 13 (D13)  |                                         | ->PPD42 +PM25_SENSOR+
-| 12 (D12)  |                                         | ->PPD42 +PM10_SENSOR+
+| 12 (D12)  |                                         | ->PPD42 +PM1_SENSOR+
 | XPD (D16) | (Deep Sleep)                            |
 | ADC (A0)  | (10-bit 1V)                             | ->PPD42 +A_SENSOR+
 | EN        | Enable PIN                              |
@@ -129,7 +129,7 @@ image::https://drive.google.com/file/d/0B5B2OKuFeGQfWjY5S21PNXlLc1k/view?usp=sha
 | 1         | Ground                                  | ->GND line
 | 2         | Output P2 +PM25_SENSOR+                 | ->D13
 | 3         | Vcc (5V, 90mA)                          | ->3V3 line
-| 4         | Output P1 +PM10_SENSOR+                 | ->D12
+| 4         | Output P1 +PM1_SENSOR+                  | ->D12
 | 5         | Input (T1) +A_SENSOR+, threshold for P2 | ->ADC
 |==============================================================================
 

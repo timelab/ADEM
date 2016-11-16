@@ -5,12 +5,12 @@
 [options="header", width="100%"]
 |============================================================================================
 | Information                                        | Sensor                | Frequency
-| Moving                                             | Accelerometer         | 1 sec
-| Shaking                                            | Accelerometer         | 1 sec
+| Moving                                             | Accelerometer         | interrupt
+| Shaking                                            | Accelerometer         | interrupt
 | Time                                               | GPS                   | 1 sec
 | Location (longitude/latitude)                      | GPS                   | 1 sec
-| Particulate matter PM10                            | Particulate           | 30 secs
-| Particulate matter PM24                            | Particulate           | 20 secs
+| Particulate matter PM1                             | Particulate           | 20 secs
+| Particulate matter PM25                            | Particulate           | 20 secs
 | Humidity                                           | Humidity              | 1 min
 | Temperature                                        | Humidity              | 1 min
 | Pressure                                           | Barometer             | 1 min

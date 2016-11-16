@@ -33,7 +33,7 @@
 
 #define GPS_RX_PIN 4                    // to GPS module RX pin. Does not work on GPIO 16 (XPD).
 #define GPS_TX_PIN SW_SERIAL_UNUSED_PIN // we send no data to the GPS module
-//#define PPD_PM10_PIN 12                 // to PPD42NS pin 4, do not use GPIO16, does not seem to work: 12
+//#define PPD_PM1_PIN 12                  // to PPD42NS pin 4, do not use GPIO16, does not seem to work: 12
 //#define PPD_PM25_PIN 13                 // to PPD42NS pin 2, do not use GPIO16
 #define NEOPIXEL_PIN 5
 #define GPS_BAUD 9600
@@ -114,16 +114,16 @@ void loop() {
       Serial.println("Satellites: " + String(gps.satellites.value()));
     }
 
-    unsigned long PM10 = particulate.readPM10Ppm();
+    unsigned long PM1 = particulate.readPM1Ppm();
     unsigned long PM25 = particulate.readPM25Ppm();
         
-    Serial.print("PM10 ppm: ");
-    Serial.println(PM10);
+    Serial.print("PM1 ppm: ");
+    Serial.println(PM1);
     Serial.print("PM25 ppm: ");
     Serial.println(PM25);
 
 /*
-    if (PM10 > 0 || PM25 > 0) {    
+    if (PM1 > 0 || PM25 > 0) {
       NEOgreen();
     }
 */
