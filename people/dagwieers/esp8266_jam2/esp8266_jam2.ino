@@ -183,13 +183,13 @@ void loop() {
 
   delay(20);
 
-  unsigned long PM10 = particulate.readPM10Ppm();
+  unsigned long PM1 = particulate.readPM1Ppm();
   unsigned long PM25 = particulate.readPM25Ppm();
 
-  if (PM10 > 0 || PM25 > 0) {
-    if (PM10 > 0) {
-      __LOG("PM10 ppm: ");
-      __LOGLN(PM10);
+  if (PM1 > 0 || PM25 > 0) {
+    if (PM1 > 0) {
+      __LOG("PM1 ppm: ");
+      __LOGLN(PM1);
       neopixel.setPixelColor(0, 0, 70, 0);
       neopixel.show();
     }
