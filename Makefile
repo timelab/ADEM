@@ -17,6 +17,8 @@ CFLAGS += -DDEBUG_OUTPUT=Serial
 ### Set hardware type based on SKETCH
 ifeq ($(SKETCH_DIR),i2c-slave)
 HWTYPE := uno-pro-mini
+else ifeq ($(SKETCH_DIR),people/dagwieers/arduino_pro_mini_test)
+HWTYPE := uno-pro-mini
 else ifeq ($(SKETCH_DIR),people/kavers1/i2c-gps-nav)
 HWTYPE := uno-pro-mini
 else
@@ -33,7 +35,7 @@ endif
 
 ### Arduino UNO Pro Mini
 ifeq ($(HWTYPE),uno-pro-mini)
-BOARD = arduino:avr:pro:cpu=16MHzatmega328
+BOARD = arduino:avr:pro:cpu=8MHzatmega328
 SERIAL_PORT := /dev/ttyUSB0
 FLASH_BAUD := 57600
 UPLOAD_CMD = "$(ARDUINO_PATH)/hardware/tools/avr/bin/avrdude" -C $(ARDUINO_PATH)/hardware/tools/avr/etc/avrdude.conf -v -p atmega328p -c arduino -P $(SERIAL_PORT) -b $(FLASH_BAUD) -D -U flash:w:"$(BUILD_PATH)/$(SKETCH_NAME).hex"
@@ -53,9 +55,9 @@ PREFS = --prefs=build.debug_level="$(CFLAGS)" --prefs=tools.ctags.path="$(CTAGS)
 
 ### Add project custom libraries/ directory
 ifneq ($(wildcard $(SKETCH_DIR)/libraries/.*),)
-    LIBRARIES=$(SKETCH_DIR)/libraries/
+    LIBRARIES = $(SKETCH_DIR)/libraries/
 else
-    LIBRARIES=adem/libraries/
+    LIBRARIES = adem/libraries/
 endif
 
 SKETCHES = $(find $(CURDIR) -name *.ino)
@@ -97,7 +99,7 @@ serial:
 
 monitor:
 	@echo "Serial speed is $(SERIAL_BAUD)"
-	-setserial -v $(SERIAL_PORT) spd_cust divisor $$(( 24000000 / ( 2 * $(SERIAL_BAUD) ) ))
+#	-setserial -v $(SERIAL_PORT) spd_cust divisor $$(( 24000000 / ( 2 * $(SERIAL_BAUD) ) ))
 #	stty -F $(SERIAL_PORT) ispeed $(SERIAL_BAUD) ospeed $(SERIAL_BAUD) cs8 -cstopb parenb
 #	stty -F $(SERIAL_PORT) ispeed $(SERIAL_BAUD) ospeed $(SERIAL_BAUD)
 #	stty <$(SERIAL_PORT)
