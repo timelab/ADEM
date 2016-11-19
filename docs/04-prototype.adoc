@@ -73,7 +73,7 @@ image::https://drive.google.com/file/d/0B5B2OKuFeGQfWjY5S21PNXlLc1k/view?usp=sha
 - Pin D4: GPS TX
 - Pin D5: NeoPixel (+ Onboard LED)
 - Pin D12: PPD42 PM1
-- Pin D13: PPD42 PM25
+- Pin D13: PPD42 PM2.5
 - Pin D14: I2C SCL
 - Pin D16: (Deep Sleep) -> Usable ?
 - Pin A0: PPD42 A

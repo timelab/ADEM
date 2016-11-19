@@ -9,7 +9,7 @@
 
 Welcome to the ADEM project documentation.
 
-The aim of this project is to create a device that collects air polution data (PM1 and PM25 fine dust) and is mounted on bicycles to crowdsource factual air pollution information in and around the city of Ghent, Belgium.
+The aim of this project is to create a device that collects air polution data (PM1 and PM2.5 fine dust) and is mounted on bicycles to crowdsource factual air pollution information in and around the city of Ghent, Belgium.
 
 The hardware and firmware design is modular and extendable. The device can be locally reproduced and repaired.
 

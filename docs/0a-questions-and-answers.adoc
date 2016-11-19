@@ -10,7 +10,7 @@
 | Time                                               | GPS                   | 1 sec
 | Location (longitude/latitude)                      | GPS                   | 1 sec
 | Particulate matter PM1                             | Particulate           | 20 secs
-| Particulate matter PM25                            | Particulate           | 20 secs
+| Particulate matter PM2.5                           | Particulate           | 20 secs
 | Humidity                                           | Humidity              | 1 min
 | Temperature                                        | Humidity              | 1 min
 | Pressure                                           | Barometer             | 1 min
