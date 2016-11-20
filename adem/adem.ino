@@ -35,7 +35,7 @@
 #include "store_and_forward.h"
 
 #define PM1_PIN 12
-#define PM25_PIN 13
+#define PM25_PIN 13	// The PM25 we use in naming everywhere actually means PM2.5!
 #define GPS_TX_PIN 16
 #define GPS_RX_PIN 4
 #define GPS_BAUD 9600
