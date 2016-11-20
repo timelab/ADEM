@@ -28,7 +28,7 @@
 #include <battery_lipo.h>
 #include <buzzer_passive.h>
 //#include <gps_SwSerial.h>
-#include <I2Cgps.h>
+#include <gps_I2C.h>
 #include <humidity_HTU21D.h>
 #include <led_NeoPixel.h>
 #include <particulate_PPD42.h>
