@@ -187,6 +187,8 @@ Now for convenience you can do building, flashing and monitoring at once:
 
  $ make upload monitor
 
+Use CTRL+a and then k to exit monitor
+
 
 == External libraries
 
