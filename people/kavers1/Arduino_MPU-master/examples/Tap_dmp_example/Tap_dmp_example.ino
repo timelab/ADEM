@@ -102,52 +102,59 @@ void loop() {
       Serial.print("Gyro: ");Serial.print(gyro[0]/gyro_sens);Serial.print(" ");Serial.print(gyro[1]/gyro_sens);Serial.print(" ");Serial.println(gyro[2]/gyro_sens);
     if(sensors & INV_XYZ_ACCEL)
       Serial.print("Acce: ");Serial.print(accel[0]);Serial.print(" ");Serial.print(accel[1]);Serial.print(" ");Serial.println(accel[2]);
-      Serial.print("Delta:");Serial.print(accel[0]-accl[0]);Serial.print(" ");Serial.print(accel[1]-accl[1]);Serial.print(" ");Serial.println(accel[2]-accl[2]);
-      
-      if ((abs(accel[0]-accl[0]) < threshold) && (abs(accel[0]-accl[0]) < threshold) & (abs(accel[0]-accl[0]) < threshold) )
-      {  
-        if (! standstill)
-        {
-          Serial.println("standstill detection activated");
-          standstill = true;
-          state = 1;
+    Serial.print("Delta:");Serial.print(accel[0]-accl[0]);Serial.print(" ");Serial.print(accel[1]-accl[1]);Serial.print(" ");Serial.println(accel[2]-accl[2]);
+      if (state != 3)
+      {
+        if ((abs(accel[0]-accl[0]) < threshold) && (abs(accel[0]-accl[0]) < threshold) & (abs(accel[0]-accl[0]) < threshold) )
+        {  
+          if (! standstill)
+          {
+            Serial.println("standstill detection activated");
+            standstill = true;
+            state = 1;
+          }
+          else
+            if (millis() - lastmillis > 10000)
+            {
+              Serial.println("!!!!!!!!!!!!!!!! we came to a halt !!!!!!!!!!!!!!!!!");
+              dmp_enable_feature(DMP_FEATURE_TAP);
+              state = 2;
+            }
         }
         else
-          if (millis() - lastmillis > 10000)
-          {
-            Serial.println("!!!!!!!!!!!!!!!! we came to a halt !!!!!!!!!!!!!!!!!");
-            state = 2;
-          }
+        {
+          standstill = false;
+          if (state == 1) state = 0;
+          lastmillis = millis();
+        }  
       }
-      else
-      {
-        standstill = false;
-        if (state == 1) state = 0;
-        lastmillis = millis();
-      }  
       accl[0] = accel[0];
       accl[1] = accel[1];
       accl[2] = accel[2];
       Serial.print(" ");Serial.println(state);
       PL();
+      }
       for(int i=0;i<1;i++){
         switch (state){
         case 0 :
             pixels.setPixelColor(i, pixels.Color(150,0,0)); // Moderately bright green color.
             break;
         case 1 :
-            pixels.setPixelColor(i, pixels.Color(100,100,0)); // Moderately bright green color.
+            pixels.setPixelColor(i, pixels.Color(100,100,0)); // Moderately bright yellow color.
             break;
         case 2 :
-            pixels.setPixelColor(i, pixels.Color(0,150,0)); // Moderately bright green color.
+            pixels.setPixelColor(i, pixels.Color(0,150,0)); // Moderately bright red color.
             break;
         case 3 :
             pixels.setPixelColor(i, pixels.Color(0,0,150)); // Moderately bright green color.
-            delay(1000);
+            pixels.show();
+            dmp_enable_feature(DMP_FEATURE_TAP | DMP_FEATURE_SEND_RAW_ACCEL | DMP_FEATURE_SEND_CAL_GYRO | DMP_FEATURE_GYRO_CAL);
+            delay(5000);
+            state = 0;
+            standstill = false;
             break;
         }            
-      }
-      pixels.show(); // This sends the updated pixel color to the hardware.
-
+        pixels.show(); // This sends the updated pixel color to the hardware.
+        
   }
 }
