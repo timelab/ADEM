@@ -43,17 +43,19 @@ I2CGps::~I2CGps() {
 void I2CGps::begin(void) {
     int tmp = 0;
     Serial.print("Initializing GPS... ");
-    if (I2Cdev::readBytes(i2cGpsAddress,I2C_GPS_REG_VERSION,1,(uint8_t *)&tmp))
-    {
-        if ( tmp == 33)
-           Serial.println("I2C GPS OK");
-        else
-           Serial.println("I2C GPS no version match");
+    if (I2Cdev::readBytes(i2cGpsAddress,I2C_GPS_REG_VERSION,1,(uint8_t *)&tmp)) {
+        if ( tmp == 33) {
+            Serial.println("I2C GPS OK");
+	    _initialized = true;
+        }
+        else {
+           Serial.print("I2C GPS no version match, version 0x");
+           Serial.println(tmp, HEX);
+        }
     }
-    else
-    {
-        Serial.print("No I2C (GPS) slave found at ");
-        Serial.print(GPS_ADDRESS, HEX);
+    else {
+        Serial.print("No I2C (GPS) slave found at 0x");
+        Serial.println(GPS_ADDRESS, HEX);
     }
 }
 
@@ -69,7 +71,7 @@ void I2CGps::process() {
 void I2CGps::read() {
     I2C_REGISTERS regs;
    
-    if (I2Cdev::readBytes(i2cGpsAddress,0,32,(uint8_t *)&regs))
+    if (_initialized && (I2Cdev::readBytes(i2cGpsAddress,0,32,(uint8_t *)&regs)))
     {
     /// TODO fill the structure byte by byte
     

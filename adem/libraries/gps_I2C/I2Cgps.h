@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with ADEM.  If not, see <http://www.gnu.org/licenses/>.
  *
- * Copyright 2016 Dag Wieers, Lieven Blancke
+ * Copyright 2016 Koen Verstringhe
  *
  */
 
@@ -27,17 +27,17 @@
 
 #include "i2c_gps_registers.h"                 //Register definitions
 
-#define GPS_ADDRESS 20
+#define GPS_ADDRESS 0x20
 
 struct I2CGPSData : sensorData{
-    uint8_t day;
-    uint8_t month;
-    uint8_t year;
-    uint32_t time;
-    GPS_COORDINATES location;
-    uint8_t satellites;
-    uint16_t altitude;
-    uint16_t speed;
+    uint8_t day = 0;
+    uint8_t month = 0;
+    uint8_t year = 0;
+    uint32_t time = 0;
+    GPS_COORDINATES location = GPS_COORDINATES{0,0};
+    uint8_t satellites = 0;
+    uint16_t altitude = 0;
+    uint16_t speed = 0;
 };
 
 //abstract class Sensor
