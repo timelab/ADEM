@@ -74,7 +74,7 @@
 // Blink feedback, by guru_florida
 #define BLINK_INTERVAL 90
 
-//#define DEBUG_I2CGPS 1
+#define DEBUG_I2CGPS 1
 
 #ifdef DEBUG_I2CGPS
 #define SERIAL_BAUD 38400
@@ -887,6 +887,7 @@ void requestEvent() {
 void receiveEvent(int bytesReceived) {
   // Read all received bytes and store up to MAX_SENT_BYTES in receivedCommands
   uint8_t  *ptr;
+  __LOG("Received #bytes: "); __LOGLN(bytesReceived);
   for (int a = 0; a < bytesReceived; a++) {
     if (a < MAX_SENT_BYTES) {
       receivedCommands[a] = Wire.read();
@@ -894,6 +895,7 @@ void receiveEvent(int bytesReceived) {
       Wire.read();  // if we receive more data then allowed just throw it away
     }
   }
+  __LOG("receivedCommands[0]"); __LOGLN((int)receivedCommands[0]);
 
   // If the first byte received is I2C_GPS_COMMAND then the next byte is the actual command
   if (receivedCommands[0] == I2C_GPS_COMMAND) {
