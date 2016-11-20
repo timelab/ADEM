@@ -226,6 +226,9 @@ void upload_run(void *){
       case GPS_SWSERIAL:
         pSens = &gps;
         break;
+      case GPS_I2C:
+        pSens = &gps;
+        break;
       case ACCELERO_MPU6050:
         pSens = &accelerometer;
         break;

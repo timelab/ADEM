@@ -29,7 +29,6 @@
 // Software version for cross checking
 #define VERSION 33
 
-//#include "config.h"
 #include <SoftwareSerial.h>
 #include "WireMW.h"
 //Register definitions
@@ -222,6 +221,8 @@ bool GPS_NMEA_newFrame(char c) {
 
 //  __LOG(c);
   switch (c) {
+
+//    Serial.print(c);
 
     case '$':
       param = 0;
@@ -895,7 +896,7 @@ void receiveEvent(int bytesReceived) {
       Wire.read();  // if we receive more data then allowed just throw it away
     }
   }
-  __LOG("receivedCommands[0]"); __LOGLN((int)receivedCommands[0]);
+  __LOG("receivedCommands[0]: "); __LOGLN( (int) receivedCommands[0]);
 
   // If the first byte received is I2C_GPS_COMMAND then the next byte is the actual command
   if (receivedCommands[0] == I2C_GPS_COMMAND) {
