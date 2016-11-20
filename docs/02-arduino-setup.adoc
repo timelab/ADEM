@@ -156,7 +156,7 @@ The first command is using the GNU screen tool for connecting to the device, and
 
   $ make monitor SERIAL_PORT=/dev/ttyUSB0 SERIAL_BAUD=74880
 
-The default serial port for monitoring is `/dev/ttyUSB0` and the default baud rate for monitoring is `38400`.
+The default serial port for monitoring is `/dev/ttyUSB0` and the default baud rate for monitoring is `38400`. Use  `CTRL+a` and then `k` to exit monitor.
 
 
 === Building with DEBUG enabled
@@ -186,8 +186,6 @@ There is a demonstration mode that is enabled by doing:
 Now for convenience you can do building, flashing and monitoring at once:
 
  $ make upload monitor
-
-Use CTRL+a and then k to exit monitor
 
 
 == External libraries
