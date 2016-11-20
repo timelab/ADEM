@@ -30,40 +30,40 @@
 #define GPS_ADDRESS 0x20
 
 struct I2CGPSData : sensorData{
-    uint8_t day = 0;
-    uint8_t month = 0;
-    uint8_t year = 0;
-    uint32_t time = 0;
-    GPS_COORDINATES location = GPS_COORDINATES{0,0};
-    uint8_t satellites = 0;
-    uint16_t altitude = 0;
-    uint16_t speed = 0;
+  uint8_t day = 0;
+  uint8_t month = 0;
+  uint8_t year = 0;
+  uint32_t time = 0;
+  GPS_COORDINATES location = GPS_COORDINATES{0,0};
+  uint8_t satellites = 0;
+  uint16_t altitude = 0;
+  uint16_t speed = 0;
 };
 
 //abstract class Sensor
 class I2CGps : public Sensor {
 public:
-    I2CGps(int rx=4, int tx=0, int bd=9600);
-    I2CGps();
-    ~I2CGps();
+  I2CGps(int rx=4, int tx=0, int bd=9600);
+  I2CGps();
+  ~I2CGps();
 
-    //virtual function must be implemented
-    virtual void begin();
-    virtual void end();
-    virtual void read();
-    virtual void write();
-    virtual void process();
-    virtual String report();
-    virtual String buildReport(sensorData *sData);
-    
-    boolean ready = false;
+  //virtual function must be implemented
+  virtual void begin();
+  virtual void end();
+  virtual void read();
+  virtual void write();
+  virtual void process();
+  virtual String report();
+  virtual String buildReport(sensorData *sData);
+
+  boolean ready = false;
 
 private:
-    StaticJsonBuffer<200> jsonBuffer;
-    
-    I2CGPSData measuredData;
-    String FormatDateTime(I2CGPSData *data);
-    int i2cGpsAddress = GPS_ADDRESS;
+  StaticJsonBuffer<200> jsonBuffer;
+
+  I2CGPSData measuredData;
+  String FormatDateTime(I2CGPSData *data);
+  int i2cGpsAddress = GPS_ADDRESS;
 
 };
 
