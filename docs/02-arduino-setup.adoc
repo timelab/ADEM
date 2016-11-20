@@ -85,7 +85,7 @@ In order to build project code using Arduino Sketch IDE, you need to ensure that
 
 On Linux and MacOS/X you can do this with the following command:
 
-   $ cd /path/to/git/clone/ADEM
+   $ cd /path/to/git/clone/ADEM/adem
    $ ln -sf "$PWD/libraries/"* ~/Arduino/libraries/
 
 
