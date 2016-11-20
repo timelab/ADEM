@@ -70,22 +70,21 @@ void I2CGps::process() {
 
 void I2CGps::read() {
     I2C_REGISTERS regs;
-   
-    if (_initialized && (I2Cdev::readBytes(i2cGpsAddress,0,32,(uint8_t *)&regs)))
-    {
-    /// TODO fill the structure byte by byte
+    if (!_initialized) I2CGps::begin();
+    if (_initialized && (I2Cdev::readBytes(i2cGpsAddress,0,32,(uint8_t *)&regs))) {
+        /// TODO fill the structure byte by byte
     
-    // use I2CDev library readBytes(uint8_t devAddr, uint8_t regAddr, uint8_t length, uint8_t *data, uint16_t timeout=I2Cdev::readTimeout);
-    // readbytes(GPS_ADDRESS,0,32,(uint8_t) &measuredData,0)
+        // use I2CDev library readBytes(uint8_t devAddr, uint8_t regAddr, uint8_t length, uint8_t *data, uint16_t timeout=I2Cdev::readTimeout);
+        // readbytes(GPS_ADDRESS,0,32,(uint8_t) &measuredData,0)
 
-    measuredData.year = regs.year;
-    measuredData.month = regs.month;
-    measuredData.day = regs.day;
-    measuredData.time = regs.time;
-    measuredData.location = regs.gps_loc;
-    measuredData.satellites = regs.status.numsats;
-    measuredData.altitude = regs.altitude;
-    measuredData.speed = regs.ground_speed;
+        measuredData.year = regs.year;
+        measuredData.month = regs.month;
+        measuredData.day = regs.day;
+        measuredData.time = regs.time;
+        measuredData.location = regs.gps_loc;
+        measuredData.satellites = regs.status.numsats;
+        measuredData.altitude = regs.altitude;
+        measuredData.speed = regs.ground_speed;
 	_measured = true;
     }
 }

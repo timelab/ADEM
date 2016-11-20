@@ -27,7 +27,8 @@
 #include <barometer_BMP085.h>
 #include <battery_lipo.h>
 #include <buzzer_passive.h>
-#include <gps_SwSerial.h>
+//#include <gps_SwSerial.h>
+#include <I2Cgps.h>
 #include <humidity_HTU21D.h>
 #include <led_NeoPixel.h>
 #include <particulate_PPD42.h>
@@ -104,7 +105,8 @@ MPU6050Sensor accelerometer;
 BMP085Sensor barometer;
 LipoBattery battery;
 PassiveBuzzer buzzer;
-SwSerialGPS gps = SwSerialGPS(GPS_RX_PIN, GPS_TX_PIN, GPS_BAUD);
+//SwSerialGPS gps = SwSerialGPS(GPS_RX_PIN, GPS_TX_PIN, GPS_BAUD);
+I2CGps gps = I2CGps(GPS_RX_PIN, GPS_TX_PIN, GPS_BAUD);
 HTU21DFSensor humidity;
 NeoPixelLed led = NeoPixelLed(1, NEOPIXEL_PIN, NEO_GRB + NEO_KHZ800);
 PPD42Sensor particulate(PM1_PIN, PM25_PIN);
@@ -270,6 +272,7 @@ void sleep_state() {
 
   if (accelerometer.isMoving() or debug.moving) {
     next_state = STATE_GPSTEST;
+    __LOGLN("accelerometer.isMoving() or debug.moving, next_state = STATE_GPSTEST");
   } else {
     if (not buffer.empty()) {
       next_state = STATE_WIFITEST;
