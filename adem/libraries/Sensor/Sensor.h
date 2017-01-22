@@ -38,7 +38,7 @@ class Sensor {
   public:
     Sensor();
     ~Sensor();
-  //virtual function must be implemented
+    //virtual function must be implemented
     virtual void begin();
     virtual void end();
     virtual void read();
@@ -51,8 +51,9 @@ class Sensor {
     size_t dataBufferSize();
     uint8_t * dataToBuffer();
     //Sensor ();
-    protected:
-	bool _measured = false;
+  protected:
+    bool _measured = false;
+    bool _initialized = false;
     sensorData measuredData;
 };
 

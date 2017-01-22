@@ -67,8 +67,8 @@ void twi_init(void)
   twi_state = TWI_READY;
   
   // activate internal pullups for twi.
-  digitalWrite(SDA, 1);
-  digitalWrite(SCL, 1);
+  digitalWrite(SDA, LOW);
+  digitalWrite(SCL, LOW);
 
   // initialize twi prescaler and bit rate
   cbi(TWSR, TWPS0);

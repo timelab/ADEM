@@ -29,7 +29,6 @@
 // Software version for cross checking
 #define VERSION 33
 
-//#include "config.h"
 #include <SoftwareSerial.h>
 #include <Wire.h>
 //Register definitions
@@ -224,6 +223,8 @@ bool GPS_NMEA_newFrame(char c) {
 
 //  __LOG(c);
   switch (c) {
+
+//    Serial.print(c);
 
     case '$':
       param = 0;
@@ -850,6 +851,81 @@ restart:
 #endif //MTK
 
 
+<<<<<<< HEAD
+=======
+// I2C handlers
+//
+// Handler for requesting data
+
+// Read data from I2C_RAG_MAP and send back
+void requestEvent() {
+  if (receivedCommands[0] >= I2C_GPS_LST_RECEIVE) {
+    // Accessing gps data, switch new_data_flag;
+    i2c_dataset.status.new_data = 0;
+  }
+
+  // TODO: Shouldn't we limit the data written to sizeof(i2c_dataset) - receivedCommands[0] ?
+  //
+  __LOG("Send data: "); __LOGLN(receivedCommands[0]);
+
+  // Write data from the requested data register position
+  int8_t* ptr = 0;
+  ptr = (int8_t *) &i2c_dataset;
+
+//  for (int i = 0; i <= 32; i++) {
+//    int8_t  j = ptr[i];
+//    __LOG("SD "); __LOG(i); __LOG(":"); __LOGLN((char) j, HEX);
+//  }
+//  __LOGLN();
+
+  // Write up to 32 byte, since master is responsible for reading and sending NACK
+  Wire.write((uint8_t *) &i2c_dataset+receivedCommands[0], 32-receivedCommands[0]);
+
+// 32 byte limit is in the Wire library, we have to live with it unless writing our own wire library
+}
+
+
+// Handler for receiving data
+
+// When first byte is less than the REG_MAP_SIZE we just read the I2C_REG_MAP register
+// Else it is a command we have to execute
+void receiveEvent(int bytesReceived) {
+  // Read all received bytes and store up to MAX_SENT_BYTES in receivedCommands
+  uint8_t  *ptr;
+  __LOG("Received #bytes: "); __LOGLN(bytesReceived);
+  for (int a = 0; a < bytesReceived; a++) {
+    if (a < MAX_SENT_BYTES) {
+      receivedCommands[a] = Wire.read();
+    } else {
+      Wire.read();  // if we receive more data then allowed just throw it away
+    }
+  }
+  __LOG("receivedCommands[0]: "); __LOGLN( (int) receivedCommands[0]);
+
+  // If the first byte received is I2C_GPS_COMMAND then the next byte is the actual command
+  if (receivedCommands[0] == I2C_GPS_COMMAND) {
+    // Just one byte, ignore all others
+    new_command = receivedCommands[1];
+    return;
+  }
+
+  // If we just received 1 bytes then this is a read command and the first byte is the offset in the I2C_REG_MAP
+  if (bytesReceived == 1) {
+    if (receivedCommands[0] < REG_MAP_SIZE) {
+      // Read command from a given register
+      return;
+    } else {
+      // Addressing over the reg_map fallback to first byte
+      receivedCommands[0] = 0x00;
+      return;
+    }
+  }
+  __LOG("Received byte : "); __LOGLN(receivedCommands[0]);
+
+  // More than 1 byte was received, so there is definitely some data to write into a register
+  // Check for writeable registers and discard data is it's not writeable
+}
+>>>>>>> b5035aa2f595009eebd2ed6d280174eaa9cb9f00
 
 
 void blink_update() {
