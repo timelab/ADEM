@@ -63,8 +63,8 @@ typedef struct {
 
 	//Status and command registers
 	STATUS_REGISTER       status;                   // 00  status register
-  uint8_t               res1;
-  uint8_t               res2;
+  uint8_t               res1;                     // 01
+  uint8_t               res2;                     // 02
 	uint8_t               sw_version;               // 03  Version of the I2C_GPS sw
 	uint8_t               res3;                     // 04  reserved for future use
 	uint8_t               res4;                     // 05  reserved for future use
@@ -76,8 +76,8 @@ typedef struct {
 
 	//GPS & navigation data
 	GPS_COORDINATES       gps_loc;                  // 15 current location (8 byte) lat,lon
-	int32_t               nav_lat;                  // 15 The desired bank towards North (Positive) or South (Negative)      1 deg = 100 max 30deg (3000)
-	int32_t               nav_lon;                  // 19 The desired bank towards East (Positive) or West (Negative)        1 deg = 100 max 30deg (3000)
+	//int32_t               nav_lat;                  // 15 The desired bank towards North (Positive) or South (Negative)      1 deg = 100 max 30deg (3000)
+	//int32_t               nav_lon;                  // 19 The desired bank towards East (Positive) or West (Negative)        1 deg = 100 max 30deg (3000)
 	uint16_t              ground_speed;             // 23 ground speed from gps m/s*100
 	int16_t               altitude;                 // 25 gps altitude
 	uint16_t              ground_course;            // 27 GPS ground course
