@@ -1,7 +1,7 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 // I2C GPS NAV registers
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-//
+
 #define I2C_GPS_STATUS_00                            00 //(Read only)
 #define I2C_GPS_STATUS_NEW_DATA       0x01      // New data is available (after every GGA frame)
 #define I2C_GPS_STATUS_2DFIX          0x02      // 2dfix achieved
@@ -32,14 +32,14 @@
 #define I2C_GPS_REG_RES3                            05   // reserved for future use (uint8_t)
 #define I2C_GPS_REG_RES4                            06   // reserved for future use (uint8_t)
 
-#define I2C_GPS_DAY                                 07   // UTC Time from GPS in hhmmss.sss * 100 (uint32_t)(unneccesary precision) (Read Only)
-#define I2C_GPS_MONTH                               08   // UTC Time from GPS in hhmmss.sss * 100 (uint32_t)(unneccesary precision) (Read Only)
-#define I2C_GPS_YEAR                                09   // UTC Time from GPS in hhmmss.sss * 100 (uint32_t)(unneccesary precision) (Read Only)
+#define I2C_GPS_DAY                                 07   // UTC Time from GPS in hhmmss.sss * 100 (uint8_t)(unneccesary precision) (Read Only)
+#define I2C_GPS_MONTH                               08   // UTC Time from GPS in hhmmss.sss * 100 (uint8_t)(unneccesary precision) (Read Only)
+#define I2C_GPS_YEAR                                09   // UTC Time from GPS in hhmmss.sss * 100 (uint8_t)(unneccesary precision) (Read Only)
 
 #define I2C_GPS_TIME                                11   // UTC Time from GPS in hhmmss.sss * 100 (uint32_t)(unneccesary precision) (Read Only)
 #define I2C_GPS_LOCATION                            15   // current location 8 byte (lat, lon) int32_t
-#define I2C_GPS_LAT                                 15   // 
-#define I2C_GPS_LON                                 19   // 
+#define I2C_GPS_LAT                                 15   // long
+#define I2C_GPS_LON                                 19   // long
 #define I2C_GPS_GROUND_SPEED                        23   // GPS ground speed in m/s*100 (uint16_t)      (Read Only)
 #define I2C_GPS_ALTITUDE                            25   // GPS altitude in meters (uint16_t)           (Read Only)
 #define I2C_GPS_GROUND_COURSE			                  27   // GPS ground course (uint16_t)
@@ -55,34 +55,35 @@ typedef struct {
 } STATUS_REGISTER;
 
 typedef struct {
-	long      lat;            //degree*10 000 000
-	long      lon;            //degree*10 000 000
+	int32_t      lat;            //degree*10 000 000
+	int32_t      lon;            //degree*10 000 000
 } GPS_COORDINATES;
 
 typedef struct {
 
 	//Status and command registers
 	STATUS_REGISTER       status;                   // 00  status register
-  uint8_t               res1;                     // 01
-  uint8_t               res2;                     // 02
+    uint8_t               res1;                     // 01
+    uint8_t               res2;                     // 02
 	uint8_t               sw_version;               // 03  Version of the I2C_GPS sw
 	uint8_t               res3;                     // 04  reserved for future use
 	uint8_t               res4;                     // 05  reserved for future use
 	uint8_t               res5;                     // 06  reserved for future use
 	uint8_t               day;                      // 07
 	uint8_t               month;                    // 08
-	uint16_t              year;                     // 09
-	uint32_t              time;                     // 11 UTC Time from GPS
+	uint8_t               year;                     // 09
+    uint16_t              last_receive;             // 30 reserved for future use
+    uint32_t              time;                     // 10 UTC Time from GPS
 
 	//GPS & navigation data
-	GPS_COORDINATES       gps_loc;                  // 15 current location (8 byte) lat,lon
-	//int32_t               nav_lat;                  // 15 The desired bank towards North (Positive) or South (Negative)      1 deg = 100 max 30deg (3000)
-	//int32_t               nav_lon;                  // 19 The desired bank towards East (Positive) or West (Negative)        1 deg = 100 max 30deg (3000)
-	uint16_t              ground_speed;             // 23 ground speed from gps m/s*100
-	int16_t               altitude;                 // 25 gps altitude
-	uint16_t              ground_course;            // 27 GPS ground course
-	uint16_t              fix_age;                  // 29 GPS fix age 0.001 sec resolution
-	uint16_t              last_receive;              // 31 reserved for future use
+	GPS_COORDINATES       gps_loc;                  // 14 current location (8 byte) lat,lon
+	//int32_t               nav_lat;                  // 14 The desired bank towards North (Positive) or South (Negative)      1 deg = 100 max 30deg (3000)
+	//int32_t               nav_lon;                  // 18 The desired bank towards East (Positive) or West (Negative)        1 deg = 100 max 30deg (3000)
+	uint16_t              ground_speed;             // 22 ground speed from gps m/s*100
+	int16_t               altitude;                 // 24 gps altitude
+	uint16_t              ground_course;            // 26 GPS ground course
+	uint16_t              fix_age;                  // 28 GPS fix age 0.001 sec resolution
+
 
 } I2C_REGISTERS;
 
