@@ -71,18 +71,18 @@ typedef struct {
 	uint8_t               res5;                     // 06  reserved for future use
 	uint8_t               day;                      // 07
 	uint8_t               month;                    // 08
-	uint16_t              year;                     // 09
-	uint32_t              time;                     // 11 UTC Time from GPS
+	uint8_t               year;                     // 09
+    uint16_t              last_receive;             // 10 reserved for future use    
+	uint32_t              time;                     // 12 UTC Time from GPS
 
 	//GPS & navigation data
-	GPS_COORDINATES       gps_loc;                  // 15 current location (8 byte) lat,lon
-	int32_t               nav_lat;                  // 15 The desired bank towards North (Positive) or South (Negative)      1 deg = 100 max 30deg (3000)
-	int32_t               nav_lon;                  // 19 The desired bank towards East (Positive) or West (Negative)        1 deg = 100 max 30deg (3000)
-	uint16_t              ground_speed;             // 23 ground speed from gps m/s*100
-	int16_t               altitude;                 // 25 gps altitude
-	uint16_t              ground_course;            // 27 GPS ground course
-	uint16_t              fix_age;                  // 29 GPS fix age 0.001 sec resolution
-	uint16_t              res6;                     // 31 reserved for future use
+	GPS_COORDINATES       gps_loc;                  // 16 current location (8 byte) lat,lon
+//	int32_t               nav_lat;                  // 16 The desired bank towards North (Positive) or South (Negative)      1 deg = 100 max 30deg (3000)
+//	int32_t               nav_lon;                  // 20 The desired bank towards East (Positive) or West (Negative)        1 deg = 100 max 30deg (3000)
+	uint16_t              ground_speed;             // 24 ground speed from gps m/s*100
+	int16_t               altitude;                 // 26 gps altitude
+	uint16_t              ground_course;            // 28 GPS ground course
+	uint16_t              fix_age;                  // 30 GPS fix age 0.001 sec resolution
 
 } I2C_REGISTERS;
 
