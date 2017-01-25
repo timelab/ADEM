@@ -35,7 +35,7 @@ The casing cannot be completely sealed to get usable humidity and pressure readi
 
 == Can we still make changes to the PCB design ?
 
-At the moment changes to the PCB design are possible. Once we order the first badge of PCB printers, we have to be careful in making new changes.
+At the moment changes to the PCB design are possible. Once we order the first batch of PCB printers, we have to be careful in making new changes.
 
 
 == What are the essential parts for a release ?
@@ -61,7 +61,7 @@ In future revisions (betas) we expect the following additional components:
 
 Not in detail.
 
-We already established that sensor-records will be stored in memory in binary form in a ring-buffer. When the device is not moving, a WIFI fix is obtained and records are being uploaded (and buffer emptied). These records will store sensor id information, timing and sensor data. Since the GPS frequency is intermitted with sensor data the records can be properly timestamped.
+We already established that sensor-records will be stored in memory in binary form in a ring-buffer. When the device is not moving, a WIFI fix is obtained and records are uploaded (and buffer emptied). These records will store sensor id information, timing and sensor data. Since the GPS frequency is intermitted with sensor data the records can be properly timestamped.
 
 This ensures efficient use of scarce memory, while retaining augmented information to the back-end.
 

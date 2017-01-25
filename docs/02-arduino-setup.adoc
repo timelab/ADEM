@@ -26,6 +26,12 @@ https://learn.sparkfun.com/tutorials/esp8266-thing-hookup-guide/installing-the-e
 
     $ sudo yum install git
 
+    - For Windows:
+
+    Download and install from https://git-scm.com/downloads
+    If you are editing code, make sure that your editor or IDE does not modify line-endings (this would make it look like unmodified files have been changed, and/or results in extra newlines under Linux).
+    JetBrains IntelliJ IDEA is an example of a multi-platform IDE which can work with github, and provide structure to the codebase.
+
 - Set your GitHub and e-mailadress
 
     $ git config --global user.name "John Doe"
@@ -38,13 +44,17 @@ You can make a local copy of the ADEM project code by running the following git 
 
     $ git clone git@github.com:timelab/ADEM.git
 
-If you have a login, you can fork the project to your GitHub profile, and add it as a separate remote in _.git/config_.
+If you have a login, you can fork the project to your GitHub profile, and add it as a separate remote (stored in _.git/config_).
+    $ git remote add ADEMyourname https://github.com/yourgitusername/ADEM
+    $ git remote update
+
 This way you can create pull-requests by modifying your local copy and pushing it to your personal GitHub profile.
-The GitHub web-interface than proposes to create a pull-request. It helps if you use different branches for pushing changes.
+Afterwards, the GitHub web-interface proposes to create a pull-request. It helps if you use different branches for pushing changes.
 
 More information regarding the use of Git is available from: http://www.git-scm.com/book/en/v1/Git-Basics
+The forking and contributing aspect is handled on: https://www.git-scm.com/book/en/v2/GitHub-Contributing-to-a-Project
 
-More information regarding the use of GitHub is available from: https://guides.github.com/activities/hello-world/A
+More information regarding the use of GitHub is available from: https://guides.github.com/activities/hello-world/
 
 === Git daily use
 
@@ -64,9 +74,11 @@ Commit your changes to your local copy:
 
     $ git commit --all --message "Added new file with info on GitHub use."
 
-Now upload it to the online repository:
+Now upload it to the ADEM online repository, or your forked copy:
 
     $ git push
+Or
+    $ git push ADEMyourname
 
 What has happenend:
 
@@ -88,6 +100,8 @@ On Linux and MacOS/X you can do this with the following command:
    $ cd /path/to/git/clone/ADEM/adem
    $ ln -sf "$PWD/libraries/"* ~/Arduino/libraries/
 
+On Windows you will have to overwrite the Arduino "Sketchbook location" with the path to where your ADEM folder is. You can set this under File -> Preferences.
+If you are already using Arduino for other projects, alternatively, you can check out the ADEM repository to a subfolder of the default Sketchbook location.
 
 === Using make for building Arduino code
 
@@ -158,6 +172,8 @@ The first command is using the GNU screen tool for connecting to the device, and
 
 The default serial port for monitoring is `/dev/ttyUSB0` and the default baud rate for monitoring is `38400`. Use  `CTRL+a` and then `k` to exit monitor.
 
+FIXME: apparently you can use 'tail' to monitor, if you set the the terminal line settings correctly using stty; ex. stty -F /dev/serial/by-id/usb-1a86_USB2.0-Serial-if00-port0 cs8 74880 ignbrk -brkint -icrnl -imaxbel -opost -onlcr -isig -icanon -iexten -echo -echoe -echok -echoctl -echoke noflsh -ixon -crtscts
+FIXME: untested with ESP8266 (tested with Arduino Nano at different baud rate)
 
 === Building with DEBUG enabled
 
