@@ -508,6 +508,7 @@ void setup() {
   state = STATE_START;
   Wire.begin();
   Wire.setClock(100000);
+  Wire.setClockStretchLimit(50000);
 
   Serial.begin(SERIAL_BAUD);
   Serial.println();
