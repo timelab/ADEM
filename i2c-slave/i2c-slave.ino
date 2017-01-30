@@ -863,7 +863,7 @@ void blink_update() {
 
       _statusled_state = !_statusled_state;
       // Set the LED off
- //     digitalWrite(13, _statusled_state ? HIGH : LOW);
+      digitalWrite(13, _statusled_state ? HIGH : LOW);
       _statusled_timer = now + 1000;
       return;
     }
@@ -883,12 +883,12 @@ void blink_update() {
       _statusled_state = false;
       _statusled_timer = now + ((_statusled_blinks>0) ? BLINK_INTERVAL : 1000);
       // Set the LED off
-//      digitalWrite(13, LOW);
+      digitalWrite(13, LOW);
     } else {
       _statusled_state = true;
       _statusled_timer = now + BLINK_INTERVAL;
       // Set the LED on
-//      digitalWrite(13, HIGH);
+      digitalWrite(13, HIGH);
     }
   }
 }
@@ -1017,12 +1017,15 @@ void setup() {
 
   // Set up default parameters
   i2c_dataset.sw_version = VERSION;
-
+  __LOG("Version : ");
+  __LOGLN(VERSION);
   // Start I2C communication routines
   __LOG("Initializing I2C...");
   // DO NOT FORGET TO COMPILE WITH 400KHz!!! else change TWBR Speed to 100khz on Host !!!
   // Address 0x40 write 0x41 read
   Wire.begin(I2C_ADDRESS);
+  __LOG(" @ ");
+  __LOG(I2C_ADDRESS);
   __LOGLN(" OK");
 
   // Set up event handlers
@@ -1075,7 +1078,7 @@ void loop() {
         __LOG(" LON: "); __LOGLN(i2c_dataset.gps_loc.lon);
       }
 
-      if (i2c_dataset.status.gps3dfix == 1 && i2c_dataset.status.numsats >= 5) {
+      if (i2c_dataset.status.gps3dfix == 1 && i2c_dataset.status.numsats >= 4) {
         lastframe_time = i2c_dataset.last_receive;
         // Reset watchdog timer
         _watchdog_timer = i2c_dataset.last_receive;
@@ -1091,12 +1094,15 @@ void loop() {
 
   // Check watchdog timer, after 1200ms without valid packet, assume that gps communication is lost.
   if (_watchdog_timer != 0) {
-    if (_watchdog_timer+1200 < millis()) {
+    if (_watchdog_timer+2000 < (millis() && 0xFF)) {
+      __LOG(" WDT resetting registers ------------------");__LOG(_watchdog_timer);__LOG(" <-> ");__LOGLN(millis());
       i2c_dataset.status.gps2dfix = 0;
       i2c_dataset.status.gps3dfix = 0;
-      i2c_dataset.status.numsats = 0;
+//      i2c_dataset.status.numsats = 0;
       i2c_dataset.gps_loc.lat = 0;
       i2c_dataset.gps_loc.lon = 0;
+      i2c_dataset.ground_speed = 0;
+      i2c_dataset.altitude = 0;
        _watchdog_timer = 0;
       i2c_dataset.status.new_data = 1;
     }
