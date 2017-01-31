@@ -1,5 +1,15 @@
 //#define brzo
 
+#include <arduino_mpu.h>
+#include <inv_mpu.h>
+#include <inv_mpu_dmp_motion_driver.h>
+
+#include <Wire.h>
+#include <I2Cdev.h>
+#include <Adafruit_NeoPixel.h>
+
+
+
 #ifdef brzo
 #include <brzo_i2c.h>
 #else
@@ -12,7 +22,7 @@
  This example code is in the public domain
  
  The blue LED on the ESP-01 module is connected to GPIO1 
- (which is also the TXD pin; so we cannot use Serial.print() at the same time)
+ (which is also the TXD pin; so we cannot use __LOG() at the same time)
  
  Note that this sketch uses LED_BUILTIN to find the pin with the internal LED
 */
@@ -108,6 +118,67 @@ typedef struct {
 
 // ****************************************************************************** end include file
 
+#define SERIAL_BAUD 115200
+#define DEBUG
+#ifdef DEBUG
+#define __LOG(msg) Serial.print(msg)
+#define __LOGHEX(msg) Serial.print("0x");Serial.print(msg,HEX);Serial.print(" ")
+#define __LOGLN(msg) Serial.println(msg)
+#else
+#define __LOG(msg)
+#define __LOGHEX(msg)
+#define __LOGLN(msg)
+#endif
+
+#define DEFAULT_MPU_HZ 4
+#define INTERRUPT_PIN 4
+
+volatile bool dataReady = false;
+volatile uint8_t tap_direction;
+volatile uint8_t tap_count;
+void interrupt(){
+  dataReady = true;
+}
+volatile bool tapped = false;
+void tap_cb(unsigned char in1,unsigned char in2){
+  __LOGLN("Tap call back called");
+  __LOG(" IN1 : ");__LOG(in1);
+  __LOG(" IN2 : ");__LOG(in2);
+  __LOGLN("");
+  tap_direction = in1;
+  tap_count = in2;
+  tapped = true;
+}
+
+
+
+unsigned short gyro_rate, gyro_fsr;
+unsigned char accel_fsr;
+float gyro_sens;
+unsigned short accel_sens;
+
+short gyro[3], accel[3], sensors;
+unsigned char more;
+long quat[4];
+unsigned long sensor_timestamp;
+
+// ****************************************************************************** end tapdetection
+
+
+// Which pin on the Arduino is connected to the NeoPixels?
+// On a Trinket or Gemma we suggest changing this to 1
+#define PIN            0
+
+// How many NeoPixels are attached to the Arduino?
+#define NUMPIXELS   8
+
+// When we setup the NeoPixel library, we tell it how many pixels, and which pin to use to send signals.
+// Note that for older NeoPixel strips you might need to change the third parameter--see the strandtest
+// example for more information on possible values.
+Adafruit_NeoPixel pixels = Adafruit_NeoPixel(NUMPIXELS, PIN, NEO_GRB + NEO_KHZ800);
+// ****************************************************************************** end neopixels
+
+
 int ledState = LOW;     
 int nDevices = 0;
 int address = 0;
@@ -117,6 +188,34 @@ int cnt = 0;
 uint8_t buffer[3];
 I2C_REGISTERS regs;
 
+void SetTapColor(){
+
+  switch (tap_direction){
+  case 1:
+      pixels.setPixelColor(7,128 - tap_count * 16,0,0);
+      break;
+  case 2:
+      pixels.setPixelColor(7,128 + tap_count * 16,0,0);
+      break ;
+  case 3:
+      pixels.setPixelColor(7,0,128 - tap_count * 16,0);
+      break;
+  case 4:
+      pixels.setPixelColor(7,0,128 + tap_count * 16,0);
+      break;
+  case 5:
+      pixels.setPixelColor(7,0,0,128 - tap_count * 16);
+      break;
+  case 6:
+      pixels.setPixelColor(7,0,0,128 + tap_count * 16);
+      break;
+  default:
+    ;
+  }
+  pixels.show();
+  tap_direction = 0;
+  tap_count = 0;
+}
 
 unsigned long previousMillis = 0;
 const long interval = 100;
@@ -126,7 +225,12 @@ const long interval = 100;
 #define SCL_PIN 14
 
 void setup() {
-  Serial.begin(115200);
+  Serial.begin(SERIAL_BAUD);
+  pixels.begin();
+  //pixels.setBrightness(31);
+  pixels.setPixelColor(0,128,0,0);
+  pixels.show();
+  
 #ifdef brzo  
   // Setup i2c with clock stretching timeout of 2000 usec
   brzo_i2c_setup(SDA_PIN, SCL_PIN, 2000);
@@ -135,14 +239,44 @@ void setup() {
   Wire.setClockStretchLimit(50000);
 #endif
   pinMode(LED_BUILTIN, OUTPUT);
-  Serial.print("size of registers =");
-  Serial.println(sizeof(regs));
-  Serial.println((uint32_t)&regs.status - (uint32_t)&regs);
-  Serial.println((uint32_t)&regs.sw_version - (uint32_t)&regs);
-  Serial.println((uint32_t)&regs.year - (uint32_t)&regs);
-  Serial.println((uint32_t)&regs.time - (uint32_t)&regs);
-  Serial.println((uint32_t)&regs.gps_loc.lat - (uint32_t)&regs);
-  Serial.println((uint32_t)&regs.last_receive - (uint32_t)&regs);
+  __LOG("size of registers =");
+  __LOGLN(sizeof(regs));
+  __LOGLN((uint32_t)&regs.status - (uint32_t)&regs);
+  __LOGLN((uint32_t)&regs.sw_version - (uint32_t)&regs);
+  __LOGLN((uint32_t)&regs.year - (uint32_t)&regs);
+  __LOGLN((uint32_t)&regs.time - (uint32_t)&regs);
+  __LOGLN((uint32_t)&regs.gps_loc.lat - (uint32_t)&regs);
+  __LOGLN((uint32_t)&regs.last_receive - (uint32_t)&regs);
+
+
+  struct int_param_s params;
+  params.pin = INTERRUPT_PIN;
+  params.cb = interrupt;
+  __LOGLN(mpu_init(&params));
+  __LOGLN(mpu_set_sensors(INV_XYZ_GYRO | INV_XYZ_ACCEL));
+  __LOGLN(mpu_configure_fifo(INV_XYZ_GYRO | INV_XYZ_ACCEL));
+  __LOGLN(mpu_set_sample_rate(DEFAULT_MPU_HZ));
+  
+  mpu_get_sample_rate(&gyro_rate); __LOG("FIFOrate: ");__LOG(gyro_rate);__LOGLN("Hz");
+  mpu_get_gyro_fsr(&gyro_fsr); __LOG("Gyro FSR: +/- ");__LOG(gyro_fsr);__LOGLN("DPS");
+  mpu_get_accel_fsr(&accel_fsr); __LOG("Accel FSR: +/- ");__LOG(accel_fsr);__LOGLN("G");
+
+  dmp_register_tap_cb(tap_cb);
+  dmp_set_tap_axes(7); // all axis X,Y,Z
+  dmp_set_tap_thresh(1,10);
+  dmp_set_tap_thresh(2,10);
+  dmp_set_tap_thresh(3,10);
+  
+  __LOGLN(dmp_load_motion_driver_firmware());
+  __LOGLN(dmp_enable_feature(DMP_FEATURE_TAP | DMP_FEATURE_SEND_RAW_ACCEL | DMP_FEATURE_SEND_CAL_GYRO | DMP_FEATURE_GYRO_CAL));
+  __LOGLN(dmp_set_fifo_rate(DEFAULT_MPU_HZ));
+  __LOGLN(mpu_set_dmp_state(1));
+
+  dmp_set_interrupt_mode(DMP_INT_GESTURE);
+
+  mpu_get_gyro_sens(&gyro_sens);
+  mpu_get_accel_sens(&accel_sens);
+
 }
 
 void loop()
@@ -173,16 +307,15 @@ void loop()
 
     if (error == 0)
     {
-      Serial.print(millis());
-      Serial.print(" : ");
-      Serial.print("I2C - 0x");
-      if (address<16) 
-        Serial.print("0");
-      Serial.println(address,HEX);
+      __LOG(millis());
+      __LOG(" : ");
+      __LOG("I2C - ");
+      __LOGHEX(address);__LOGLN();
       if (address == 0x20)
       {
-        Serial.println("  GPS I2C slave found");
-        Serial.println("  read version number");
+        __LOGLN("  GPS I2C slave found");
+        __LOGLN("  read version number");
+        pixels.setPixelColor(1,128,0,0);
 #ifdef brzo        
         brzo_i2c_start_transaction(address, 100);
         buffer[0] = 0x03; // select temperature register
@@ -190,70 +323,108 @@ void loop()
         buffer[0] = 0x00; // select temperature register
         brzo_i2c_read(buffer, 1, false); // Read temperature, two bytes
         error = brzo_i2c_end_transaction();
-        Serial.print(" version returned = ");
-        Serial.println(buffer[0]);
-        Serial.print(" return code = ");
-        Serial.println(error);
+        __LOG(" version returned = ");
+        __LOGLN(buffer[0]);
+        __LOG(" return code = ");
+        __LOGLN(error);
 #else
         Wire.beginTransmission(address);
-        Wire.write(3);
+        Wire.write(0);
         Wire.endTransmission();
-        
-        Wire.requestFrom(address, 32);
-//        Wire.endTransmission();
-        // Wait for data to become available
-        while (cnt = Wire.available() < 1)
-        ;
-        cnt = Wire.available();
-        Serial.print(cnt);
-        Serial.print(" bytes received [");
-        uint8_t * ptr = (uint8_t *)&regs;
-        ptr = ptr + 3;
-        while (Wire.available() > 0)
+        __LOGLN("ready to receive version number. ");
+//        delay(2);
+
+        __LOG("I2C status : ");
+        __LOGLN(twi_status());
+        int bcnt = Wire.requestFrom(address, 32);
+        __LOG("I2C requestfrom : ");
+        __LOG(bcnt);
+        if (bcnt != 32)
         {
-           tmp = Wire.read();
-           *ptr++ = tmp;
-           Serial.print(tmp);
-           if (cnt>1) Serial.print(",");
-           delay(10);
+          __LOGLN("timed out !!!!!!!!!!!!!");
+          pixels.setPixelColor(6,128,128,0);
         }
-        Serial.println("]");
-
-       Serial.print("Year ");Serial.println(regs.year) ;
-       Serial.print("month ");Serial.println(regs.month);
-       Serial.print("day" );Serial.println( regs.day);
-       Serial.print("time");Serial.println( regs.time);
-       Serial.print("location");Serial.print( regs.gps_loc.lat); Serial.print(" ");Serial.println( regs.gps_loc.lon);
-       Serial.print("satellites");Serial.println( regs.status.numsats);
-       Serial.print("altitude");Serial.println( regs.altitude);
-       Serial.print("last received :");Serial.println( regs.last_receive);
-    
-
+        else          
+        {
+          __LOGLN();
+//        Wire.endTransmission();
+          // Wait for data to become available
+ /*         int timeout = 0;
+          delay(10);
+          while ((cnt = Wire.available() < 1) or (timeout++ > 10))
+            delay(1);
+            
+          cnt = Wire.available();
+          if (cnt < 1 )
+            __LOG("timed out !!!!!!!!!!!!!");
+          else          
+            __LOG(cnt);*/
+          __LOG(" bytes received [");
+          uint8_t * ptr = (uint8_t *)&regs;
+          ptr = ptr;
+          cnt = 1;
+          while (Wire.available() > 0)
+          {
+             tmp = Wire.read();
+             *ptr++ = tmp;
+             __LOG(tmp);
+             if (++cnt>1) __LOG(",");
+////             delay(10);
+          }
+          __LOGLN("]");
+  
+         __LOG("Year ");__LOGLN(regs.year) ;
+         __LOG("month ");__LOGLN(regs.month);
+         __LOG("day " );__LOGLN( regs.day);
+         __LOG("time ");__LOGLN( regs.time);
+         __LOG("location ");__LOG( regs.gps_loc.lat); __LOG(" ");__LOGLN( regs.gps_loc.lon);
+         __LOG("satellites ");__LOGLN( regs.status.numsats);
+         __LOG("altitude ");__LOGLN( regs.altitude);
+         __LOG("last received : ");__LOGLN( regs.last_receive);
+         pixels.setPixelColor(0,2 << regs.status.numsats ,0,128 * regs.status.gps2dfix);
+        }
 #endif        
       }
       nDevices++;
     }
     else if (error==4) 
     {
-      Serial.print(millis());
-      Serial.print(" : ");
-      Serial.print("Unknown error at 0x");
-      if (address<16) 
-        Serial.print("0");
-      Serial.println(address,HEX);
+      __LOG(millis());
+      __LOG(" : ");
+      __LOGHEX(address);__LOGLN();
     } 
     if (address == 127)  
     {
       if (nDevices == 0) 
       {
-        Serial.println("No I2C devices found");
+        __LOGLN("No I2C devices found");
       }
       else
       {
-        Serial.println("done");
+        __LOGLN("done");
       }
+ //     for(int i = nDevices;i>0;i--)
+ //       pixels.setPixelColor(i, pixels.Color(0,0,0));
       address = 0;
       nDevices = 0;
     }
   }
+  if (nDevices >0)
+    pixels.setPixelColor(nDevices, pixels.Color(0,150,0)); // Moderately bright green color.
+    pixels.setPixelColor(nDevices +1, pixels.Color(0,0,0)); // Moderately bright green color.
+    pixels.show(); // This sends the updated pixel col
+    if(dataReady){
+    dmp_read_fifo(gyro, accel, quat, &sensor_timestamp, &sensors, &more);
+    if(!more) dataReady=false;
+      __LOGLN("tap detected");
+      if (tapped) {
+        SetTapColor();
+        tapped = false;
+      }
+//    if(sensors & INV_XYZ_GYRO)
+//      __LOG("Gyro: ");__LOG(gyro[0]/gyro_sens);__LOG(" ");__LOG(gyro[1]/gyro_sens);__LOG(" ");__LOGLN(gyro[2]/gyro_sens);
+//    if(sensors & INV_XYZ_ACCEL)
+//      __LOG("Acce: ");__LOG(accel[0]/(float)accel_sens);__LOG(" ");__LOG(accel[1]/(float)accel_sens);__LOG(" ");__LOGLN(accel[2]/(float)accel_sens);
+//      __LOGLN();
+    }
 }
