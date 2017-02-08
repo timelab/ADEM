@@ -158,7 +158,7 @@ The default serial port for flashing depends on the HWTYPE but usually is `/dev/
 
 === Connecting to the device
 
-The most "stable" way to connect to your device is unfortunately still using the Serial Monitor of the Arduino Sketch IDE. This has something to do with the serial port initialization and baud rate. Once the port is initialized (at 74880), you can usually switch to using this:
+The most "stable" way to connect to your device is unfortunately still using the Serial Monitor of the Arduino Sketch IDE. This has something to do with the serial port initialization and baud rate. Once the port is initialized in the Arduino IDE (at 74880 baud), you can exit the IDE and switch to using this:
 
   $ make monitor
 
