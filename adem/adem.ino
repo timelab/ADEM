@@ -179,8 +179,10 @@ void battery_run(void *) {
 
 void gps_run(void *) {
   gps.read();
-  buffer.write((char *)gps.dataToBuffer(), gps.dataBufferSize());
-  __LOGLN(gps.report());
+  if (gps.ready) {
+    buffer.write((char *)gps.dataToBuffer(), gps.dataBufferSize());
+    __LOGLN(gps.report());
+  }
 }
 
 void humidity_run(void *) {
@@ -275,7 +277,8 @@ void sleep_state() {
 
   if (accelerometer.isMoving() or debug.moving) {
     next_state = STATE_GPSTEST;
-    __LOGLN("accelerometer.isMoving() or debug.moving, next_state = STATE_GPSTEST");
+    if (accelerometer.isMoving()) __LOGLN("accelerometer.isMoving(), next_state = STATE_GPSTEST");
+    if (debug.moving) __LOGLN("debug.moving, next_state = STATE_GPSTEST");
   } else {
     if (not buffer.empty()) {
       next_state = STATE_WIFITEST;
@@ -296,11 +299,12 @@ void config_state() {
 
 void gpstest_state() {
 
-  //gps.read();
-
   if (accelerometer.isMoving() or debug.moving) {
+    gps.read();
     if (gps.ready or debug.gpsready) {
       next_state = STATE_COLLECT;
+      if (gps.ready) __LOGLN("gps.ready, next_state = STATE_COLLECT");
+      if (debug.gpsready) __LOGLN("debug.gpsready, next_state = STATE_COLLECT");
     }
   } else {
     next_state = STATE_SLEEP;
@@ -556,6 +560,7 @@ void loop() {
 
   if (state != next_state) {
     __LOG("Transition from "); __LOG(states[state]); __LOG(" to "); __LOGLN(states[next_state]);
+
 
     switch(state) {
 
