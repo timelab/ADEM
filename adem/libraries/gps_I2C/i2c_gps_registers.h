@@ -48,6 +48,7 @@
 
 
 typedef struct {
+	uint8_t    ready : 1;
 	uint8_t    new_data : 1;
 	uint8_t    gps2dfix : 1;
 	uint8_t    gps3dfix : 1;

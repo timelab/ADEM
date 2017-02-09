@@ -121,13 +121,13 @@ const char UBLOX_INIT[] PROGMEM = {
 };
 #endif
 
-
+// storage for the I2C communication.
 static I2C_REGISTERS i2c_dataset;
-
+// stack of commands that can be send by the I2C master
 static uint8_t receivedCommands[MAX_SENT_BYTES];
 // New command received (!=0)
 static uint8_t new_command;
-
+// software serial to communicate with the GPS module, freeing up standard serial for debugging/programming
 static SoftwareSerial *swSerial = new SoftwareSerial(GPS_RX_PIN, GPS_TX_PIN, false);
 
 // Blink code variables
@@ -1050,7 +1050,7 @@ void loop() {
 //#pragma region while serial available
 
   while (swSerial->available()) {
-    i2c_dataset.last_receive = millis();
+    _watchdog_timer = millis;
 //    __LOG("serial data received from GPS ");
 
   #ifdef NMEA
@@ -1079,12 +1079,16 @@ void loop() {
       }
 
       if (i2c_dataset.status.gps3dfix == 1 && i2c_dataset.status.numsats >= 4) {
-        lastframe_time = i2c_dataset.last_receive;
-        // Reset watchdog timer
-        _watchdog_timer = i2c_dataset.last_receive;
+        lastframe_time = _watchdog_timer;
       }
+      
+      
       // Have new data at this point anyway
       i2c_dataset.status.new_data = 1;
+      i2c_dataset.last_receive = _watchdog_timer;
+      i2c_dataset.status.ready = i2c_dataset.status.gps2dfix == 1 && i2c_dataset.status.numsats >= 4 && 
+                                 i2c_dataset.gps_loc.lat != 0 && i2c_dataset.gps_loc.lon != 0 &&
+                                 i2c_dataset.month != 0 && i2c_dataset.day != 0;
 
     } // new frame
   } // while
@@ -1094,15 +1098,17 @@ void loop() {
 
   // Check watchdog timer, after 1200ms without valid packet, assume that gps communication is lost.
   if (_watchdog_timer != 0) {
-    if (_watchdog_timer+2000 < (millis() && 0xFF)) {
+    if (_watchdog_timer+2000 < (millis() )) {
       __LOG(" WDT resetting registers ------------------");__LOG(_watchdog_timer);__LOG(" <-> ");__LOGLN(millis());
+      i2c_dataset.status.ready = false;
+/*  are we clearing out data or just flagging we are not ready ????
       i2c_dataset.status.gps2dfix = 0;
       i2c_dataset.status.gps3dfix = 0;
 //      i2c_dataset.status.numsats = 0;
       i2c_dataset.gps_loc.lat = 0;
       i2c_dataset.gps_loc.lon = 0;
       i2c_dataset.ground_speed = 0;
-      i2c_dataset.altitude = 0;
+      i2c_dataset.altitude = 0;*/
        _watchdog_timer = 0;
       i2c_dataset.status.new_data = 1;
     }
