@@ -45,19 +45,26 @@ void I2CGps::begin(void) {
   Serial.print("Initializing GPS... ");
   if (I2Cdev::readBytes(i2cGpsAddress,I2C_GPS_REG_VERSION,1,(uint8_t *)&tmp)) {
     if ( tmp == 33) {
-      Serial.println("I2C GPS OK");
-     _initialized = true;
+      Serial.println("I2C GPS OK, waiting for location fix");
+      _initialized = true;
     } else {
+      _initialized = false;
       Serial.print("I2C GPS no version match, version 0x");
       Serial.println(tmp, HEX);
     }
   } else {
+    _initialized = false;
     Serial.print("No I2C (GPS) slave found at 0x");
     Serial.println(GPS_ADDRESS, HEX);
+    delay(100); // give the I2C slave GPS a bit of time to initialize
+    yield();
   }
 }
 
 void I2CGps::end() {
+    _initialized = false;
+    _measured = false;
+    ready = false;
 }
 
 void I2CGps::write() {
@@ -68,6 +75,7 @@ void I2CGps::process() {
 
 void I2CGps::read() {
   I2C_REGISTERS regs;
+  if (!_initialized) I2CGps::begin();
 
   if (_initialized && (I2Cdev::readBytes(i2cGpsAddress,0,32,(uint8_t *)&regs))) {
     /// TODO fill the structure byte by byte
@@ -84,6 +92,30 @@ void I2CGps::read() {
     measuredData.altitude = regs.altitude;
     measuredData.speed = regs.ground_speed;
     _measured = true;
+
+    ready = (regs.status.gps2dfix == 1) && (measuredData.speed != 65535) && (measuredData.altitude != 65535) && (measuredData.location.lat != -1) && (measuredData.location.lon != -1) && (measuredData.location.lat != 0) && (measuredData.location.lon != 0) && (measuredData.month != 0) && (measuredData.day != 0);
+    if (ready) {
+      Serial.println("GPS READY");
+      Serial.print("  gps2dfix="); Serial.println(regs.status.gps2dfix);
+      Serial.print("  speed="); Serial.println(measuredData.speed);
+      Serial.print("  altitude="); Serial.println( measuredData.altitude);
+      Serial.print("  lat="); Serial.println(measuredData.location.lat);
+      Serial.print("  lon="); Serial.println(measuredData.location.lon);
+    } else {
+      _measured = false;
+      Serial.print("GPS waiting for fix, satellites="); Serial.println(regs.status.numsats);
+      /* Serial.print("  gps2dfix="); Serial.println(regs.status.gps2dfix);
+      Serial.print("  speed="); Serial.println(measuredData.speed);
+      Serial.print("  altitude="); Serial.println( measuredData.altitude);
+      Serial.print("  lat="); Serial.println(measuredData.location.lat);
+      Serial.print("  lon="); Serial.println(measuredData.location.lon);
+      */
+      delay (100); // give the GPS some time
+      yield();
+    }
+  } else {
+    _measured = false;
+    ready = false;
   }
 }
 

@@ -29,7 +29,8 @@ endif
 ifeq ($(HWTYPE),sparkfun-esp8266-thing)
 BOARD = esp8266:esp8266:thing
 SERIAL_PORT := /dev/ttyUSB0
-FLASH_BAUD := 921600
+#FLASH_BAUD := 921600
+FLASH_BAUD := 460800
 UPLOAD_CMD = "$(ARDUINO15_PATH)/packages/esp8266/tools/esptool/0.4.9/esptool" -v -cd nodemcu -cb $(FLASH_BAUD) -cp $(SERIAL_PORT) -ca 0x00000 -cf "$(BUILD_PATH)/$(SKETCH_NAME).bin"
 endif
 
