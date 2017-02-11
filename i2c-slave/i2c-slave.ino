@@ -1036,6 +1036,7 @@ void setup() {
   __LOGLN("-------------------- initializing done -------------------");
 }
 
+volatile uint32_t _watchdog_timer = 0;
 
 // Main loop
 void loop() {
@@ -1043,14 +1044,13 @@ void loop() {
   static uint8_t GPS_fix_home;
   static uint8_t _command_wp;
   static uint8_t _command;
-  static uint32_t _watchdog_timer = 0;
   uint8_t axis;
   uint16_t fraction3[2];
 
 //#pragma region while serial available
 
   while (swSerial->available()) {
-    _watchdog_timer = millis;
+    _watchdog_timer = millis();
 //    __LOG("serial data received from GPS ");
 
   #ifdef NMEA
@@ -1095,10 +1095,10 @@ void loop() {
 //#pragma endregion
 
   blink_update();
-
+ 
   // Check watchdog timer, after 1200ms without valid packet, assume that gps communication is lost.
   if (_watchdog_timer != 0) {
-    if (_watchdog_timer+2000 < (millis() )) {
+    if ((_watchdog_timer+2000) < (millis() )) {
       __LOG(" WDT resetting registers ------------------");__LOG(_watchdog_timer);__LOG(" <-> ");__LOGLN(millis());
       i2c_dataset.status.ready = false;
 /*  are we clearing out data or just flagging we are not ready ????
@@ -1109,8 +1109,8 @@ void loop() {
       i2c_dataset.gps_loc.lon = 0;
       i2c_dataset.ground_speed = 0;
       i2c_dataset.altitude = 0;*/
-       _watchdog_timer = 0;
-      i2c_dataset.status.new_data = 1;
+      _watchdog_timer = 0;
+      i2c_dataset.status.new_data = 0;
     }
   }
 
