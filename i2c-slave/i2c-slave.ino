@@ -851,7 +851,7 @@ restart:
 #endif //MTK
 
 
-
+uint8_t _last_cnt = 0;
 
 void blink_update() {
 
@@ -869,11 +869,15 @@ void blink_update() {
     }
 
     if (_statusled_blinks == 0) {
-      if (i2c_dataset.status.gps3dfix == 1) {
-        _statusled_blinks = 3;
-      } else if(i2c_dataset.status.gps2dfix == 1) {
-         _statusled_blinks = 2;
-      } else {
+      if ((i2c_dataset.status.gps2dfix == 1) |  (i2c_dataset.status.gps3dfix == 1)) {
+        if (i2c_dataset.res3 != _last_cnt) {
+          _statusled_blinks = 3;
+          _last_cnt = i2c_dataset.res3;
+        }
+        else 
+          _statusled_blinks = 2;
+      }
+      else {
         _statusled_blinks = 1;
       }
     }
