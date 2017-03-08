@@ -64,7 +64,7 @@ private:
   I2CGPSData measuredData;
   String FormatDateTime(I2CGPSData *data);
   int i2cGpsAddress = GPS_ADDRESS;
-
+  int8_t readBytes(uint8_t devAddr, uint8_t regAddr, uint8_t length, uint8_t *data);
 };
 
 #endif

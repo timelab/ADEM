@@ -20,6 +20,8 @@
 
 #include "gps_I2C.h"
 
+#define I2CDEV_SERIAL_DEBUG
+
 #ifdef DEBUG_GPS
 #define __LOG(msg) Serial.print(msg)
 #define __LOGLN(msg) Serial.println(msg)
@@ -43,7 +45,8 @@ I2CGps::~I2CGps() {
 void I2CGps::begin(void) {
   int tmp = 0;
   Serial.print("Initializing GPS... ");
-  if (I2Cdev::readBytes(i2cGpsAddress,I2C_GPS_REG_VERSION,1,(uint8_t *)&tmp)) {
+//  if (I2Cdev::readBytes(i2cGpsAddress,I2C_GPS_REG_VERSION,1,(uint8_t *)&tmp)) {
+  if (I2CGps::readBytes(i2cGpsAddress,I2C_GPS_REG_VERSION,1,(uint8_t *)&tmp)) {
     if ( tmp == 33) {
       Serial.println("I2C GPS OK, waiting for location fix");
       _initialized = true;
@@ -77,7 +80,8 @@ void I2CGps::read() {
   I2C_REGISTERS regs;
   if (!_initialized) I2CGps::begin();
 
-  if (_initialized && (I2Cdev::readBytes(i2cGpsAddress,0,32,(uint8_t *)&regs))) {
+//  if (_initialized && (I2Cdev::readBytes(i2cGpsAddress,0,32,(uint8_t *)&regs))) {
+  if (_initialized && (I2CGps::readBytes(i2cGpsAddress,0,32,(uint8_t *)&regs) == 32)) {    
     /// TODO fill the structure byte by byte
 
     // use I2CDev library readBytes(uint8_t devAddr, uint8_t regAddr, uint8_t length, uint8_t *data, uint16_t timeout=I2Cdev::readTimeout);
@@ -96,11 +100,12 @@ void I2CGps::read() {
     ready = (regs.status.gps2dfix == 1) && (measuredData.speed != 65535) && (measuredData.altitude != 65535) && (measuredData.location.lat != -1) && (measuredData.location.lon != -1) && (measuredData.location.lat != 0) && (measuredData.location.lon != 0) && (measuredData.month != 0) && (measuredData.day != 0);
     if (ready) {
       Serial.println("GPS READY");
-      Serial.print("  gps2dfix="); Serial.println(regs.status.gps2dfix);
-      Serial.print("  speed="); Serial.println(measuredData.speed);
+      Serial.print("  lat="); Serial.print(measuredData.location.lat);
+      Serial.print("  lon="); Serial.print(measuredData.location.lon);
+      Serial.print("  gps2dfix="); Serial.print(regs.status.gps2dfix);
+      Serial.print("  speed="); Serial.print(measuredData.speed);
       Serial.print("  altitude="); Serial.println( measuredData.altitude);
-      Serial.print("  lat="); Serial.println(measuredData.location.lat);
-      Serial.print("  lon="); Serial.println(measuredData.location.lon);
+      
     } else {
       _measured = false;
       Serial.print("GPS waiting for fix, satellites="); Serial.println(regs.status.numsats);
@@ -110,7 +115,7 @@ void I2CGps::read() {
       Serial.print("  lat="); Serial.println(measuredData.location.lat);
       Serial.print("  lon="); Serial.println(measuredData.location.lon);
       */
-      delay (100); // give the GPS some time
+//      delay (100); // give the GPS some time
       yield();
     }
   } else {
@@ -155,4 +160,52 @@ String I2CGps::buildReport(sensorData *sData)  {
 
   root.printTo(response, sizeof(response));
   return response;
+}
+//// replace I2CDEV readbytes for esp implementation
+int8_t I2CGps::readBytes(uint8_t devAddr, uint8_t regAddr, uint8_t length, uint8_t *data) {
+    #ifdef I2CDEV_SERIAL_DEBUG
+        Serial.print("I2C (0x");
+        Serial.print(devAddr, HEX);
+        Serial.print(") reading ");
+        Serial.print(length, DEC);
+        Serial.print(" bytes from 0x");
+        Serial.print(regAddr, HEX);
+        Serial.print("...");
+    #endif
+
+    int8_t count = 0;
+    uint32_t t1 = millis();
+    delay(10);
+    Wire.beginTransmission(devAddr);
+    Wire.write(regAddr);
+    Wire.endTransmission();
+    yield();
+    #ifdef I2CDEV_SERIAL_DEBUG
+        Serial.print(" requestfrom ");
+    #endif
+
+    int8_t receiv_count = Wire.requestFrom(devAddr, (uint8_t)min(length , BUFFER_LENGTH));
+    #ifdef I2CDEV_SERIAL_DEBUG
+        Serial.print(receiv_count,DEC);
+        Serial.print( " received ");
+    #endif
+    if (receiv_count >= min(length,BUFFER_LENGTH)) {
+      for (; Wire.available(); count++) {
+          data[count] = Wire.read();
+          #ifdef I2CDEV_SERIAL_DEBUG
+              Serial.print(data[count], HEX);
+              if (count + 1 < length) Serial.print(" ");
+          #endif
+      }
+    }
+    // check for timeout
+    if ( receiv_count == 0 ) count = -1; // timeout
+
+    #ifdef I2CDEV_SERIAL_DEBUG
+        Serial.print(". Done (");
+        Serial.print(count, DEC);
+        Serial.println(" read).");
+    #endif
+
+    return count;
 }
