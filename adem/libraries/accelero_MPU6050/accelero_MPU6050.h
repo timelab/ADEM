@@ -41,7 +41,7 @@
 
 #define DEFAULT_MPU_HZ 4
 
-#define INTERRUPT_PIN 5
+#define INTERRUPT_PIN 4
 
 struct MPU6050SensorData : sensorData {
     float _accel_X;
@@ -51,7 +51,7 @@ struct MPU6050SensorData : sensorData {
     float _gyro_X;
     float _gyro_Y;
     float _gyro_Z;
-    long _timestamp;
+    long  _timestamp;
 };
 
 
@@ -68,6 +68,7 @@ class MPU6050Sensor : public Sensor{
     virtual void read();
     virtual void write();
     virtual void process();
+    void configdmp();
     uint8_t* bufferData();
     String bufferedReport(uint8_t* buffer);
     virtual String report();
@@ -78,7 +79,7 @@ class MPU6050Sensor : public Sensor{
     void enableLowPower(bool status);
     bool isMoving();
     bool shaken = false;
-    float movingThreshold = 0.78;
+    float movingThreshold = 1.1;
     long  notmovingDelay = 20000L;
     //MPU6050Sensor ();
   protected:
@@ -92,6 +93,7 @@ class MPU6050Sensor : public Sensor{
     long quat[4];
     unsigned long _sensorTimestamp;
     unsigned long _movingTimestamp;
+    bool _initialized = false;
     
      // Static methods and variables for the interrupt functions
     static void mpu_interrupt();
