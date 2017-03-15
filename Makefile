@@ -97,13 +97,12 @@ clean:
 serial:
 	@echo "Serial speed is $(SERIAL_BAUD)"
 	-setserial -v $(SERIAL_PORT) spd_cust divisor $$(( 24000000 / ( 2 * $(SERIAL_BAUD) ) ))
+#	stty <$(SERIAL_PORT) $(SERIAL_BAUD)
 	cat <$(SERIAL_PORT)
-#	cu --line $(SERIAL_PORT) --speed $(SERIAL_BAUD)
 
 monitor:
 	@echo "Serial speed is $(SERIAL_BAUD)"
-#	-setserial -v $(SERIAL_PORT) spd_cust divisor $$(( 24000000 / ( 2 * $(SERIAL_BAUD) ) ))
+	-setserial -v $(SERIAL_PORT) spd_cust divisor $$(( 24000000 / ( 2 * $(SERIAL_BAUD) ) ))
 #	stty -F $(SERIAL_PORT) ispeed $(SERIAL_BAUD) ospeed $(SERIAL_BAUD) cs8 -cstopb parenb
-#	stty -F $(SERIAL_PORT) ispeed $(SERIAL_BAUD) ospeed $(SERIAL_BAUD)
-#	stty <$(SERIAL_PORT)
+#	stty <$(SERIAL_PORT) $(SERIAL_BAUD)
 	screen -fn $(SERIAL_PORT) $(SERIAL_BAUD),cs8,ixon,ixoff,-istrip,-ctsrts,-dsrdtr
