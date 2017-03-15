@@ -29,6 +29,7 @@ endif
 ifeq ($(HWTYPE),sparkfun-esp8266-thing)
 BOARD = esp8266:esp8266:thing
 SERIAL_PORT := /dev/ttyUSB0
+#SERIAL_BAUD := 74880
 #FLASH_BAUD := 921600
 FLASH_BAUD := 460800
 UPLOAD_CMD = "$(ARDUINO15_PATH)/packages/esp8266/tools/esptool/0.4.9/esptool" -v -cd nodemcu -cb $(FLASH_BAUD) -cp $(SERIAL_PORT) -ca 0x00000 -cf "$(BUILD_PATH)/$(SKETCH_NAME).bin"
@@ -37,7 +38,8 @@ endif
 ### Arduino UNO Pro Mini
 ifeq ($(HWTYPE),uno-pro-mini)
 BOARD = arduino:avr:pro:cpu=8MHzatmega328
-SERIAL_PORT := /dev/ttyUSB0
+SERIAL_PORT := /dev/ttyUSB1
+SERIAL_BAUD := 115200
 FLASH_BAUD := 57600
 UPLOAD_CMD = "$(ARDUINO_PATH)/hardware/tools/avr/bin/avrdude" -C $(ARDUINO_PATH)/hardware/tools/avr/etc/avrdude.conf -v -p atmega328p -c arduino -P $(SERIAL_PORT) -b $(FLASH_BAUD) -D -U flash:w:"$(BUILD_PATH)/$(SKETCH_NAME).hex"
 endif
@@ -51,7 +53,7 @@ FLASH_BAUD := 115200
 UPLOAD_CMD = "$(ARDUINO_PATH)/hardware/tools/avr/bin/avrdude" -C $(ARDUINO_PATH)/hardware/tools/avr/etc/avrdude.conf -v -p atmega328p -c arduino -P $(SERIAL_PORT) -b $(FLASH_BAUD) -D -U flash:w:"$(BUILD_PATH)/$(SKETCH_NAME).hex"
 endif
 
-CTAGS = $(ARDUINO_PATH)/tools-builder/ctags/5.8-arduino10
+CTAGS = $(ARDUINO_PATH)/tools-builder/ctags/5.8-arduino11
 PREFS = --prefs=build.debug_level="$(CFLAGS)" --prefs=tools.ctags.path="$(CTAGS)"
 
 ### Add project custom libraries/ directory
