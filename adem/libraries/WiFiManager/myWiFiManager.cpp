@@ -257,6 +257,10 @@ boolean myWiFiManager::autoConnect(char const *apName, char const *apPassword) {
     //connected
     return true;
   }
+  if (_shouldSleep) {
+    WiFi.mode(WIFI_OFF);
+    return false;
+  }
 
   return startConfigPortal(apName, apPassword);
 }
@@ -344,7 +348,7 @@ int myWiFiManager::connectWifi(String ssid, String pass) {
     WiFi.begin(ssid.c_str(), pass.c_str());
     connRes = waitForConnectResult();
   } else {
-    if (WiFi.SSID()) {
+    if (WiFi.SSID() && WiFi.SSID() != "") {
       DEBUG_WM("Using last saved values, should be faster : ");
       DEBUG_WM_LN(WiFi.SSID());
       //trying to fix connection in progress hanging
@@ -383,9 +387,13 @@ int myWiFiManager::connectWifi(String ssid, String pass) {
             for (int j = 1; j < 5; j++) {
               if (WiFi.SSID(indices[i])  == _listSSID[j]) {
                 DEBUG_WM("try to connect to ");
-                DEBUG_WM_LN(_listSSID[j].c_str());
+                DEBUG_WM(_listSSID[j].c_str());
+                DEBUG_WM(" #  ");
+                DEBUG_WM(_listPWD[j].c_str());
                 WiFi.begin(_listSSID[j].c_str(),_listPWD[j].c_str());
                 connRes = waitForConnectResult();
+                DEBUG_WM(" -->  ");
+                DEBUG_WM_LN(connRes);
                 break;
               }
             }
@@ -411,7 +419,7 @@ uint8_t myWiFiManager::waitForConnectResult() {
   if (_connectTimeout == 0) {
     return WiFi.waitForConnectResult();
   } else {
-    DEBUG_WM_LN (F("Waiting for connection result with time out"));
+   // DEBUG_WM_LN (F("Waiting for connection result with time out"));
     unsigned long start = millis();
     boolean keepConnecting = true;
     uint8_t status;
@@ -419,12 +427,13 @@ uint8_t myWiFiManager::waitForConnectResult() {
       status = WiFi.status();
       if (millis() > start + _connectTimeout) {
         keepConnecting = false;
-        DEBUG_WM_LN (F("Connection timed out"));
+      //  DEBUG_WM_LN (F("Connection timed out"));
       }
       if (status == WL_CONNECTED || status == WL_CONNECT_FAILED) {
         keepConnecting = false;
       }
       delay(100);
+      yield();
     }
     return status;
   }
@@ -500,6 +509,10 @@ void myWiFiManager::setMinimumSignalQuality(int quality) {
 
 void myWiFiManager::setBreakAfterConfig(boolean shouldBreak) {
   _shouldBreakAfterConfig = shouldBreak;
+}
+
+void myWiFiManager::setSleepAfterAutoConnect(boolean shouldSleep) {
+  _shouldSleep = shouldSleep;
 }
 
 //// =============================================================================================

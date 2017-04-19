@@ -129,6 +129,8 @@ class myWiFiManager
     void          addParameter(myWiFiManagerParameter *p);
     //if this is set, it will exit after config, even if connection is unsucessful.
     void          setBreakAfterConfig(boolean shouldBreak);
+    //if this is set, it will go to wifi off when no connection is found
+    void          setSleepAfterAutoConnect(boolean shouldSleep);
     //if this is set, try WPS setup when starting (this will delay config portal for up to 2 mins)
     //TODO
     //if this is set, customise style
@@ -169,6 +171,7 @@ class myWiFiManager
     int           _minimumQuality         = -1;
     boolean       _removeDuplicateAPs     = true;
     boolean       _shouldBreakAfterConfig = false;
+    boolean       _shouldSleep            = false;
     boolean       _tryWPS                 = false;
 
     const char*   _customHeadElement      = "";
