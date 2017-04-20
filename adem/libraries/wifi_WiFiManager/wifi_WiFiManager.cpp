@@ -21,7 +21,9 @@
 #include "wifi_WiFiManager.h"
 
 WiFiManagerWifi::WiFiManagerWifi() {
-    WiFiManager wifimanager;
+    myWiFiManager wifimanager;
+    sprintf(SSID, "ADEM-%d", ESP.getChipId());
+    _initialized = false;
 }
 
 WiFiManagerWifi::~WiFiManagerWifi() {
@@ -37,6 +39,7 @@ void WiFiManagerWifi::begin() {
     // Only consider APs with signal over 15%
     wifimanager.setMinimumSignalQuality(15);
     Serial.println("OK");
+    _initialized = true;
 }
 
 void WiFiManagerWifi::end() {
@@ -58,16 +61,20 @@ void WiFiManagerWifi::sleep() {
     //wifi_set_sleep_type(LIGHT_SLEEP_T);
     WiFi.disconnect();
     WiFi.mode(WIFI_OFF);
-    WiFi.forceSleepBegin();
+    //KOV WiFi.forceSleepBegin();
+    //KOV delay(1); // needed to go to sleep
 
     Serial.println("OK");
 }
 
 void WiFiManagerWifi::start_ap(char SSID[20]) {
+    if (!_initialized) begin();
     // Wake WIFI
-    WiFi.forceSleepWake();
+    //KOV WiFi.forceSleepWake();
+    //KOV delay(1); // needed to wakeup the modem
 
     // Start ConfigPortal and wait for submit or timeout
+    WiFi.begin();
     if (wifimanager.startConfigPortal(SSID)) {
         connected_once = true;
         // Log that wifi-connection worked
@@ -77,16 +84,20 @@ void WiFiManagerWifi::start_ap(char SSID[20]) {
 }
 
 void WiFiManagerWifi::start_client() {
+    if (!_initialized) begin();
     // Wake WIFI
-    WiFi.forceSleepWake();
-
+    //KOV WiFi.forceSleepWake();
+    //KOV delay (1); //needed to wakeup the modem
     // Start ConfigPortal and wait for submit or timeout
+    wifimanager.setSleepAfterAutoConnect(true);
     if (wifimanager.autoConnect()) {
         connected = true;
         // Log that wifi-connection worked
     } else {
         // Log that wifi-connection failed
         connected = false;
+        WiFi.disconnect();
+        WiFi.mode(WIFI_OFF);
     }
 }
 

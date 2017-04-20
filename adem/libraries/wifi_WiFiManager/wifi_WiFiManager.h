@@ -22,7 +22,7 @@
 #define _WiFiManagerWifi_h
 
 #include <Arduino.h>
-#include <WiFiManager.h>
+#include <myWiFiManager.h>
 
 class WiFiManagerWifi {
 public:
@@ -45,8 +45,9 @@ public:
     bool connected_once = false;
 
 private:
-    WiFiManager wifimanager;
-
+    myWiFiManager wifimanager;
+    bool _initialized;
+    char SSID[20];
 };
 
 #endif

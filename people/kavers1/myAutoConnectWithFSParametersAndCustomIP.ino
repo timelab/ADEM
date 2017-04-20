@@ -186,7 +186,7 @@ void setup() {
   //set config save notify callback
   myWifiManager.setSaveConfigCallback(saveConfigCallback);
 
-  demo = new myWiFiManagerParameter("Demo",SetupDemoPage);
+  demo = new myWiFiManagerParameter("Demo",SetupDemoPage());
   //add all your parameters here
   myWifiManager.addParameter(custom_config);
   myWifiManager.addParameter(demo);
