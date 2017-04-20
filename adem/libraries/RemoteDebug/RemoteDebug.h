@@ -83,7 +83,7 @@ class RemoteDebug: public Print
 	void setFilter(String filter);
 	void setNoFilter();
 
-	boolean isActive(uint8_t debugLevel = DEBUG);
+	boolean isActive(uint8_t debugLevel = DEBUGLVL);
 
 	// Print
 
@@ -92,7 +92,7 @@ class RemoteDebug: public Print
     // Debug levels
 
 	static const uint8_t VERBOSE = 0;
-	static const uint8_t DEBUG = 1;
+	static const uint8_t DEBUGLVL = 1;
 	static const uint8_t INFO = 2;
 	static const uint8_t WARNING = 3;
 	static const uint8_t ERROR = 4;
@@ -106,8 +106,8 @@ private:
 
 	boolean _connected = false;				// Client is connected ?
 
-	uint8_t _clientDebugLevel = DEBUG;		// Level setted by user in telnet
-	uint8_t _lastDebugLevel = DEBUG;		// Last Level setted by active()
+	uint8_t _clientDebugLevel = DEBUGLVL;		// Level setted by user in telnet
+	uint8_t _lastDebugLevel = DEBUGLVL;		// Last Level setted by active()
 
 	boolean _showTime = false;				// Show time in millis
 

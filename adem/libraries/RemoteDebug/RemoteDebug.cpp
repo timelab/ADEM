@@ -36,16 +36,13 @@ String bufferPrint = "";
 void RemoteDebug::begin (String hostName) {
 
     // Initialize server telnet
-
     telnetServer.begin();
     telnetServer.setNoDelay(true);
 
     // Reserve space to buffer of print writes
-
     bufferPrint.reserve(BUFFER_PRINT);
 
     // Host name of this device
-
     _hostName = hostName;
 }
 
@@ -54,13 +51,11 @@ void RemoteDebug::begin (String hostName) {
 void RemoteDebug::stop () {
 
     // Stop Client
-
     if (telnetClient && telnetClient.connected()) {
         telnetClient.stop();
     }
 
     // Stop server
-
     telnetServer.stop();
 }
 
@@ -71,72 +66,49 @@ void RemoteDebug::handle() {
 //uint32_t timeBegin = millis();
 
     // look for Client connect trial
-
     if (telnetServer.hasClient()) {
-
       if (!telnetClient || !telnetClient.connected()) {
-
         if (telnetClient) { // Close the last connect - only one supported
-
           telnetClient.stop();
-
         }
 
         // Get telnet client
-
         telnetClient = telnetServer.available();
-
         telnetClient.flush();  // clear input buffer, else you get strange characters
-
         _lastTimeCommand = millis(); // To mark time for inactivity
 
         // Show the initial message
-
         showHelp ();
 
         // Empty buffer in
-
         while(telnetClient.available()) {
             telnetClient.read();
         }
-
       }
     }
 
     // Is client connected ? (to reduce overhead in active)
-
     _connected = (telnetClient && telnetClient.connected());
 
     // Get command over telnet
-
     if (_connected) {
 
         while(telnetClient.available()) {  // get data from Client
-
             // Get character
-
             char character = telnetClient.read();
 
             // Newline or CR
-
             if (character == '\n' || character == '\r') {
 
                 // Process the command
-
                 if (_command.length() > 0) {
-
                     processCommand();
-
                 }
-
                 _command = ""; // Init it for next command
-
             } else if (isPrintable(character)) {
 
                 // Concat
-
                 _command.concat(character);
-
             }
         }
 
@@ -245,7 +217,7 @@ size_t RemoteDebug::write(uint8_t character) {
             if (_showColors == false) {
                 switch (_lastDebugLevel) {
                     case VERBOSE:   show = "v"; break;
-                    case DEBUG:     show = "d"; break;
+                    case DEBUGLVL:     show = "d"; break;
                     case INFO:      show = "i"; break;
                     case WARNING:   show = "w"; break;
                     case ERROR:     show = "e"; break;
@@ -253,7 +225,7 @@ size_t RemoteDebug::write(uint8_t character) {
             } else {
                 switch (_lastDebugLevel) {
                     case VERBOSE:   show = "v"; break;
-                    case DEBUG:     show = COLOR_BACKGROUND_GREEN; show.concat(COLOR_BLACK); show.concat("d"); break;
+                    case DEBUGLVL:     show = COLOR_BACKGROUND_GREEN; show.concat(COLOR_BLACK); show.concat("d"); break;
                     case INFO:      show = COLOR_BACKGROUND_WHITE; show.concat(COLOR_BLACK); show.concat("i"); break;
                     case WARNING:   show = COLOR_BACKGROUND_YELLOW; show.concat(COLOR_BLACK); show.concat("w"); break;
                     case ERROR:     show = COLOR_BACKGROUND_RED; show.concat(COLOR_BLACK);  show.concat("e"); break;
@@ -318,22 +290,17 @@ size_t RemoteDebug::write(uint8_t character) {
             send.concat(") ");
 
             // Write to telnet buffered
-
             if (_connected || _serialEnabled) {  // send data to Client
                 bufferPrint = send;
             }
         }
-
         _newLine = false;
-
     }
 
     // Print ?
-
     boolean doPrint = false;
 
     // New line ?
-
     if (character == '\n') {
 
         bufferPrint.concat("\r"); // Para clientes windows - 29/01/17
@@ -509,7 +476,7 @@ void RemoteDebug::processCommand() {
 
         // Debug level
 
-        _clientDebugLevel = DEBUG;
+        _clientDebugLevel = DEBUGLVL;
 
         telnetClient.println("* Debug level setted to Debug");
 
