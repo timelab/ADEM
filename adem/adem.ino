@@ -35,6 +35,7 @@
 #include <wifi_WiFiManager.h>
 #include "store_and_forward.h"
 
+
 #define PM1_PIN 12
 #define PM25_PIN 13	// The PM25 we use in naming everywhere actually means PM2.5!
 #define GPS_TX_PIN 16
@@ -43,9 +44,31 @@
 #define NEOPIXEL_PIN 0
 #define SERIAL_BAUD 74880
 
+#define TELNET
+
+#ifdef TELNET
+#include "RemoteDebug.h"        //https://github.com/JoaoLopesF/RemoteDebug
+
+RemoteDebug Telnet;
+
+// Host name
+
+#define HOST_NAME "rem-debug" // PLEASE CHANGE IT
+
+// Time
+
+uint32_t mLastTime = 0;
+uint32_t mTimeSeconds = 0;
+#endif
+
 #ifdef DEBUG
-#define __LOG(msg) Serial.print(msg)
-#define __LOGLN(msg) Serial.println(msg)
+  #ifdef TELNET
+    #define __LOG(msg) Telnet.print(msg)
+    #define __LOGLN(msg) Telnet.println(msg)
+  #else
+    #define __LOG(msg) Serial.print(msg)
+    #define __LOGLN(msg) Serial.println(msg)
+  #endif
 #else
 #define __LOG(msg)
 #define __LOGLN(msg)
@@ -459,9 +482,9 @@ void gpstest_to_collect() {
   humidity.begin();
   humidity_task = TickerTask::createPeriodic(&humidity_run, 10000);
   humidity_task->name = "humidity";
-  particulate.begin();
-  particulate_task = TickerTask::createPeriodic(&particulate_run, 10000);
-  particulate_task->name = "particulate";
+//  particulate.begin();
+//  particulate_task = TickerTask::createPeriodic(&particulate_run, 10000);
+//  particulate_task->name = "particulate";
 }
 
 void collect_to_gpstest() {
@@ -517,6 +540,9 @@ void setup() {
   Serial.begin(SERIAL_BAUD);
   Serial.println();
   Serial.println("Serial communication... OK");
+#ifdef TELNET  
+  TelnetSetup();
+#endif
 
   __LOGLN();
   __LOGLN("Setup started in DEBUG mode.");
@@ -632,7 +658,10 @@ void loop() {
   }
 
   schedule->tick();
-
+  
+#ifdef TELNET
+    Telnet.handle();
+#endif  
 #ifndef DEMO
 #ifdef DEBUG
   if (Serial.available() > 0) {
@@ -674,3 +703,93 @@ void loop() {
 }
 
 // vim:syntax=cpp
+
+
+void TelnetSetup()
+{
+
+#ifdef HOSTNAME
+    if (MDNS.begin(HOST_NAME)) {
+        Serial.print("* MDNS responder started. Hostname -> ");
+        Serial.println(HOST_NAME);
+    }
+    // Register the services
+
+    // MDNS.addService("http", "tcp", 80);   // Web server - discomment if you need this
+
+    MDNS.addService("telnet", "tcp", 23); // Telnet server RemoteDebug
+#endif
+Telnet.begin(HOST_NAME); // Initiaze the telnet server
+
+    Telnet.setResetCmdEnabled(true); // Enable the reset command
+
+    //Debug.showDebugLevel(false); // To not show debug levels
+    //Debug.showTime(true); // To show time
+    //Debug.showProfiler(true); // To show profiler - time between messages of Debug
+                                // Good to "begin ...." and "end ...." messages
+
+    Telnet.showProfiler(true); // Profiler
+    Telnet.showColors(true); // Colors
+
+    // Debug.setSerialEnabled(true); // if you wants serial echo - only recommended if ESP8266 is plugged in USB
+
+    String helpCmd =  "gps for gpsfix\nmove for moving\nshake to shake\nwifi for wifi";
+    
+    Telnet.setHelpProjectsCmds(helpCmd);
+    Telnet.setCallBackProjectCmds(&processCmdRemoteDebug);
+
+    // This sample
+
+    Serial.println("* Arduino RemoteDebug Library");
+    Serial.println("*");
+    Serial.print("* WiFI connected. IP address: ");
+    Serial.println(WiFi.localIP());
+    Serial.println("*");
+    Serial.println("* Please use the telnet client (telnet for Mac/Unix or putty and others for Windows)");
+    Serial.println("*");
+    Serial.println("* This sample will send messages of debug in all levels.");
+    Serial.println("*");
+    Serial.println("* Please try change debug level in telnet, to see how it works");
+    Serial.println("*");
+
+}
+
+#ifdef TELNET // Not in PRODUCTION
+
+// Process commands from RemoteDebug
+
+void processCmdRemoteDebug() {
+
+    String lastCmd = Telnet.getLastCommand();
+    lastCmd.toLowerCase();
+    switch (lastCmd[0]) {
+        case 'g':
+          debug.gpsready = not debug.gpsready;
+          __LOG("debug.gpsready is "); __LOGLN(debug.gpsready?"on.":"off.");
+          break;
+        case 'm':
+          debug.moving = not debug.moving;
+          __LOG("debug.moving is "); __LOGLN(debug.moving?"on.":"off.");
+          break;
+        case 'r':
+          __LOGLN("Restarting system.");
+          next_state = STATE_RESET;
+          break;
+        case 's':
+          debug.shaken = not debug.shaken;
+          __LOG("debug.shaken is "); __LOGLN(debug.shaken?"on.":"off.");
+          break;
+        case 'w':
+          debug.wifi = not debug.wifi;
+          __LOG("debug.wifi is "); __LOGLN(debug.wifi?"on.":"off.");
+          break;
+        case 'h':
+        case '?':
+          debug_help();
+          break;
+        default:
+          __LOGLN("No action.");
+    }
+
+}
+#endif
