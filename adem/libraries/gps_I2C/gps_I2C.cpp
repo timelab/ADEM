@@ -20,7 +20,7 @@
 
 #include "gps_I2C.h"
 
-#define I2CDEV_SERIAL_DEBUG
+//#define I2CDEV_SERIAL_DEBUG
 
 #ifdef DEBUG_GPS
 #define __LOG(msg) Serial.print(msg)
