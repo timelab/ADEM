@@ -119,8 +119,8 @@ void MPU6050Sensor::read() {
         measuredData._accel_Y = (float)accel[1]/accel_sens;
         measuredData._accel_Z = (float)accel[2]/accel_sens;
         __LOG("MPU: accel data 1: ");__LOG(accel[0]);
-        __LOG("2: ");__LOG(accel[1]);
-        __LOG("3: ");__LOGLN(accel[2]);
+        __LOG(" 2: ");__LOG(accel[1]);
+        __LOG(" 3: ");__LOGLN(accel[2]);
         
         // calculate the total acceleration. 
         // No square root taken for speed reason
@@ -144,8 +144,8 @@ void MPU6050Sensor::read() {
         measuredData._gyro_Y = gyro[1]/gyro_sens;
         measuredData._gyro_Z = gyro[2]/gyro_sens;
         __LOG("MPU: gyro data 1: ");__LOG(gyro[0]);
-        __LOG("2: ");__LOG(gyro[1]);
-        __LOG("3: ");__LOGLN(gyro[2]);
+        __LOG(" 2: ");__LOG(gyro[1]);
+        __LOG(" 3: ");__LOGLN(gyro[2]);
         _measured = true;
     }
     else

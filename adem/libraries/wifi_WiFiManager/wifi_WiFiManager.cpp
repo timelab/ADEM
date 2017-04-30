@@ -34,7 +34,7 @@ void WiFiManagerWifi::begin() {
     Serial.print("Initializing WiFiManager... ");
     // Set ConfigPortal timeout as AP
     wifimanager.setConfigPortalTimeout(300);
-    // Set connect timeout for WiFiManager client
+    // Set connect timeout for WiFiManager client is sec
     wifimanager.setConnectTimeout(15);
     // Only consider APs with signal over 15%
     wifimanager.setMinimumSignalQuality(15);
@@ -89,6 +89,7 @@ void WiFiManagerWifi::start_client() {
     //KOV WiFi.forceSleepWake();
     //KOV delay (1); //needed to wakeup the modem
     // Start ConfigPortal and wait for submit or timeout
+    ETS_GPIO_INTR_DISABLE(); // stop interrupt comming in
     wifimanager.setSleepAfterAutoConnect(true);
     if (wifimanager.autoConnect()) {
         connected = true;
@@ -99,6 +100,7 @@ void WiFiManagerWifi::start_client() {
         WiFi.disconnect();
         WiFi.mode(WIFI_OFF);
     }
+    ETS_GPIO_INTR_ENABLE();
 }
 
 String WiFiManagerWifi::report()  {

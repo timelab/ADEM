@@ -60,8 +60,8 @@ void I2CGps::begin(void) {
     Serial.print("No I2C (GPS) slave found at 0x");
     Serial.println(GPS_ADDRESS, HEX);
     delay(100); // give the I2C slave GPS a bit of time to initialize
-    yield();
   }
+  yield();
 }
 
 void I2CGps::end() {

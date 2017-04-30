@@ -199,6 +199,7 @@ void accelerometer_run(void *) {
   while (accelerometer.hasData()) {
     accelerometer.read();
     buffer.write((char *)accelerometer.dataToBuffer(), accelerometer.dataBufferSize());
+    yield(); // we can have lots of data stpp WDT crashes
 //    __LOGLN(accelerometer.report());
   }
 }
@@ -509,14 +510,15 @@ void collect_to_gpstest() {
   barometer.end();
   humidity_task->clear();
   humidity.end();
-  particulate_task->clear();
-  particulate.end();
+//  particulate_task->clear();
+//  particulate.end();
 }
 
 void sleep_to_wifitest() {
 
-  // Resume wificlient task
-
+  // Resume wificlient tas
+  // disable the accelero interrupts while connecting to wifi
+  
 }
 
 void wifitest_to_sleep() {
@@ -528,6 +530,8 @@ void wifitest_to_sleep() {
 }
 
 void wifitest_to_upload() {
+  // TODO KOV enable accelero interrupts
+  
   if (not upload_task) {
     upload_task = TickerTask::createIdle(&upload_run);
   }
@@ -615,8 +619,7 @@ void loop() {
     //{  
       _lst_msg = 0;
       debug.breakcont = false;  // clear continue flag in break mode
-      __LOGLN();
-    
+      __LOG(" >>> >>> >>> moving to next state : "); __LOG(states[state]);__LOG("  -->  ");__LOG(states[next_state]); __LOGLN("<<< <<< <<<");
       switch(state) {
 
         case STATE_START:
@@ -730,6 +733,14 @@ void loop() {
             }
             __LOGLN("debug.breakcontinue set ");
             break;
+          case 'e':
+            __LOGLN("Trying to connect to wifi ");
+            yield();
+            ETS_GPIO_INTR_DISABLE();
+            delay(1000);
+            wifi.start_client();
+            ETS_GPIO_INTR_ENABLE();
+            break; 
 
         case 'h':
         case '?':
@@ -834,6 +845,12 @@ void processCmdRemoteDebug() {
               debug.breakcont = true;
             }
             __LOGLN("debug.breakcontinue set ");
+            break; 
+          case 'e':
+            __LOGLN("Trying to connect to wifi ");
+            yield();
+            delay(1000);
+            wifi.start_client();
             break; 
         case 'h':
         case '?':

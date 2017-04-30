@@ -243,6 +243,7 @@ boolean myWiFiManager::autoConnect(char const *apName, char const *apPassword) {
 
 
   // attempt to connect; should it fail, fall back to AP
+  yield();
   WiFi.mode(WIFI_STA);
   // read eeprom for ssid and pass
   //String ssid = getSSID();
@@ -427,11 +428,12 @@ uint8_t myWiFiManager::waitForConnectResult() {
       status = WiFi.status();
       if (millis() > start + _connectTimeout) {
         keepConnecting = false;
-      //  DEBUG_WM_LN (F("Connection timed out"));
+        DEBUG_WM_LN (F("Connection timed out"));
       }
       if (status == WL_CONNECTED || status == WL_CONNECT_FAILED) {
         keepConnecting = false;
       }
+      DEBUG_WM (F("."));
       delay(100);
       yield();
     }
