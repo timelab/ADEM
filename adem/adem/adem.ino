@@ -250,36 +250,52 @@ void upload_run(void *){
   int s = 0;
   String strReport;
   Sensor * pSens = NULL;
-  __LOG("buffered report : #");
+  __LOG("buffered report ");
   if (~ buffer.empty()){
     lID = buffer.peek();
-    buffer.nack();
+    __LOG(" for sensor ID : ");__LOG(lID);
     switch (lID){
       case BAROMETER_BMP085:
+        __LOG(" BAROMETER");
         pSens = &barometer;
         break;
       case HUMIDITY_HTU21D:
+        __LOG(" HUMIDITY");
         pSens = &humidity;
         break;
       case PARTICULATE_PPD42:
+        __LOG(" PPD42");
         pSens = &particulate;
         break;
       case GPS_SWSERIAL:
+        __LOG(" GPS SERIAL");
         pSens = &gps;
         break;
       case GPS_I2C:
+        __LOG(" GPS I2C");
         pSens = &gps;
         break;
       case ACCELERO_MPU6050:
+        __LOG(" ACCELEROMETER");
         pSens = &accelerometer;
         break;
+      default :
+        return;
 /// TODO : what if ID is not recognized ? How to recover from corrupt data ?
-
     }
-
+    buffer.nack();
+    
+    __LOG(" get buffer for sensor for nrbytes = ");__LOG(pSens->dataBufferSize());
     s = buffer.peek(&lbuf[0], pSens->dataBufferSize());
-    if (s)
+    if (s > 0 ) {
+      __LOGLN("");
+      __LOG(lbuf[0]);
+      for (int i = 1; i < s;i++){
+        __LOG(lbuf[i]); __LOG(",");
+      }
+      __LOGLN("");
       strReport = pSens->bufferedReport((uint8_t *)&lbuf[0]);
+    }  
     __LOG(strReport);
     __LOGLN("#");
     // send off strReport to datastore
@@ -741,9 +757,36 @@ void loop() {
             wifi.start_client();
             ETS_GPIO_INTR_ENABLE();
             break; 
-
+        case '0' : // STATE_START
+                  state = STATE_START;next_state = STATE_START;
+                  break;
+        case '1' : //STATE_DEMO,
+                  state = STATE_START;next_state = STATE_START;
+                  break;
+        case '2' : //STATE_SLEEP,
+                  state = STATE_SLEEP;next_state = STATE_SLEEP;
+                  break;
+        case '3' : //STATE_CONFIG,
+                  state = STATE_SLEEP;next_state = STATE_SLEEP;
+                  break;
+        case '4' : //STATE_GPSTEST,
+                  state = STATE_GPSTEST;next_state = STATE_GPSTEST;
+                  break;
+        case '5' : //STATE_COLLECT,
+                  state = STATE_COLLECT;next_state = STATE_COLLECT;
+                  break;
+        case '6' : //STATE_WIFITEST,
+                  state = STATE_WIFITEST;next_state = STATE_WIFITEST;
+                  break;
+        case '7' : //STATE_UPLOAD,
+                  state = STATE_UPLOAD;next_state = STATE_UPLOAD;
+                  break;
+        case '8' : //STATE_RESET,
+                  state = STATE_RESET;next_state = STATE_RESET;
+                  break;
         case 'h':
         case '?':
+          __LOG(" >>> >>> >>> current state is : "); __LOG(states[state]);
           debug_help();
           break;
         default:
@@ -846,12 +889,39 @@ void processCmdRemoteDebug() {
             }
             __LOGLN("debug.breakcontinue set ");
             break; 
-          case 'e':
+        case 'e':
             __LOGLN("Trying to connect to wifi ");
             yield();
             delay(1000);
             wifi.start_client();
             break; 
+        case '0' : // STATE_START
+                  next_state = STATE_START;
+                  break;
+        case '1' : //STATE_DEMO,
+                  state = STATE_START;
+                  break;
+        case '2' : //STATE_SLEEP,
+                  state = STATE_SLEEP;
+                  break;
+        case '3' : //STATE_CONFIG,
+                  state = STATE_CONFIG;
+                  break;
+        case '4' : //STATE_GPSTEST,
+                  state = STATE_GPSTEST;
+                  break;
+        case '5' : //STATE_COLLECT,
+                  state = STATE_COLLECT;
+                  break;
+        case '6' : //STATE_WIFITEST,
+                  state = STATE_WIFITEST;
+                  break;
+        case '7' : //STATE_UPLOAD,
+                  state = STATE_UPLOAD;
+                  break;
+        case '8' : //STATE_RESET,
+                  state = STATE_RESET;
+                  break;
         case 'h':
         case '?':
           debug_help();

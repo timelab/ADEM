@@ -19,6 +19,17 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #include "store_and_forward.h"
 #include <ctype.h>
 
+#define DEBUG
+
+#ifdef DEBUG
+#define __LOG(msg) Serial.print(msg)
+#define __LOGLN(msg) Serial.println(msg)
+#else
+#define __LOG(msg)
+#define __LOGLN(msg)
+#endif
+
+
 storeAndForwardBuf::storeAndForwardBuf(size_t size) :
 next(NULL), _size(size), _buf(new char[size]), _bufend(_buf + size), _begin(_buf), _end(_begin) {
 	if (_buf == 0) _size = 0;
@@ -92,6 +103,7 @@ int storeAndForwardBuf::peek() {
 
 size_t storeAndForwardBuf::peek(char *dst, size_t size) {
 	size_t bytes_available = available();
+	__LOG("store and forward peek : ");__LOG(bytes_available);__LOG(" for "); __LOG(size);
 	size_t size_to_read = (size < bytes_available) ? size : bytes_available;
 	size_t size_read = size_to_read;
 	char * begin = _begin;
@@ -104,19 +116,21 @@ size_t storeAndForwardBuf::peek(char *dst, size_t size) {
 	}
 	memcpy(dst, begin, size_to_read);
 	_next = wrap_if_bufend(_begin + size_to_read);
+	__LOG(" and read ");__LOGLN(size_read);
 	return size_read;
 }
 
 int storeAndForwardBuf::read() {
 	if (empty())
 		return -1;
-
+    __LOG("----- store and forward "); __LOGLN( _end - _begin);
 	char result = *_begin;
 	_begin = wrap_if_bufend(_begin + 1);
 	return static_cast<int>(result);
 }
 
 size_t storeAndForwardBuf::read(char* dst, size_t size) {
+	__LOG("----- store and forward "); __LOGLN( _end - _begin);
 	size_t bytes_available = available();
 	size_t size_to_read = (size < bytes_available) ? size : bytes_available;
 	size_t size_read = size_to_read;
@@ -136,13 +150,14 @@ size_t storeAndForwardBuf::read(char* dst, size_t size) {
 size_t storeAndForwardBuf::write(char c) {
 	if (full())
 		return 0;
-
+    __LOG("+++++ store and forward ");   __LOGLN( _end - _begin);
 	*_end = c;
 	_end = wrap_if_bufend(_end + 1);
 	return 1;
 }
 
 size_t storeAndForwardBuf::write(const char* src, size_t size) {
+	__LOG("+++++ store and forward ");__LOGLN( _end - _begin);
 	size_t bytes_available = room();
 	size_t size_to_write = (size < bytes_available) ? size : bytes_available;
 	size_t size_written = size_to_write;

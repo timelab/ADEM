@@ -37,6 +37,8 @@ volatile bool MPU6050Sensor::_dataReady = false;
 
 
 MPU6050Sensor::MPU6050Sensor() {
+    
+    measuredData.ID = ACCELERO_MPU6050;
 	_measured = false;
 }
 MPU6050Sensor::~MPU6050Sensor(){
@@ -46,6 +48,7 @@ MPU6050Sensor::~MPU6050Sensor(){
 
 void MPU6050Sensor::begin () {
     __LOG(" initializing accelero :");
+    __LOG("size of sensor data = "); __LOG(sizeof(measuredData));__LOG("/");__LOGLN(dataBufferSize());
     if (! _initialized)
         configdmp();
   /*struct int_param_s params;
@@ -108,6 +111,7 @@ void MPU6050Sensor::end () {
 void MPU6050Sensor::read() {
  
   if(_dataReady){
+    
     __LOG("MPU: ");__LOG("before dmp_read ");
     dmp_read_fifo(gyro, accel, quat, &_sensorTimestamp, &sensors, &more);
     __LOGLN(_sensorTimestamp);
@@ -121,7 +125,9 @@ void MPU6050Sensor::read() {
         __LOG("MPU: accel data 1: ");__LOG(accel[0]);
         __LOG(" 2: ");__LOG(accel[1]);
         __LOG(" 3: ");__LOGLN(accel[2]);
-        
+         __LOG("MPU: accel calc 1: ");__LOG(measuredData._accel_X);
+        __LOG(" 2: ");__LOG(measuredData._accel_Y);
+        __LOG(" 3: ");__LOGLN(measuredData._accel_Z);
         // calculate the total acceleration. 
         // No square root taken for speed reason
         // We only need this value to compare to a threshold so we can live with the square value
@@ -190,7 +196,7 @@ bool MPU6050Sensor::hasData()
 void MPU6050Sensor::write() {
 }
 
-void MPU6050Sensor::mpu_interrupt() {
+ICACHE_RAM_ATTR void MPU6050Sensor::mpu_interrupt() {
  _dataReady = true;
 }
 
@@ -220,7 +226,7 @@ String MPU6050Sensor::report()  {
     return buildReport(&measuredData);
  }
 
-String MPU6050Sensor::buildReport(MPU6050SensorData *sData){
+String MPU6050Sensor::buildReport(sensorData *sData){
     StaticJsonBuffer<200> jsonBuffer;
     JsonObject& root = jsonBuffer.createObject();
     char response[200];
@@ -233,9 +239,9 @@ String MPU6050Sensor::buildReport(MPU6050SensorData *sData){
     root["Gyro_X"] = (float)tmpData->_gyro_X;
     root["Gyro_Y"] = (float)tmpData->_gyro_Y;
     root["Gyro_Z"] = (float)tmpData->_gyro_Z;
-    
+    __LOGLN("json built");
     root.printTo(response, sizeof(response));
-    
+    __LOGLN("response built");
     return response;
 }
    
@@ -248,8 +254,10 @@ uint8_t * MPU6050Sensor::dataToBuffer(){
 };
 
 String MPU6050Sensor::bufferedReport(uint8_t * bufferedData){
+    __LOGLN("copying buffered data to report");
     MPU6050SensorData tmpData;
     memcpy(&tmpData,bufferedData,sizeof(measuredData));
+    __LOGLN("building buffered report");
     buildReport(&tmpData);
 }
 

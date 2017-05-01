@@ -48,7 +48,7 @@ class Sensor {
     String bufferedReport(uint8_t* buffer);
     virtual String report();
     virtual String buildReport(sensorData *sData);
-    size_t dataBufferSize();
+    virtual size_t dataBufferSize();
     uint8_t * dataToBuffer();
     //Sensor ();
   protected:

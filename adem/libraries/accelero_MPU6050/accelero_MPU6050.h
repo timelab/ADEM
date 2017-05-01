@@ -72,7 +72,7 @@ class MPU6050Sensor : public Sensor{
     uint8_t* bufferData();
     String bufferedReport(uint8_t* buffer);
     virtual String report();
-    virtual String buildReport(MPU6050SensorData *sData);
+    virtual String buildReport(sensorData *sData);
     size_t dataBufferSize();
     uint8_t * dataToBuffer();
     bool hasData();

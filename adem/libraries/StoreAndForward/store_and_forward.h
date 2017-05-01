@@ -3,7 +3,7 @@
 *
 * ADEM is free software: you can redistribute it and/or modify
 * it under the terms of the GNU General Public License as published by
-* the Free Software Foundation, either version 3 of the License,·
+* the Free Software Foundation, either version 3 of the License,ï¿½
 * (at your option) any later version.
 *
 * ADEM is distributed in the hope that it will be useful,
@@ -52,6 +52,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #ifndef __storeAndForwardBuf_h
 #define __storeAndForwardBuf_h
 
+#include <Arduino.h>
 #include <stddef.h>
 #include <stdint.h>
 #include <string.h>
