@@ -90,7 +90,9 @@ void WiFiManagerWifi::start_client() {
     //KOV delay (1); //needed to wakeup the modem
     // Start ConfigPortal and wait for submit or timeout
     ETS_GPIO_INTR_DISABLE(); // stop interrupt comming in
+    Serial.println(" interrupts disabled ");
     wifimanager.setSleepAfterAutoConnect(true);
+    Serial.println(" wifi sleep after autoconnect ");
     if (wifimanager.autoConnect()) {
         connected = true;
         // Log that wifi-connection worked
@@ -101,6 +103,7 @@ void WiFiManagerWifi::start_client() {
         WiFi.mode(WIFI_OFF);
     }
     ETS_GPIO_INTR_ENABLE();
+    Serial.println(" interrupts enabled ");
 }
 
 String WiFiManagerWifi::report()  {

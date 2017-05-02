@@ -31,6 +31,7 @@
 #include <Arduino.h>
 
 #include <Sensor.h>
+#define ARDUINOJSON_ENABLE_ARDUINO_STRING 1 // see ArduinoJson wiki
 #include <ArduinoJson.h>
 #include <arduino_mpu.h>
 #include <inv_mpu.h>

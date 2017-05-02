@@ -301,10 +301,14 @@ void upload_run(void *){
     // send off strReport to datastore
     // if ACK of storage then ack buffer
     boolean success = true;
-    if (success)
+    if (success){
+        __LOGLN("acknowledge buffer");
         buffer.ack();
-    else
+    }
+    else {
+        __LOGLN("nack buffer");
         buffer.nack();
+    }
   }
 }
 
@@ -377,9 +381,12 @@ void collect_state() {
 }
 
 void wifitest_state() {
-
+  __LOG("in wifi test ");
+  //ETS_GPIO_INTR_DISABLE();
+  
   wifi.start_client();
-
+  __LOG("wifi client started ");
+  // ETS_GPIO_INTR_ENABLE();
   if (wifi.connected or debug.wifi) {
     next_state = STATE_UPLOAD;
   }
@@ -892,8 +899,10 @@ void processCmdRemoteDebug() {
         case 'e':
             __LOGLN("Trying to connect to wifi ");
             yield();
+            ETS_GPIO_INTR_DISABLE();
             delay(1000);
             wifi.start_client();
+            ETS_GPIO_INTR_ENABLE();
             break; 
         case '0' : // STATE_START
                   next_state = STATE_START;

@@ -258,6 +258,6 @@ String MPU6050Sensor::bufferedReport(uint8_t * bufferedData){
     MPU6050SensorData tmpData;
     memcpy(&tmpData,bufferedData,sizeof(measuredData));
     __LOGLN("building buffered report");
-    buildReport(&tmpData);
+    return buildReport(&tmpData);
 }
 

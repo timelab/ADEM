@@ -130,7 +130,7 @@ int storeAndForwardBuf::read() {
 }
 
 size_t storeAndForwardBuf::read(char* dst, size_t size) {
-	__LOG("----- store and forward "); __LOGLN( _end - _begin);
+	__LOG("----- store and forward ");__LOG( _end - _next);__LOG(" / ");__LOGLN( _end - _begin);
 	size_t bytes_available = available();
 	size_t size_to_read = (size < bytes_available) ? size : bytes_available;
 	size_t size_read = size_to_read;
@@ -142,22 +142,23 @@ size_t storeAndForwardBuf::read(char* dst, size_t size) {
 		dst += top_size;
 	}
 	memcpy(dst, _begin, size_to_read);
-	_begin = wrap_if_bufend(_begin + size_to_read);
-	_next = _begin;
+	_next = wrap_if_bufend(_begin + size_to_read);
+	
+	__LOG("+++++ store and forward : "); __LOG( _end - _next);__LOG(" / ");__LOGLN( _end - _begin);
 	return size_read;
 }
 
 size_t storeAndForwardBuf::write(char c) {
 	if (full())
 		return 0;
-    __LOG("+++++ store and forward ");   __LOGLN( _end - _begin);
+    __LOG("+++++ store and forward ");__LOG( _end - _next);__LOG(" / ");__LOGLN( _end - _begin);
 	*_end = c;
 	_end = wrap_if_bufend(_end + 1);
 	return 1;
 }
 
 size_t storeAndForwardBuf::write(const char* src, size_t size) {
-	__LOG("+++++ store and forward ");__LOGLN( _end - _begin);
+	__LOG("+++++ store and forward ");__LOG( _end - _next);__LOG(" / ");__LOGLN( _end - _begin);
 	size_t bytes_available = room();
 	size_t size_to_write = (size < bytes_available) ? size : bytes_available;
 	size_t size_written = size_to_write;
@@ -175,10 +176,14 @@ size_t storeAndForwardBuf::write(const char* src, size_t size) {
 
 void storeAndForwardBuf::ack() {
 	_begin = _next;
+    __LOG("+++++ store and forward : "); __LOG( _end - _next);__LOG(" / ");__LOGLN( _end - _begin);
+
 }
 
 void storeAndForwardBuf::nack() {
 	_next = _begin;
+    __LOG("+++++ store and forward : "); __LOG( _end - _next);__LOG(" / ");__LOGLN( _end - _begin);
+
 }
 
 void storeAndForwardBuf::flush() {

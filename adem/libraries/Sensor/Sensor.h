@@ -45,7 +45,7 @@ class Sensor {
     virtual void write();
     virtual void process();
     uint8_t* bufferData();
-    String bufferedReport(uint8_t* buffer);
+    virtual String bufferedReport(uint8_t* buffer);
     virtual String report();
     virtual String buildReport(sensorData *sData);
     virtual size_t dataBufferSize();
