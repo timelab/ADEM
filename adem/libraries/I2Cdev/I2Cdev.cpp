@@ -293,13 +293,16 @@ int8_t I2Cdev::readBytes(uint8_t devAddr, uint8_t regAddr, uint8_t length, uint8
                     Wire.endTransmission();
 //                    Wire.beginTransmission(devAddr);
                     uint8_t receive_cnt = Wire.requestFrom(devAddr, (uint8_t)min(length - k, BUFFER_LENGTH));
+                    #ifdef I2CDEV_SERIAL_DEBUG
                     Serial.print("received ");
                     Serial.print(receive_cnt);
                     Serial.print(" of ");
                     Serial.print(length);
+                    #endif
                     if (receive_cnt >= (uint8_t)min(length - k, BUFFER_LENGTH)){
+                        #ifdef I2CDEV_SERIAL_DEBUG
                         Serial.print(" read data ");
-            
+                        #endif
                         for (; Wire.available() && (timeout == 0 || millis() - t1 < timeout); count++) {
                             data[count] = Wire.read();
                             #ifdef I2CDEV_SERIAL_DEBUG
