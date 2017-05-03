@@ -151,14 +151,15 @@ size_t storeAndForwardBuf::read(char* dst, size_t size) {
 size_t storeAndForwardBuf::write(char c) {
 	if (full())
 		return 0;
-    __LOG("+++++ store and forward ");__LOG( _end - _next);__LOG(" / ");__LOGLN( _end - _begin);
+    __LOG("+++++ store and forward character ");__LOG( _end - _next);__LOG(" / ");__LOGLN( _end - _begin);
 	*_end = c;
 	_end = wrap_if_bufend(_end + 1);
 	return 1;
 }
 
 size_t storeAndForwardBuf::write(const char* src, size_t size) {
-	__LOG("+++++ store and forward ");__LOG( _end - _next);__LOG(" / ");__LOGLN( _end - _begin);
+	__LOG("+++++ store and forward buffer ");__LOG( _end - _next);__LOG(" / ");__LOGLN( _end - _begin);
+	if (src == 0) __LOGLN("!!!!!!!!!!!!!  NO ID ");
 	size_t bytes_available = room();
 	size_t size_to_write = (size < bytes_available) ? size : bytes_available;
 	size_t size_written = size_to_write;

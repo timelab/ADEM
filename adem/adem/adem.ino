@@ -141,7 +141,7 @@ BMP085Sensor barometer;
 LipoBattery battery;
 PassiveBuzzer buzzer;
 //SwSerialGPS gps = SwSerialGPS(GPS_RX_PIN, GPS_TX_PIN, GPS_BAUD);
-I2CGps gps = I2CGps(GPS_RX_PIN, GPS_TX_PIN, GPS_BAUD);
+I2CGps gps = I2CGps();
 HTU21DFSensor humidity;
 NeoPixelLed led = NeoPixelLed(1, NEOPIXEL_PIN, NEO_GRB + NEO_KHZ800);
 PPD42Sensor particulate(PM1_PIN, PM25_PIN);

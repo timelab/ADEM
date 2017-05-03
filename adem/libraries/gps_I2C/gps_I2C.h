@@ -43,7 +43,7 @@ struct I2CGPSData : sensorData{
 //abstract class Sensor
 class I2CGps : public Sensor {
 public:
-  I2CGps(int rx=4, int tx=0, int bd=9600);
+  I2CGps(int address);
   I2CGps();
   ~I2CGps();
 

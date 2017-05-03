@@ -30,7 +30,8 @@
 #define __LOGLN(msg)
 #endif
 
-I2CGps::I2CGps(int rx, int tx, int bd) {
+I2CGps::I2CGps(int address) {
+  i2cGpsAddress = address;
   measuredData.ID = GPS_I2C;
 }
 
