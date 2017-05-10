@@ -112,13 +112,13 @@ In order to do that, you first have to ensure that the Makefile can find your Ar
 On Linux you can do this
 
   $ cd /path/to/git/clone/ADEM
-  $ ln -sf "/path/to/your/arduino-1.6.8" ./Arduino
+  $ ln -sf "/path/to/your/arduino-1.8.2" ./Arduino
   $ ln -sf ~"/.arduino15" ./arduino15
 
 On MacOSX you can do the following:
 
   $ cd /path/to/git/clone/ADEM
-  $ ln -sf "/path/to/your/Arduino 1.6.8.app/Contents/Java" ./Arduino
+  $ ln -sf "/path/to/your/Arduino 1.8.2.app/Contents/Java" ./Arduino
   $ ln -sf ~"/Library/Arduino15" ./arduino15
 
 Now you can start building the source code by doing:
