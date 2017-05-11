@@ -54,10 +54,12 @@ public:
   virtual void write();
   virtual void process();
   virtual String report();
+  virtual size_t dataBufferSize();  
+  virtual uint8_t * dataToBuffer();
   virtual String buildReport(sensorData *sData);
 
   boolean ready = false;
-
+  
 private:
   StaticJsonBuffer<200> jsonBuffer;
 

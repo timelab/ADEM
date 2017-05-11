@@ -166,6 +166,14 @@ String PPD42Sensor::report()  {
     return buildReport(&measuredData);
 }
 
+size_t PPD42Sensor::dataBufferSize() {
+    return sizeof(measuredData);
+}
+
+uint8_t * PPD42Sensor::dataToBuffer(){
+    return (uint8_t *) & measuredData;
+};
+
 String PPD42Sensor::buildReport(sensorData *sData)  {
     StaticJsonBuffer<200> jsonBuffer;
     JsonObject& root = jsonBuffer.createObject();

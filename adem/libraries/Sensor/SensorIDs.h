@@ -5,3 +5,4 @@
 #define GPS_SWSERIAL 5
 #define ACCELERO_MPU6050 6
 #define GPS_I2C 7
+#define BATTERY 8

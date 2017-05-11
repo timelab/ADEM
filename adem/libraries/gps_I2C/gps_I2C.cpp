@@ -96,6 +96,7 @@ void I2CGps::read() {
     measuredData.satellites = regs.status.numsats;
     measuredData.altitude = regs.altitude;
     measuredData.speed = regs.ground_speed;
+    measuredData.ID = GPS_I2C;
     _measured = true;
 
     ready = (regs.status.gps2dfix == 1) && (measuredData.speed != 65535) && (measuredData.altitude != 65535) && (measuredData.location.lat != -1) && (measuredData.location.lon != -1) && (measuredData.location.lat != 0) && (measuredData.location.lon != 0) && (measuredData.month != 0) && (measuredData.day != 0);
@@ -124,6 +125,14 @@ void I2CGps::read() {
     ready = false;
   }
 }
+
+size_t I2CGps::dataBufferSize() {
+    return sizeof(measuredData);
+}
+
+uint8_t * I2CGps::dataToBuffer(){
+    return (uint8_t *) & measuredData;
+};
 
 String I2CGps::FormatDateTime(I2CGPSData *date) {
   char gpsDateTime[26] = "";

@@ -191,7 +191,7 @@ TickerTask *upload_task = NULL;
 // TASKS
 void accelerometer_run(void *) {
 //  __LOGLN(":accelerometer: -> Check moving/shaken");
-  accelerometer.read();
+  //accelerometer.read();
   //Serial.println(accelerometer.report());
 
   // process normal accel data in logging.
@@ -251,52 +251,53 @@ void upload_run(void *){
   String strReport;
   Sensor * pSens = NULL;
   __LOG("buffered report ");
-  if (~ buffer.empty()){
+  if (not buffer.empty()){
     lID = buffer.peek();
     __LOG(" for sensor ID : ");__LOG(lID);
     switch (lID){
       case BAROMETER_BMP085:
-        __LOG(" BAROMETER");
+        __LOGLN(" BAROMETER");
         pSens = &barometer;
         break;
       case HUMIDITY_HTU21D:
-        __LOG(" HUMIDITY");
+        __LOGLN(" HUMIDITY");
         pSens = &humidity;
         break;
       case PARTICULATE_PPD42:
-        __LOG(" PPD42");
+        __LOGLN(" PPD42");
         pSens = &particulate;
         break;
       case GPS_SWSERIAL:
-        __LOG(" GPS SERIAL");
+        __LOGLN(" GPS SERIAL");
         pSens = &gps;
         break;
       case GPS_I2C:
-        __LOG(" GPS I2C");
+        __LOGLN(" GPS I2C");
         pSens = &gps;
         break;
       case ACCELERO_MPU6050:
-        __LOG(" ACCELEROMETER");
+        __LOGLN(" ACCELEROMETER");
         pSens = &accelerometer;
         break;
       default :
         return;
 /// TODO : what if ID is not recognized ? How to recover from corrupt data ?
     }
-    buffer.nack();
+    buffer.ack();
     
-    __LOG(" get buffer for sensor for nrbytes = ");__LOG(pSens->dataBufferSize());
+    __LOG("get buffer for sensor for nrbytes = ");__LOGLN(pSens->dataBufferSize());
     s = buffer.peek(&lbuf[0], pSens->dataBufferSize());
     if (s > 0 ) {
-      __LOGLN("");
+ /*     __LOGLN("");
       __LOG(lbuf[0]);
       for (int i = 1; i < s;i++){
         __LOG(lbuf[i]); __LOG(",");
       }
-      __LOGLN("");
+      __LOGLN("");*/
       strReport = pSens->bufferedReport((uint8_t *)&lbuf[0]);
+      __LOG(strReport);
     }  
-    __LOG(strReport);
+    
     __LOGLN("#");
     // send off strReport to datastore
     // if ACK of storage then ack buffer
@@ -365,6 +366,8 @@ void gpstest_state() {
       if (gps.ready) __LOGLN("gps.ready, next_state = STATE_COLLECT");
       if (debug.gpsready) __LOGLN("debug.gpsready, next_state = STATE_COLLECT");
     }
+    else
+      delay(500); // to overcome quick looping and WDT timeoutc
   } else {
     next_state = STATE_SLEEP;
   }

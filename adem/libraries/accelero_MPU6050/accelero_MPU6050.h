@@ -82,6 +82,7 @@ class MPU6050Sensor : public Sensor{
     bool shaken = false;
     float movingThreshold = 1.1;
     long  notmovingDelay = 20000L;
+    
     //MPU6050Sensor ();
   protected:
     

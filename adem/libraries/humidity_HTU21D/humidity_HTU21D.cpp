@@ -143,6 +143,14 @@ String HTU21DFSensor::report()  {
     return buildReport(&measuredData);
 }
 
+size_t HTU21DFSensor::dataBufferSize() {
+    return sizeof(measuredData);
+}
+
+uint8_t * HTU21DFSensor::dataToBuffer(){
+    return (uint8_t *) & measuredData;
+}
+
 String HTU21DFSensor::buildReport(sensorData *sData)  {
 	StaticJsonBuffer<200> jsonBuffer;
 	JsonObject& root = jsonBuffer.createObject();

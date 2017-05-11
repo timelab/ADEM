@@ -63,6 +63,8 @@ class PPD42Sensor : public Sensor {
     void process();
     PPD42Sensor(int, int);
     String report(); // should report a JSON string
+    virtual size_t dataBufferSize();    
+    virtual uint8_t * dataToBuffer();
     virtual String buildReport(sensorData *sData);
 
     uint32_t readPM1Ppm(); // returns the time (in ppm) the sensor triggered

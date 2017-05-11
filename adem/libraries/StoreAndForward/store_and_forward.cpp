@@ -18,20 +18,22 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 #include "store_and_forward.h"
 #include <ctype.h>
-
+#include "SensorIDs.h"
 #define DEBUG
 
 #ifdef DEBUG
 #define __LOG(msg) Serial.print(msg)
+#define __LOGHEX(msg) Serial.print(msg,HEX); Serial.print(",")
 #define __LOGLN(msg) Serial.println(msg)
 #else
 #define __LOG(msg)
+#define __LOGHEX(msg)
 #define __LOGLN(msg)
 #endif
 
 
 storeAndForwardBuf::storeAndForwardBuf(size_t size) :
-next(NULL), _size(size), _buf(new char[size]), _bufend(_buf + size), _begin(_buf), _end(_begin) {
+ _size(size), _buf(new char[size]), _bufend(_buf + size), _begin(_buf), _end(_begin),_next(_begin) {
 	if (_buf == 0) _size = 0;
 }
 
@@ -106,6 +108,11 @@ size_t storeAndForwardBuf::peek(char *dst, size_t size) {
 	__LOG("store and forward peek : ");__LOG(bytes_available);__LOG(" for "); __LOG(size);
 	size_t size_to_read = (size < bytes_available) ? size : bytes_available;
 	size_t size_read = size_to_read;
+	__LOGLN("");
+	for(int i=0; i < size_read; i++){
+	  __LOGHEX(_begin[i]);
+	}
+	__LOGLN("");
 	char * begin = _begin;
 	if (_end < _begin && size_to_read >(size_t) (_bufend - _begin)) {
 		size_t top_size = _bufend - _begin;
@@ -131,6 +138,11 @@ int storeAndForwardBuf::read() {
 
 size_t storeAndForwardBuf::read(char* dst, size_t size) {
 	__LOG("----- store and forward ");__LOG( _end - _next);__LOG(" / ");__LOGLN( _end - _begin);
+	__LOG("to read  : ");
+    for(int i=0 ; i < size; i++){
+	  __LOGHEX(_begin[i]);
+	}
+	__LOGLN("");
 	size_t bytes_available = available();
 	size_t size_to_read = (size < bytes_available) ? size : bytes_available;
 	size_t size_read = size_to_read;
@@ -152,6 +164,29 @@ size_t storeAndForwardBuf::write(char c) {
 	if (full())
 		return 0;
     __LOG("+++++ store and forward character ");__LOG( _end - _next);__LOG(" / ");__LOGLN( _end - _begin);
+	__LOG(" for sensor ID : ");__LOG((uint8_t) c);
+	switch ((uint8_t) c){
+      case BAROMETER_BMP085:
+        __LOG(" BAROMETER");
+        break;
+      case HUMIDITY_HTU21D:
+        __LOG(" HUMIDITY");
+        break;
+      case PARTICULATE_PPD42:
+        __LOG(" PPD42");
+        break;
+      case GPS_SWSERIAL:
+        __LOG(" GPS SERIAL");
+        break;
+      case GPS_I2C:
+        __LOG(" GPS I2C");
+        break;
+      case ACCELERO_MPU6050:
+        __LOG(" ACCELEROMETER");
+        break;
+    }
+	__LOGLN("");
+	
 	*_end = c;
 	_end = wrap_if_bufend(_end + 1);
 	return 1;
@@ -159,7 +194,12 @@ size_t storeAndForwardBuf::write(char c) {
 
 size_t storeAndForwardBuf::write(const char* src, size_t size) {
 	__LOG("+++++ store and forward buffer ");__LOG( _end - _next);__LOG(" / ");__LOGLN( _end - _begin);
-	if (src == 0) __LOGLN("!!!!!!!!!!!!!  NO ID ");
+	__LOG("to store : ");
+    for(int i=0 ; i < size; i++){
+	  __LOGHEX(src[i]);
+	}
+	__LOGLN("");
+	
 	size_t bytes_available = room();
 	size_t size_to_write = (size < bytes_available) ? size : bytes_available;
 	size_t size_written = size_to_write;
@@ -171,6 +211,11 @@ size_t storeAndForwardBuf::write(const char* src, size_t size) {
 		src += top_size;
 	}
 	memcpy(_end, src, size_to_write);
+	__LOG("stored   : ");
+	for(int i=0; i < size_to_write; i++){
+	  __LOGHEX(_end[i]);
+	}
+	__LOGLN("");
 	_end = wrap_if_bufend(_end + size_to_write);
 	return size_written;
 }

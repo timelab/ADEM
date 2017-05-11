@@ -31,7 +31,7 @@
 #define BMP085_ADDRESS 0x77  // I2C address of BMP085
 
 struct bmp085Data : sensorData {
-    float _temperature;
+	float _temperature;
     long _pressure;
 };
 
@@ -46,10 +46,13 @@ public:
 	virtual void process();
 	virtual String report();
     virtual String buildReport(sensorData *sData);
+	virtual size_t dataBufferSize();
+	virtual uint8_t * dataToBuffer();
 	//Sensor ();
 	BMP085Sensor();
 	void begin(uint8_t address);
-
+    
+    
 private:
 		
 	const unsigned char OSS = 1;  // Oversampling Setting

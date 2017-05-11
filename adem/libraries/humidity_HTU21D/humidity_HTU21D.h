@@ -63,13 +63,14 @@ public:
 	virtual void write();
 	virtual void process();
 	virtual String report();
+    virtual size_t dataBufferSize();	
     virtual String buildReport(sensorData *sData);
-
+    virtual uint8_t * dataToBuffer();  
 	//Sensor ();
 	HTU21DFSensor();
 	void begin(uint8_t address);
 	void reset(void);
-
+    
 private:
 	StaticJsonBuffer<200> jsonBuffer;
 

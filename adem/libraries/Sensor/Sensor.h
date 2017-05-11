@@ -49,8 +49,9 @@ class Sensor {
     virtual String report();
     virtual String buildReport(sensorData *sData);
     virtual size_t dataBufferSize();
-    uint8_t * dataToBuffer();
+    virtual uint8_t * dataToBuffer();
     //Sensor ();
+    
   protected:
     bool _measured = false;
     bool _initialized = false;

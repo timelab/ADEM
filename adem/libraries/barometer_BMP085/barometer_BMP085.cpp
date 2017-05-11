@@ -62,6 +62,14 @@ String BMP085Sensor::report()  {
     return buildReport(&measuredData);
 }
 
+size_t BMP085Sensor::dataBufferSize() {
+    return sizeof(measuredData);
+}
+
+uint8_t * BMP085Sensor::dataToBuffer(){
+    return (uint8_t *) & measuredData;
+};
+
 String BMP085Sensor::buildReport(sensorData * sData)  {
 	StaticJsonBuffer<200> jsonBuffer;
 	JsonObject& root = jsonBuffer.createObject();

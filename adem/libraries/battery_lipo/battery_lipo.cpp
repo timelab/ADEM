@@ -69,6 +69,14 @@ void LipoBattery::read() {
   }
 }
 
+size_t LipoBattery::dataBufferSize() {
+    return sizeof(measuredData);
+}
+
+uint8_t * LipoBattery::dataToBuffer(){
+    return (uint8_t *) & measuredData;
+};
+
 void LipoBattery::write() {
 }
 

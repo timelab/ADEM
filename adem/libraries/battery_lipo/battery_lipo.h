@@ -46,13 +46,15 @@ public:
     virtual void write();
     virtual void process();
     virtual String report();
-
+    virtual size_t dataBufferSize();    
+    virtual uint8_t * dataToBuffer();
     boolean low = false;
     boolean empty = false;
     boolean charging = false;
     boolean full = false;
 
     uint16_t vcc;
+    
 };
 
 #endif
