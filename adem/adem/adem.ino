@@ -250,8 +250,9 @@ void upload_run(void *){
   int s = 0;
   String strReport;
   Sensor * pSens = NULL;
-  __LOG("buffered report ");
+  
   if (not buffer.empty()){
+    __LOG("buffered report ");
     lID = buffer.peek();
     __LOG(" for sensor ID : ");__LOG(lID);
     switch (lID){
@@ -311,6 +312,10 @@ void upload_run(void *){
         buffer.nack();
     }
   }
+  else{
+    yield();
+  }
+
 }
 
 

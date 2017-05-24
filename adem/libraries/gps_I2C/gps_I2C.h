@@ -56,6 +56,7 @@ public:
   virtual String report();
   virtual size_t dataBufferSize();  
   virtual uint8_t * dataToBuffer();
+  String bufferedReport(uint8_t* buffer);
   virtual String buildReport(sensorData *sData);
 
   boolean ready = false;

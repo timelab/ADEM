@@ -171,6 +171,14 @@ String I2CGps::buildReport(sensorData *sData)  {
   root.printTo(response, sizeof(response));
   return response;
 }
+String I2CGps::bufferedReport(uint8_t * bufferedData){
+    __LOGLN("copying buffered data to report");
+    I2CGPSData tmpData;
+    memcpy(&tmpData,bufferedData,sizeof(measuredData));
+    __LOGLN("building buffered report");
+    return buildReport(&tmpData);
+}
+
 //// replace I2CDEV readbytes for esp implementation
 int8_t I2CGps::readBytes(uint8_t devAddr, uint8_t regAddr, uint8_t length, uint8_t *data) {
     #ifdef I2CDEV_SERIAL_DEBUG
@@ -187,8 +195,8 @@ int8_t I2CGps::readBytes(uint8_t devAddr, uint8_t regAddr, uint8_t length, uint8
     uint32_t t1 = millis();
     delay(10);
     Wire.beginTransmission(devAddr);
-    Wire.write(regAddr);
-    Wire.endTransmission();
+    Wire.write(regAddr);     // returns 1 for succes 0 for failure
+    Wire.endTransmission();  // returns the I2C status see wire implementation
     yield();
     #ifdef I2CDEV_SERIAL_DEBUG
         Serial.print(" requestfrom ");
@@ -216,6 +224,6 @@ int8_t I2CGps::readBytes(uint8_t devAddr, uint8_t regAddr, uint8_t length, uint8
         Serial.print(count, DEC);
         Serial.println(" read).");
     #endif
-
+    // check twi_status and reset bus if it hangs by calling twi_stop and wire::begin
     return count;
 }
