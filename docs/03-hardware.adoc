@@ -48,7 +48,7 @@ https://www.u-blox.com/sites/default/files/products/documents/LEA-NEO-MAX-6_HIM_
 https://www.u-blox.com/sites/default/files/products/documents/u-blox6_ReceiverDescrProtSpec_%28GPS.G6-SW-10018%29_Public.pdf[protocol spec]
 https://www.u-blox.com/sites/default/files/products/documents/u6-PowerMgt_AppNote_%28GPS.G6-X-10014%29.pdf[power management]
 
-https://www.adafruit.com/datasheets/1899_HTU21D.pdf[datasheet]
+| Humidity                  | HTU21D                    |                   | | https://www.sparkfun.com/products/retired/12064
 
 | RGB Led                   | NeoPixel WS2812 8xled     | (2.40€ banggood)  | https://learn.adafruit.com/adafruit-neopixel-uberguide/power[<60mA] |
 High Density Neopixel 8x LED
