@@ -76,7 +76,7 @@
 #define DEBUG_I2CGPS 1
 
 #ifdef DEBUG_I2CGPS
-#define SERIAL_BAUD 115200
+#define SERIAL_BAUD 77800
 #define __LOG(msg) Serial.print(msg)
 #define __LOGHEX(msg) Serial.print("0x");Serial.print(msg,HEX);Serial.print(" ")
 #define __LOGLN(msg) Serial.println(msg)
