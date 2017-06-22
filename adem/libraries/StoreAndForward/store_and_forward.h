@@ -98,17 +98,18 @@ public:
 	//void dump();
 
 private:
-	inline char* wrap_if_bufend(char* ptr) const {
-		return (ptr == _bufend) ? _buf : ptr;
+	inline char* wrap_if_bufend(char* ptr) const {  
+	//	return (ptr == _bufend) ? _buf : ptr; // this works for byte by byte increment not for block increment
+		return (ptr < _bufend) ? ptr : (ptr - _bufend + _buf);
 	}
 
 	//char buffer[500];
-	size_t _size;// = 500;
-	char* _buf;
-	const char* _bufend;
-	char* _begin;
-	char* _end;
-	char* _next;
+	size_t _size; // = 500;
+	char* _buf;   			// start of memeory buffer
+	const char* _bufend; 	// end pointer of memory buffer
+	char* _begin;			// storage pointer for next buffer to read
+	char* _end;				// end pointer of the stored messages
+	char* _next;			// pointer of the next message to read _begin will be set equal to this pointer when ack is received
 	char* _tmptr;
 };
 

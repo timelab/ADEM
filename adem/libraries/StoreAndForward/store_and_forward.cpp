@@ -31,6 +31,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #define __LOGLN(msg)
 #endif
 
+#define __RELADDR(addr) addr-_buf
 
 storeAndForwardBuf::storeAndForwardBuf(size_t size) :
  _size(size), _buf(new char[size]), _bufend(_buf + size), _begin(_buf), _end(_begin),_next(_begin) {
@@ -68,6 +69,7 @@ size_t storeAndForwardBuf::resize(size_t newSize) {
 	}
 
 	_begin = newbuf;
+	_next = newbuf;
 	_end = newbuf + bytes_available;
 	_bufend = newbuf + newSize;
 	_size = newSize;
@@ -99,70 +101,104 @@ size_t storeAndForwardBuf::room() const {
 int storeAndForwardBuf::peek() {
 	if (empty())
 		return -1;
-
+	__LOG("----- store and forward peek; b= ");
+	__LOG( __RELADDR(_begin));__LOG(" / n= ");
+	__LOG( __RELADDR(_next));__LOG(" / e= ");
+	__LOGLN( __RELADDR(_end));
+	__LOGLN("done reading");
 	return static_cast<int>(*_begin);
 }
 
 size_t storeAndForwardBuf::peek(char *dst, size_t size) {
 	size_t bytes_available = available();
-	__LOG("store and forward peek : ");__LOG(bytes_available);__LOG(" for "); __LOG(size);
+//	__LOG("store and forward peek : ");__LOG(bytes_available);__LOG(" for "); __LOG(size);
 	size_t size_to_read = (size < bytes_available) ? size : bytes_available;
 	size_t size_read = size_to_read;
-	__LOGLN("");
-	for(int i=0; i < size_read; i++){
-	  __LOGHEX(_begin[i]);
-	}
-	__LOGLN("");
+//	__LOGLN("");
+	__LOG("----- store and forward peeking; b= ");
+	__LOG( __RELADDR(_begin));__LOG(" / n= ");
+	__LOG( __RELADDR(_next));__LOG(" / e= ");
+	__LOGLN( __RELADDR(_end));
 	char * begin = _begin;
 	if (_end < _begin && size_to_read >(size_t) (_bufend - _begin)) {
 		size_t top_size = _bufend - _begin;
 		memcpy(dst, _begin, top_size);
-		begin = _buf;
-		size_to_read -= top_size;
-		dst += top_size;
+		begin = _buf;			    // wrap around
+		size_to_read -= top_size;   // decrease size by number of bytes we already read
+		dst += top_size;			// increment the destination pointer 
+		for(int i=0; i < top_size; i++){
+		  __LOGHEX(_begin[i]);
+		}
+		__LOG(" | ");
 	}
+	for(int i=0; i < size_to_read; i++){
+	  __LOGHEX(begin[i]);
+	}
+	__LOGLN("");
 	memcpy(dst, begin, size_to_read);
-	_next = wrap_if_bufend(_begin + size_to_read);
+	_next = wrap_if_bufend(_begin + size_read);
 	__LOG(" and read ");__LOGLN(size_read);
+	__LOG("----- store and forward; b= ");
+	__LOG( __RELADDR(_begin));__LOG(" / n= ");
+	__LOG( __RELADDR(_next));__LOG(" / e= ");
+	__LOGLN( __RELADDR(_end));
+	__LOGLN("done peeking");
 	return size_read;
 }
 
 int storeAndForwardBuf::read() {
 	if (empty())
 		return -1;
-    __LOG("----- store and forward "); __LOGLN( _end - _begin);
+    __LOG("----- store and forward read; b= ");
+	__LOG( __RELADDR(_begin));__LOG(" / n= ");
+	__LOG( __RELADDR(_next));__LOG(" / e= ");
+	__LOGLN( __RELADDR(_end));
+	
 	char result = *_begin;
 	_begin = wrap_if_bufend(_begin + 1);
 	return static_cast<int>(result);
 }
 
 size_t storeAndForwardBuf::read(char* dst, size_t size) {
-	__LOG("----- store and forward ");__LOG( _end - _next);__LOG(" / ");__LOGLN( _end - _begin);
+	__LOG("----- store and forward reading; b= ");
+	__LOG( __RELADDR(_begin));__LOG(" / n= ");
+	__LOG( __RELADDR(_next));__LOG(" / e= ");
+	__LOGLN( __RELADDR(_end));
 	__LOG("to read  : ");
-    for(int i=0 ; i < size; i++){
-	  __LOGHEX(_begin[i]);
-	}
-	__LOGLN("");
+    
 	size_t bytes_available = available();
 	size_t size_to_read = (size < bytes_available) ? size : bytes_available;
 	size_t size_read = size_to_read;
 	if (_end < _begin && size_to_read >(size_t) (_bufend - _begin)) {
 		size_t top_size = _bufend - _begin;
 		memcpy(dst, _begin, top_size);
+		for(int i=0 ; i < top_size; i++){
+	        __LOGHEX(_begin[i]);
+	    }
 		_begin = _buf;
 		size_to_read -= top_size;
 		dst += top_size;
 	}
 	memcpy(dst, _begin, size_to_read);
-	_next = wrap_if_bufend(_begin + size_to_read);
+	for(int i=0 ; i < size_to_read; i++){
+	  __LOGHEX(_begin[i]);
+	}
+	__LOGLN("");
+	_next = wrap_if_bufend(_begin + size_read);
 	
-	__LOG("+++++ store and forward : "); __LOG( _end - _next);__LOG(" / ");__LOGLN( _end - _begin);
+	__LOG("----- store and forward; b= ");
+	__LOG( __RELADDR(_begin));__LOG(" / n= ");
+	__LOG( __RELADDR(_next));__LOG(" / e= ");
+	__LOGLN( __RELADDR(_end));
+	__LOGLN("done reading");
 	return size_read;
 }
 
 size_t storeAndForwardBuf::write(char c) {
-	if (full())
+	if (full()){
+		__LOG("+++++ store and forward character : FULL FULL FULL");__LOG( _end - _next);__LOG(" / ");__LOGLN( _end - _begin);
 		return 0;
+	}
     __LOG("+++++ store and forward character ");__LOG( _end - _next);__LOG(" / ");__LOGLN( _end - _begin);
 	__LOG(" for sensor ID : ");__LOG((uint8_t) c);
 	switch ((uint8_t) c){
@@ -193,42 +229,61 @@ size_t storeAndForwardBuf::write(char c) {
 }
 
 size_t storeAndForwardBuf::write(const char* src, size_t size) {
-	__LOG("+++++ store and forward buffer ");__LOG( _end - _next);__LOG(" / ");__LOGLN( _end - _begin);
+	__LOG("+++++ store and forward buffer writing b=");
+	__LOG( __RELADDR(_begin));__LOG(" / n= ");
+	__LOG( __RELADDR(_next));__LOG(" / e= ");
+	__LOGLN( __RELADDR(_end));
+	__LOGLN("done reading");
+	
+	size_t bytes_available = room();
+	if (size > bytes_available){
+		__LOG("+++++ store and forward character : FULL FULL FULL");__LOG( _end - _next);__LOG(" / ");__LOGLN( _end - _begin);
+		return 0;
+	}
 	__LOG("to store : ");
     for(int i=0 ; i < size; i++){
 	  __LOGHEX(src[i]);
 	}
 	__LOGLN("");
-	
-	size_t bytes_available = room();
-	size_t size_to_write = (size < bytes_available) ? size : bytes_available;
+	size_t size_to_write = (size <= bytes_available) ? size : bytes_available;
 	size_t size_written = size_to_write;
 	if (_end >= _begin && size_to_write >(size_t) (_bufend - _end)) {
 		size_t top_size = _bufend - _end;
 		memcpy(_end, src, top_size);
+		__LOG(" stored  fill buffer splitted : ");
+		for(int i=0; i < top_size; i++){
+	  		__LOGHEX(_end[i]);
+		}
 		_end = _buf;
 		size_to_write -= top_size;
 		src += top_size;
 	}
 	memcpy(_end, src, size_to_write);
-	__LOG("stored   : ");
+	__LOG(" stored : ");
 	for(int i=0; i < size_to_write; i++){
 	  __LOGHEX(_end[i]);
 	}
 	__LOGLN("");
 	_end = wrap_if_bufend(_end + size_to_write);
+    __LOG("+++++ store and forward; b= ");
+	__LOG( __RELADDR(_begin));__LOG(" / n= ");
+	__LOG( __RELADDR(_next));__LOG(" / e= ");
+	__LOGLN( __RELADDR(_end));
+	__LOGLN("done writing");
 	return size_written;
 }
 
 void storeAndForwardBuf::ack() {
 	_begin = _next;
-    __LOG("+++++ store and forward : "); __LOG( _end - _next);__LOG(" / ");__LOGLN( _end - _begin);
+    __LOG("----- store and forward ack: b= "); __LOG( __RELADDR(_begin));__LOG(" / n= ");
+	__LOG( __RELADDR(_next));__LOG(" / e= ");
+	__LOGLN( __RELADDR(_end));
 
 }
 
 void storeAndForwardBuf::nack() {
 	_next = _begin;
-    __LOG("+++++ store and forward : "); __LOG( _end - _next);__LOG(" / ");__LOGLN( _end - _begin);
+//    __LOG("+++++ store and forward : "); __LOG( _end - _next);__LOG(" / ");__LOGLN( _end - _begin);
 
 }
 
