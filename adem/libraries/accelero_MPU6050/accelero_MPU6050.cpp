@@ -34,7 +34,7 @@
 
 // static member initialisation
 volatile bool MPU6050Sensor::_dataReady = false;
-
+volatile bool MPU6050Sensor::_tapped = false;
 
 MPU6050Sensor::MPU6050Sensor() {
     
@@ -206,7 +206,16 @@ void MPU6050Sensor::tap_cb(unsigned char i, unsigned char k) {
     __LOG("MPU: ");__LOGLN(">>>>>>>>>>>>>tap detected ............. keep on going<<<<<<<<<");
     __LOG("MPU: ");__LOG(">>>>>>>>>>>>>  "); __LOG(i); __LOG(" "); __LOGLN (k );
     __LOG("MPU: ");__LOGLN("==============================================================");
+    _tapped = true;
 }
+ 
+bool MPU6050Sensor::isShaken(){
+    bool tmp ;
+    tmp = _tapped;
+    _tapped = false;
+    return tmp;
+}
+
 void MPU6050Sensor::process() {
 }
 

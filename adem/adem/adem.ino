@@ -91,6 +91,7 @@ enum state_t {
   STATE_WIFITEST,
   STATE_UPLOAD,
   STATE_RESET,
+  STATE_LOW_POWER
 };
 char *states[] {
   "START",
@@ -102,6 +103,7 @@ char *states[] {
   "WIFITEST",
   "UPLOAD",
   "RESET",
+  "LOW POWER"
 };
 state_t prev_state = STATE_START;
 state_t state = STATE_START;
@@ -175,6 +177,7 @@ uint32_t colors[] = {
   purple,
   blue,
   white,
+  black
 };
 
 uint16_t led_state = 0;
@@ -286,7 +289,7 @@ void upload_run(void *){
     }
     buffer.ack();
     
-    __LOG("get buffer for sensor for nrbytes = ");__LOGLN(pSens->dataBufferSize());
+//    __LOG("get buffer for sensor for nrbytes = ");__LOGLN(pSens->dataBufferSize());
     s = buffer.peek(&lbuf[0], pSens->dataBufferSize());
     if (s > 0 ) {
  /*     __LOGLN("");
@@ -347,7 +350,7 @@ void sleep_state() {
   } else {
     if (not buffer.empty()) {
       next_state = STATE_WIFITEST;
-    } else if (accelerometer.shaken or debug.shaken) {
+    } else if (accelerometer.isShaken() or debug.shaken) {
       next_state = STATE_CONFIG;
     }
   }
@@ -412,7 +415,19 @@ void upload_state() {
   // Empty datastore
 
   if (buffer.empty()) {
-    next_state = STATE_WIFITEST;
+    next_state = STATE_LOW_POWER;
+  }
+}
+
+void lowpower_state() {
+
+  // Upload action finishes successfully or times out
+  // Create JSON of X records
+  // Send to server
+  // Empty datastore
+
+  if ( accelerometer.isShaken()) {
+    next_state = STATE_SLEEP;
   }
 }
 #endif // DEMO
@@ -573,6 +588,19 @@ void upload_to_wifitest() {
   upload_task->suspend();
 }
 
+void upload_to_lowpower() {
+  upload_task->suspend();
+}
+
+void lowpower_to_wifitest() {
+  
+}
+
+void lowpower_to_sleep() {
+  
+}
+
+
 void debug_help() {
   __LOGLN();
   __LOGLN("=> Press \"g\" for gpsfix, \"m\" for moving, \"r\" to restart,");
@@ -632,6 +660,7 @@ void loop() {
       case STATE_COLLECT:   collect_state(); break;
       case STATE_WIFITEST:  wifitest_state(); break;
       case STATE_UPLOAD:    upload_state(); break;
+      case STATE_LOW_POWER: lowpower_state(); break;
       case STATE_RESET:     reset_state(); break;
 #endif // DEMO
       default:              reset_state(); break;
@@ -707,6 +736,13 @@ void loop() {
         case STATE_UPLOAD:
           switch(next_state) {
             case STATE_WIFITEST:  upload_to_wifitest(); break;
+            case STATE_LOW_POWER:  upload_to_lowpower(); break;
+            default:              next_state = STATE_RESET;
+          }; break;
+          case STATE_LOW_POWER:
+          switch(next_state) {
+            case STATE_WIFITEST:  lowpower_to_wifitest(); break;
+            case STATE_SLEEP:     lowpower_to_sleep(); break;
             default:              next_state = STATE_RESET;
           }; break;
 #endif // DEMO
@@ -948,3 +984,39 @@ void processCmdRemoteDebug() {
     }
 }
 #endif
+
+/* SDA hangs low
+  Serial.println("Starting I2C bus recovery");
+  delay(2000);
+  //try i2c bus recovery at 100kHz = 5uS high, 5uS low
+  pinMode(SDAPIN, OUTPUT);//keeping SDA high during recovery
+  digitalWrite(SDAPIN, HIGH);
+  pinMode(CLKPIN, OUTPUT);
+  for (int i = 0; i < 10; i++) { //9nth cycle acts as NACK
+    digitalWrite(CLKPIN, HIGH);
+    delayMicroseconds(5);
+    digitalWrite(CLKPIN, LOW);
+    delayMicroseconds(5);
+  }
+
+  //a STOP signal (SDA from low to high while CLK is high)
+  digitalWrite(SDAPIN, LOW);
+  delayMicroseconds(5);
+  digitalWrite(CLKPIN, HIGH);
+  delayMicroseconds(2);
+  digitalWrite(SDAPIN, HIGH);
+  delayMicroseconds(2);
+  //bus status is now : FREE
+
+  Serial.println("bus recovery done, starting scan in 2 secs");
+  //return to power up mode
+  pinMode(SDAPIN, INPUT);
+  pinMode(CLKPIN, INPUT);
+  delay(2000);
+  //pins + begin advised in https://github.com/esp8266/Arduino/issues/452
+  Wire.pins(SDAPIN, CLKPIN); //this changes default values for sda and clock as well
+  Wire.begin(SDAPIN, CLKPIN);
+  //only pins: no signal on clk and sda
+  //only begin: no signal on clk, no signal on sda
+
+  */

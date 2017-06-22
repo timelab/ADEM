@@ -77,9 +77,9 @@ class MPU6050Sensor : public Sensor{
     size_t dataBufferSize();
     uint8_t * dataToBuffer();
     bool hasData();
+    bool isShaken();
     void enableLowPower(bool status);
     bool isMoving();
-    bool shaken = false;
     float movingThreshold = 1.1;
     long  notmovingDelay = 20000L;
     
@@ -101,6 +101,8 @@ class MPU6050Sensor : public Sensor{
     static void mpu_interrupt();
     static void tap_cb(unsigned char, unsigned char);
     static volatile bool _dataReady;
+    static volatile bool _tapped ;
+    
 };
 
 #endif
