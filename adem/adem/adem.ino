@@ -166,6 +166,10 @@ uint32_t purple = led.Color(63, 0, 127);
 
 uint32_t _lst_msg = 0;
 uint32_t ts =0;
+uint32_t i2c_ts = 0;
+uint32_t i2c_status = 0;
+
+unsigned char twi_sda, twi_scl;
 
 uint32_t colors[] = {
   red,
@@ -648,6 +652,85 @@ void setup() {
 
 // Main loop takes care of state and transition management
 void loop() {
+  ESP.wdtFeed();
+  ts = millis();
+// I2C status check and reset if needed
+  int tmp = Wire.status();
+  if  (tmp != I2C_OK){
+    i2c_status = tmp;
+  }
+  else{
+      i2c_ts = ts;
+  }
+  if ((ts - i2c_ts) > 1000) { // no I2C_OK status for more than 1 sec
+    switch (Wire.status()){
+      case  I2C_SCL_HELD_LOW:
+        __LOG("I2C ::::: SCL :::: CLOCK HELD LOW");
+        break;
+      case I2C_SCL_HELD_LOW_AFTER_READ:
+        __LOG("I2C ::::: SCL :::: CLOCK HELD LOW AFTER READ");
+        break;
+      case I2C_SDA_HELD_LOW:
+        __LOG("I2C ::::: SDA :::: DATA HELD LOW");
+        break;
+      case I2C_SDA_HELD_LOW_AFTER_INIT:
+        __LOG("I2C ::::: SDA :::: DATA HELD LOW AFTER INIT");
+        break;
+      case I2C_OK:
+        i2c_ts = ts;
+        break;
+    }
+    Serial.println("Starting I2C bus recovery");
+    twi_sda = SDA; // comming from pins_arduino.h
+    twi_scl = SCL; // comming from pins_arduino.h
+
+    //try i2c bus recovery at 100kHz = 5uS high, 5uS low
+    pinMode(twi_sda, OUTPUT);//keeping SDA high during recovery
+    digitalWrite(twi_sda, HIGH);
+    pinMode(twi_scl, OUTPUT);
+    for (int i = 0; i < 10; i++) { //9nth cycle acts as NACK
+      digitalWrite(twi_scl, HIGH);
+      delayMicroseconds(5);
+      digitalWrite(twi_scl, LOW);
+      delayMicroseconds(5);
+    }
+
+    //a STOP signal (SDA from low to high while CLK is high)
+    digitalWrite(twi_sda, LOW);
+    delayMicroseconds(5);
+    digitalWrite(twi_scl, HIGH);
+    delayMicroseconds(2);
+    digitalWrite(twi_sda, HIGH);
+    delayMicroseconds(2);
+    //bus status is now : FREE
+
+    Serial.println("bus recovery done, starting scan in 2 secs");
+    //return to power up mode
+    twi_stop();
+    delay(2000);
+    //pins + begin advised in https://github.com/esp8266/Arduino/issues/452
+    Wire.begin();
+    switch (Wire.status()){
+      case  I2C_SCL_HELD_LOW:
+        __LOG("I2C ::::: SCL :::: CLOCK HELD LOW");
+        break;
+      case I2C_SCL_HELD_LOW_AFTER_READ:
+        __LOG("I2C ::::: SCL :::: CLOCK HELD LOW AFTER READ");
+        break;
+      case I2C_SDA_HELD_LOW:
+        __LOG("I2C ::::: SDA :::: DATA HELD LOW");
+        break;
+      case I2C_SDA_HELD_LOW_AFTER_INIT:
+        __LOG("I2C ::::: SDA :::: DATA HELD LOW AFTER INIT");
+        break;
+      case I2C_OK:
+        i2c_ts = ts;
+        break;
+    }
+    __LOGLN("");
+  }
+// I2C status check
+
   if( state == next_state){
     switch(state) {
       case STATE_START:     start_state(); break;
@@ -666,7 +749,7 @@ void loop() {
       default:              reset_state(); break;
     }
   }
-  ts = millis();
+  
   if (state != next_state)  {
     if (ts - _lst_msg > 1000){
       _lst_msg = ts;
