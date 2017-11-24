@@ -6,3 +6,5 @@
 #define ACCELERO_MPU6050 6
 #define GPS_I2C 7
 #define BATTERY 8
+
+#define BUFFER_MEMORY 15 
