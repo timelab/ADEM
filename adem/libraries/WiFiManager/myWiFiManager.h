@@ -39,6 +39,7 @@ const char HTTP_PORTAL_OPT_END[] PROGMEM  = "<form action=\"/clear\" method=\"po
 const char HTTP_ITEM[] PROGMEM            = "<div><a href='#p' onclick='c(this)'>{v}</a>&nbsp;<span class='q {i}'>{r}%</span></div>";
 const char HTTP_FORM_START[] PROGMEM      = "<form method='get' action='wifisave'><input id='s' name='s' length=32 placeholder='SSID'><br/><input id='p' name='p' length=64 type='password' placeholder='password'><br/>";
 const char HTTP_FORM_BUTTON[] PROGMEM     = "<form action=\"/{a}\" method=\"get\"><button>{i}</button></form>" ;
+const char HTTP_FORM_EXT_BUTTON[] PROGMEM = "<form action=\"/{a}\" method=\"get\"><button>{i}</button></form><br/>" ;
 const char HTTP_FORM_CUSTOM[] PROGMEM     = "<h1>Custom Parameters</h1><form method='post' action='customsave'>";
 const char HTTP_FORM_PSTRT[] PROGMEM      = "<form method='get' action='{a}'><br/>";
 const char HTTP_FORM_PARAM[] PROGMEM      = "<br/><input id='{i}' name='{n}' length={l} placeholder='{p}' value='{v}' {c}>";
@@ -60,7 +61,9 @@ class myWiFiManagerParameter {
     myWiFiManagerParameter(const char *custom);
     myWiFiManagerParameter(const char *id, const char *placeholder, const char *defaultValue, int length);
     myWiFiManagerParameter(const char *id, const char *placeholder, const char *defaultValue, int length, const char *custom);
-    myWiFiManagerParameter(const char *id, String(* setupfunc)(void), void (*savefunc)(void) );
+    myWiFiManagerParameter(const char *id, const char *placeholder, String(* setupfunc)(void), void (* actionfunc)(void) );
+    myWiFiManagerParameter(const char *id, const char *placeholder, String(* setupfunc)(void));
+    myWiFiManagerParameter(const char *id, String(* setupfunc)(void), void (* actionfunc)(void) );
     myWiFiManagerParameter(const char *id, String(* setupfunc)(void));
     
 
@@ -79,7 +82,7 @@ class myWiFiManagerParameter {
     int         _length;
     const char *_customHTML;
     String (*_setup)(void);
-    void (*_savecallback)(void);
+    void (*_actioncallback)(void);
 
     void init(const char *id, const char *placeholder, const char *defaultValue, int length, const char *custom);
 
@@ -137,7 +140,7 @@ class myWiFiManager
     void          setCustomHeadElement(const char* element);
     //if this is true, remove duplicated Access Points - defaut true
     void          setRemoveDuplicateAPs(boolean removeDuplicates);
-
+    
   private:
     std::unique_ptr<DNSServer>        dnsServer;
     std::unique_ptr<ESP8266WebServer> server;
@@ -211,7 +214,7 @@ class myWiFiManager
     boolean       _newline_debug = true;
 
     void (*_apcallback)(myWiFiManager*) = NULL;
-    void (*_savecallback)(void) = NULL;
+    void (*_actioncallback)(void) = NULL;
 
     myWiFiManagerParameter* _params[WIFI_MANAGER_MAX_PARAMS];
 

@@ -12,7 +12,7 @@
 //define your default values here, if there are different values in config.json, they are overwritten.
 //length should be max size + 1 
 
-const char HTTP_PARAM[] PROGMEM = "<input id='config' name='config' length=1 placeholder='0' value='0' type='hidden'><input type='checkbox' onclick=\"var e = document.getElementById('config'); e.value = updatebit(e.value,this.checked,0); \">GPS</br><input type='checkbox' onclick=\"var e = document.getElementById('config'); e.value = updatebit(e.value,this.checked,1); \">barometer</br><input type='checkbox' onclick=\"var e = document.getElementById('config'); e.value = updatebit(e.value,this.checked,2); \">humidity</br><input type='checkbox' onclick=\"var e = document.getElementById('config'); e.value = updatebit(e.value,this.checked,3); \">accelero<br/>";
+//const char HTTP_PARAM[] PROGMEM = "<input id='config' name='config' length=1 placeholder='0' value='0' type='hidden'><input type='checkbox' onclick=\"var e = document.getElementById('config'); e.value = updatebit(e.value,this.checked,0); \">Gps</br><input type='checkbox' onclick=\"var e = document.getElementById('config'); e.value = updatebit(e.value,this.checked,1); \">barometer</br><input type='checkbox' onclick=\"var e = document.getElementById('config'); e.value = updatebit(e.value,this.checked,2); \">humidity</br><input type='checkbox' onclick=\"var e = document.getElementById('config'); e.value = updatebit(e.value,this.checked,3); \">accelero<br/>";
 
 const char demo_html[] PROGMEM =
 "<!DOCTYPE html>\n"
@@ -128,6 +128,8 @@ int config = 7;
 myWiFiManager myWifiManager;
 myWiFiManagerParameter * custom_config;
 myWiFiManagerParameter * demo;
+myWiFiManagerParameter * sensors_parm;
+
 char pagebuf[1024];
 String page = "";
 
@@ -140,6 +142,40 @@ void saveConfigCallback () {
 String SetupDemoPage(void){
   return FPSTR(demo_html);
 }
+
+String sensors(void) {
+  StaticJsonBuffer<256> jsonBuffer;
+  char data[256];
+  
+  JsonObject& root = jsonBuffer.createObject();
+  StaticJsonBuffer<256> jsonBufferBar;
+ 
+  JsonObject& bar = jsonBufferBar.createObject();
+	bar["Sensor"] = "BMP085/BMP180";
+	bar["Temperature"] = "23";
+	bar["Pressure"] = "1024";
+  bar.printTo(data,sizeof(data));
+  root["barometer"] = data;
+  StaticJsonBuffer<256> jsonBufferHum;
+	JsonObject& hum = jsonBufferHum.createObject();
+	hum["Sensor"] = "HTU21DF";
+	hum["Temperature"] = "22";
+	hum["Humidity"] = "64";
+	hum.printTo(data,sizeof(data));
+  root["humidity"] = data;
+  StaticJsonBuffer<256> jsonBufferPar;
+  JsonObject& part = jsonBufferPar.createObject();
+  part["Sensor"] = "PPD42";
+  part["PM1"] = "5002";
+  part["PM2.5"] = "4242";
+  part.printTo(data,sizeof(data));
+  root["particulate"] = data;
+  root.printTo(data, sizeof(data));
+
+  Serial.println("{\"barometer\":{\"Sensor\":\"BMP085/BMP180\",\"Temperature\":23.2,\"Pressuse\":1021.34},\"humidity\":{\"Sensor\":\"HTU21DF\",\"Temperature\":21.3,\"Humidity\":53.2},\"PPparticulateD42\":{\"Sensor\":\"PPD42\",\"PM1\":2103,\"PM2.5\":5302}}");
+
+  return FPSTR("{\"barometer\":{\"Sensor\":\"BMP085/BMP180\",\"Temperature\":23.2,\"Pressuse\":1021.34},\"humidity\":{\"Sensor\":\"HTU21DF\",\"Temperature\":21.3,\"Humidity\":53.2},\"particulate\":{\"Sensor\":\"PPD42\",\"PM1\":2103,\"PM2.5\":5302}}");
+}    
 
 void setup() {
   // put your setup code here, to run once:
@@ -158,7 +194,7 @@ void setup() {
   page += "<tr><td><input type='checkbox' name='options'";
   page += (1<<0 & config) != 0 ? "checked": "unchecked";
   page += " value='1'/>";
-  page += "</td><td>GPS</td></tr>";
+  page += "</td><td>Gps</td></tr>";
   page += "<tr><td><input type='checkbox' name='options'";
   page += (1<<1 & config) != 0 ? "checked": "unchecked";
   page += " value='2'/>";
@@ -178,26 +214,26 @@ void setup() {
   page += "<tr><td><input type='checkbox' name='options'";
   page += (1<<5 & config) != 0 ? "checked": "unchecked";
   page += " value='32'/>";
-  page += "</td><td>buzzer</td></tr>";
+  page += "</td><td>buzzer </td></tr>";
   page += "</table>";
 
   const char * ptr = page.c_str();
 
-  custom_config = new myWiFiManagerParameter("config","config","0",2,ptr );
+  custom_config = new myWiFiManagerParameter( "config","config","0",2,ptr );
+
   //myWiFiManager
   //Local intialization. Once its business is done, there is no need to keep it around
 
   //set config save notify callback
   myWifiManager.setSaveConfigCallback(saveConfigCallback);
 
- //demo = new myWiFiManagerParameter("Demo",SetupDemoPage());
+  demo = new myWiFiManagerParameter("Demo","DEMO", &SetupDemoPage);
+  sensors_parm = new myWiFiManagerParameter("sensors.json", &sensors);
   //add all your parameters here
   myWifiManager.addParameter(custom_config);
-  //myWifiManager.addParameter(demo);
-/*  myWifiManager.addParameter(&custom_SSID2);
-  myWifiManager.addParameter(&custom_SSID3);
-  myWifiManager.addParameter(&custom_SSID4);
-  */
+  myWifiManager.addParameter(demo);
+  myWifiManager.addParameter(sensors_parm);
+
   //reset settings - for testing
   //myWifiManager.resetSettings();
 

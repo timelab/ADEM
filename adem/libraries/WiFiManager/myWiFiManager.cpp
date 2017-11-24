@@ -36,7 +36,7 @@ myWiFiManagerParameter::myWiFiManagerParameter() {
 
   _customHTML = NULL;
   _setup = NULL;
-  _savecallback = NULL;
+  _actioncallback = NULL;
 }
 
 myWiFiManagerParameter::myWiFiManagerParameter(const char *custom) {
@@ -47,7 +47,7 @@ myWiFiManagerParameter::myWiFiManagerParameter(const char *custom) {
 
   _customHTML = custom;
   _setup = NULL;
-  _savecallback = NULL;
+  _actioncallback = NULL;
 }
 
 myWiFiManagerParameter::myWiFiManagerParameter(const char *id, const char *placeholder, const char *defaultValue, int length) {
@@ -72,17 +72,38 @@ void myWiFiManagerParameter::init(const char *id, const char *placeholder, const
 
   _customHTML = custom;
   _setup = NULL;
-  _savecallback = NULL;
+  _actioncallback = NULL;
 }
 
-myWiFiManagerParameter::myWiFiManagerParameter(const char *id, String(* setupfunc)(void), void (*savefunc)(void) ){
+myWiFiManagerParameter::myWiFiManagerParameter(const char *id, const char *placeholder, String(* setupfunc)(void), void (*actionfunc)(void) ){
+  _id = id;
+  _placeholder = placeholder;
+  _length = 0;
+  _value = NULL;
+  _customHTML = NULL;
+  _setup = setupfunc;
+  _actioncallback = actionfunc;
+
+}
+
+myWiFiManagerParameter::myWiFiManagerParameter(const char *id, const char *placeholder, String(* setupfunc)(void)){
+ _id = id;
+  _placeholder = placeholder;
+  _length = 0;
+  _value = NULL;
+  _customHTML = NULL;
+  _setup = setupfunc;
+  _actioncallback = NULL;
+}
+
+myWiFiManagerParameter::myWiFiManagerParameter(const char *id, String(* setupfunc)(void), void (*actionfunc)(void) ){
   _id = id;
   _placeholder = NULL;
   _length = 0;
   _value = NULL;
   _customHTML = NULL;
   _setup = setupfunc;
-  _savecallback = savefunc;
+  _actioncallback = actionfunc;
 
 }
 
@@ -93,7 +114,7 @@ myWiFiManagerParameter::myWiFiManagerParameter(const char *id, String(* setupfun
   _value = NULL;
   _customHTML = NULL;
   _setup = setupfunc;
-  _savecallback = NULL;
+  _actioncallback = NULL;
 }
 
 const char* myWiFiManagerParameter::getValue() {
@@ -301,9 +322,9 @@ boolean  myWiFiManager::startConfigPortal(char const *apName, char const *apPass
         //connected
         WiFi.mode(WIFI_STA);
         //notify that configuration has changed and any optional parameters should be saved
-        if ( _savecallback != NULL) {
+        if ( _actioncallback != NULL) {
           //todo: check if any custom parameters actually exist, and check if they really changed maybe
-          _savecallback();
+          _actioncallback();
         }
         break;
       }
@@ -311,9 +332,9 @@ boolean  myWiFiManager::startConfigPortal(char const *apName, char const *apPass
       if (_shouldBreakAfterConfig) {
         //flag set to exit after config after trying to connect
         //notify that configuration has changed and any optional parameters should be saved
-        if ( _savecallback != NULL) {
+        if ( _actioncallback != NULL) {
           //todo: check if any custom parameters actually exist, and check if they really changed maybe
-          _savecallback();
+          _actioncallback();
         }
         break;
       }
@@ -548,13 +569,17 @@ void myWiFiManager::handleRoot() {
       break;
     }
     if (_params[i]->isExternal()){
-      String pitem = FPSTR(HTTP_FORM_BUTTON);
-      pitem.replace("{i}", _params[i]->getID());
-      pitem.replace("{a}", _params[i]->getID());
-      page += pitem;
-      pitem = "/";
-      pitem += _params[i]->getID();
-      /// TOOD add external button with ID text
+      if (_params[i]->getPlaceholder() != NULL) {    // only parameters with placeholders show up as external webpages via button on root page
+        String pitem = FPSTR(HTTP_FORM_EXT_BUTTON);  // <form action=\"/{a}\" method=\"get\"><button>{i}</button></form><br/>
+        pitem.replace("{i}", _params[i]->getPlaceholder());   // getPlaceholder
+        pitem.replace("{a}", _params[i]->getID());
+        page += pitem;
+        pitem = "/";
+        pitem += _params[i]->getID();
+        /// TOOD add external button with ID text
+        // server->on(pitem,_params[i]._actioncallback)
+        // /<ID> is automatically handled via the not found call
+      }
     }
     else
       param = true;
@@ -883,8 +908,8 @@ void myWiFiManager::handleParamSave() {
     DEBUG_WM(F(" = "));
     DEBUG_WM_LN(value);
   }
-  if ( _savecallback != NULL) {
-          _savecallback();
+  if ( _actioncallback != NULL) {
+          _actioncallback();
   }
   else
   {
@@ -1147,37 +1172,45 @@ void myWiFiManager::handleNotFound() {
     if (_params[i] == NULL) {
       break;
     }
-    if ((_params[i]->isExternal())&&(uri.endsWith(_params[i]->getID()))) {
-      if (uri.equals("/"+ String(_params[i]->getID())))
-      {
-        String page = _params[i]->_setup();
-        server->send(200,"text/html",page);
-        return;
-      }
-      if (uri.equals("/save"+ String(_params[i]->getID())))
-      {
-        if ( _params[i]->_savecallback != NULL)
-          _params[i]->_savecallback();
-        String page = FPSTR(HTTP_HEAD);
-        page.replace("{v}", "Custom Save");
-        page += FPSTR(HTTP_SCRIPT);
-        page += FPSTR(HTTP_STYLE);
-        page += _customHeadElement;
-        page += FPSTR(HTTP_HEAD_END);
-        page += "<h1>";
-        page += FPSTR(HTTP_LOGO_SVG_SMALL);
-        page += FPSTR(HTTP_LOGO_PATH);
-        page += "</h1>";
-        page += F("<dl><dt>");
-        page += _params[i]->getID();
-        page += " saved </dt></dl>";
-        page += FPSTR(HTTP_OK);
-        page += FPSTR(HTTP_END);
-        
-        server->send(200, "text/html", page);
+    if (_params[i]->isExternal()){
+      DEBUG_WM("check for parameter ");DEBUG_WM_LN(_params[i]->getID());
+      if (uri.endsWith(_params[i]->getID())) {
+        if (uri.equals("/"+ String(_params[i]->getID())))
+        {
+          DEBUG_WM_LN( "call parameter external function ");
+          String page = _params[i]->_setup();
+          if(String(_params[i]->getID()).endsWith("json"))
+            server->send(200, "application/json", page);
+          else
+            server->send(200,"text/html",page);
+          return;
+        }
+        if (uri.equals("/save "+ String(_params[i]->getID())))
+        {
+          DEBUG_WM_LN( "call parameter custom save function ");
+          if ( _params[i]->_actioncallback != NULL)
+            _params[i]->_actioncallback();
+          String page = FPSTR(HTTP_HEAD);
+          page.replace("{v}", "Custom Save");
+          page += FPSTR(HTTP_SCRIPT);
+          page += FPSTR(HTTP_STYLE);
+          page += _customHeadElement;
+          page += FPSTR(HTTP_HEAD_END);
+          page += "<h1>";
+          page += FPSTR(HTTP_LOGO_SVG_SMALL);
+          page += FPSTR(HTTP_LOGO_PATH);
+          page += "</h1>";
+          page += F("<dl><dt>");
+          page += _params[i]->getID();
+          page += " saved </dt></dl>";
+          page += FPSTR(HTTP_OK);
+          page += FPSTR(HTTP_END);
+          
+          server->send(200, "text/html", page);
 
-        DEBUG_WM_LN(F("Sent Custom save page"));
-        return;
+          DEBUG_WM_LN(F("Sent Custom save page"));
+          return;
+        }
       }
     }
   }
@@ -1207,7 +1240,6 @@ void myWiFiManager::handleNotFound() {
 /** Redirect to captive portal if we got a request for another domain. Return true in that case so the page handler do not try to handle the request again. */
 boolean myWiFiManager::captivePortal() {
 
-   
   if (!isIp(server->hostHeader()) ) {
     DEBUG_WM_LN(F("Request redirected to captive portal"));
     server->sendHeader("Location", String("http://") + toStringIp(server->client().localIP()), true);
@@ -1225,7 +1257,7 @@ void myWiFiManager::setAPCallback( void (*func)(myWiFiManager* mymyWiFiManager) 
 
 //start up save config callback
 void myWiFiManager::setSaveConfigCallback( void (*func)(void) ) {
-  _savecallback = func;
+  _actioncallback = func;
 }
 
 //sets a custom element to add to head, like a new style tag
