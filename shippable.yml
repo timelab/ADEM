@@ -21,7 +21,7 @@ install:
     --pref boardsmanager.additional.urls=http://arduino.esp8266.com/stable/package_esp8266com_index.json
     --pref build.verbose=false
     --pref compiler.warning_level=error
-    --pref sketchbook.path=.
+    --pref sketchbook.path=adem
     --install-boards esp8266:esp8266
     --save-prefs
 script:
