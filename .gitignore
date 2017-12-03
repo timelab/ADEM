@@ -1,12 +1,18 @@
+# Unwanted extensions
+*~
+*.log
+*.suo
+
+# Unwanted directories
+.clang_complete/
+.gcc-flags.json
+.pioenvs/
+.piolibdeps/
+__vm/
+.vscode/
+Build/
+
+# Unwanted files
 Arduino
 arduino15
-Build
 config.h
-*~
-people/kavers1/MyAdem/myAdem/myAdem.v12.suo
-people/kavers1/MyAdem/myAdem/myAdem/__vm/.myAdem.vsarduino.h
-people/kavers1/MyAdem/myAdem/myAdem.v12.suo
-*.suo
-adem/.vscode/settings.json
-adem/libraries/StoreAndForward/examples/test/test.log
-*.log
