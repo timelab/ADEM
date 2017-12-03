@@ -1,28 +1,30 @@
 language: c
+
 env:
   global:
-    - ARDUINO_VERSION="1.8.5"
-    - DISPLAY=":1.0"
+  - ARDUINO_VERSION=1.8.5
+  - DISPLAY=:1.0
+
 before_install:
-  # Ensure we have a DISPLAY for the Arduino IDE [WORKAROUND]
-  - "/sbin/start-stop-daemon --start --quiet --pidfile /tmp/custom_xvfb_1.pid --make-pidfile --background --exec /usr/bin/Xvfb -- :1 -ac -screen 0 1280x1024x16"
-  # Download and extract Arduino
-  - wget -nv http://downloads.arduino.cc/arduino-$ARDUINO_VERSION-linux64.tar.xz
-  - tar -xJf arduino-$ARDUINO_VERSION-linux64.tar.xz
-  # Install Arduino into the known PATH [WORKAROUND]
-  - sudo mv $PWD/arduino-$ARDUINO_VERSION /usr/local/share/arduino
-  - sudo ln -snf /usr/local/share/arduino/arduino /usr/local/bin/arduino
-  # The below fails to work
-#  - export PATH="$PATH:$PWD/arduino-$ARDUINO_VERSION"
+# Ensure we have a DISPLAY for the Arduino IDE [WORKAROUND]
+- "/sbin/start-stop-daemon --start --quiet --pidfile /tmp/custom_xvfb_1.pid --make-pidfile --background --exec /usr/bin/Xvfb -- :1 -ac -screen 0 1280x1024x16"
+# Download and extract Arduino
+- wget -nv http://downloads.arduino.cc/arduino-$ARDUINO_VERSION-linux64.tar.xz
+- tar -xJf arduino-$ARDUINO_VERSION-linux64.tar.xz
+
 install:
-  # Ensure we use the current directory to include library/
-  - >
-    arduino
-    --pref boardsmanager.additional.urls=http://arduino.esp8266.com/stable/package_esp8266com_index.json
-    --pref build.verbose=false
-    --pref compiler.warning_level=error
-    --pref sketchbook.path=adem
-    --install-boards esp8266:esp8266
-    --save-prefs
+# Ensure we use the adem directory to include library/
+- >
+  PATH="$PATH:$PWD/arduino-$ARDUINO_VERSION"
+  arduino
+  --pref boardsmanager.additional.urls=http://arduino.esp8266.com/stable/package_esp8266com_index.json
+  --pref build.verbose=false
+  --pref compiler.warning_level=error
+  --pref sketchbook.path=adem
+  --install-boards esp8266:esp8266
+  --save-prefs
+
 script:
-  - arduino --verify --board esp8266:esp8266:thing $PWD/adem/adem.ino
+- >
+  PATH="$PATH:$PWD/arduino-$ARDUINO_VERSION"
+  arduino --verify --board esp8266:esp8266:thing $PWD/adem/adem.ino
