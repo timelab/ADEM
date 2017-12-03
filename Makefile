@@ -2,7 +2,7 @@ ARDUINO_PATH = $(CURDIR)/Arduino
 ARDUINO15_PATH = $(CURDIR)/arduino15
 BUILD_PATH = $(CURDIR)/Build
 
-SKETCH = adem/adem/adem.ino
+SKETCH = adem/adem.ino
 SKETCH_NAME = $(shell basename $(SKETCH))
 SKETCH_DIR = $(shell dirname $(SKETCH))
 
