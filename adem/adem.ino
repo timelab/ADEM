@@ -18,6 +18,8 @@
  *
  */
 
+//#define DEMO 1
+ 
 #include <TickerSchedlr.h>
 #include <DNSServer.h>
 #include <ESP8266WebServer.h>
@@ -71,13 +73,16 @@ uint32_t mTimeSeconds = 0;
   #ifdef TELNET
     #define __LOG(msg) Telnet.print(msg)
     #define __LOGLN(msg) Telnet.println(msg)
+    #define __LOGHEX(msg) Telnet.print("0x");Telnet.print(msg,HEX);Telnet.print(" ")
   #else
     #define __LOG(msg) Serial.print(msg)
     #define __LOGLN(msg) Serial.println(msg)
+    #define __LOGHEX(msg) Serial.print("0x");Serial.print(msg,HEX);Serial.print(" ")
   #endif
 #else
 #define __LOG(msg)
 #define __LOGLN(msg)
+#define __LOGHEX(msg) 
 #endif
 
 // Different states of the program
@@ -91,6 +96,7 @@ enum state_t {
   STATE_WIFITEST,
   STATE_UPLOAD,
   STATE_RESET,
+  STATE_LOW_POWER,
 };
 char *states[] {
   "START",
@@ -102,19 +108,24 @@ char *states[] {
   "WIFITEST",
   "UPLOAD",
   "RESET",
+  "LOW POWER",
 };
 state_t prev_state = STATE_START;
 state_t state = STATE_START;
+bool wififail = false;
+bool demoflag = false;
+uint16_t sensors_detected = 0;
+uint16_t sensors_config = -1;
 
-#ifdef DEMO
+/*#ifdef DEMO
 const char *mdnsname = "adem";  // Used by mDNS. Try http://adem.local/
 DNSServer dnsserver;
 ESP8266WebServer webserver(80);
 IPAddress apIP(192, 168, 4, 1);
 state_t next_state = STATE_DEMO;
-#else // DEMO
-state_t next_state = STATE_SLEEP;
-#endif // DEMO
+#else // DEMO*/
+state_t next_state = STATE_START;
+//#endif // DEMO
 
 // DEBUG input
 class Debug {
@@ -141,7 +152,7 @@ BMP085Sensor barometer;
 LipoBattery battery;
 PassiveBuzzer buzzer;
 //SwSerialGPS gps = SwSerialGPS(GPS_RX_PIN, GPS_TX_PIN, GPS_BAUD);
-I2CGps gps = I2CGps(GPS_RX_PIN, GPS_TX_PIN, GPS_BAUD);
+I2CGps gps = I2CGps();
 HTU21DFSensor humidity;
 NeoPixelLed led = NeoPixelLed(1, NEOPIXEL_PIN, NEO_GRB + NEO_KHZ800);
 PPD42Sensor particulate(PM1_PIN, PM25_PIN);
@@ -164,6 +175,10 @@ uint32_t purple = led.Color(63, 0, 127);
 
 uint32_t _lst_msg = 0;
 uint32_t ts =0;
+uint32_t i2c_ts = 0;
+uint32_t i2c_status = 0;
+
+unsigned char twi_sda, twi_scl;
 
 uint32_t colors[] = {
   red,
@@ -175,6 +190,7 @@ uint32_t colors[] = {
   purple,
   blue,
   white,
+  black
 };
 
 uint16_t led_state = 0;
@@ -191,7 +207,7 @@ TickerTask *upload_task = NULL;
 // TASKS
 void accelerometer_run(void *) {
 //  __LOGLN(":accelerometer: -> Check moving/shaken");
-  accelerometer.read();
+  //accelerometer.read();
   //Serial.println(accelerometer.report());
 
   // process normal accel data in logging.
@@ -199,6 +215,7 @@ void accelerometer_run(void *) {
   while (accelerometer.hasData()) {
     accelerometer.read();
     buffer.write((char *)accelerometer.dataToBuffer(), accelerometer.dataBufferSize());
+    yield(); // we can have lots of data stpp WDT crashes
 //    __LOGLN(accelerometer.report());
   }
 }
@@ -249,78 +266,114 @@ void upload_run(void *){
   int s = 0;
   String strReport;
   Sensor * pSens = NULL;
-  __LOG("buffered report : #");
-  if (~ buffer.empty()){
+  
+  if (not buffer.empty()){
+    __LOG("buffered report ");
     lID = buffer.peek();
-    buffer.nack();
+    __LOG(" for sensor ID : ");__LOG(lID);
     switch (lID){
       case BAROMETER_BMP085:
+        __LOGLN(" BAROMETER");
         pSens = &barometer;
         break;
       case HUMIDITY_HTU21D:
+        __LOGLN(" HUMIDITY");
         pSens = &humidity;
         break;
       case PARTICULATE_PPD42:
+        __LOGLN(" PPD42");
         pSens = &particulate;
         break;
       case GPS_SWSERIAL:
+        __LOGLN(" GPS SERIAL");
         pSens = &gps;
         break;
       case GPS_I2C:
+        __LOGLN(" GPS I2C");
         pSens = &gps;
         break;
       case ACCELERO_MPU6050:
+        __LOGLN(" ACCELEROMETER");
         pSens = &accelerometer;
         break;
+      default :
+        return;
 /// TODO : what if ID is not recognized ? How to recover from corrupt data ?
-
     }
-
+    buffer.ack();
+    
+//    __LOG("get buffer for sensor for nrbytes = ");__LOGLN(pSens->dataBufferSize());
     s = buffer.peek(&lbuf[0], pSens->dataBufferSize());
-    if (s)
+    if (s > 0 ) {
+ /*     __LOGLN("");
+      __LOG(lbuf[0]);
+      for (int i = 1; i < s;i++){
+        __LOG(lbuf[i]); __LOG(",");
+      }
+      __LOGLN("");*/
       strReport = pSens->bufferedReport((uint8_t *)&lbuf[0]);
-    __LOG(strReport);
+      __LOG(strReport);
+    }  
+    
     __LOGLN("#");
     // send off strReport to datastore
     // if ACK of storage then ack buffer
     boolean success = true;
-    if (success)
+    if (success){
+        __LOGLN("acknowledge buffer");
         buffer.ack();
-    else
+    }
+    else {
+        __LOGLN("nack buffer");
         buffer.nack();
+    }
   }
+  else{
+    yield();
+  }
+
 }
 
+void demo_run(void *){
+
+}
 
 // STATES
 void start_state() {
   // TODO
   // I2C scanner based on address we call the proper sensor begin
   // address should be identical to the device ID in the sensorIDs.h file
-
+  scan_I2C();
+  //read config
+  sensors_config = -1;
   battery_task = TickerTask::createPeriodic(&battery_run, 300000);
   battery_task->name = "battery";
+  next_state = STATE_SLEEP;
 }
 
-#ifdef DEMO
 void demo_state() {
   delay(50);
-  dnsserver.processNextRequest();
-  webserver.handleClient();
+//  dnsserver.processNextRequest();
+//  webserver.handleClient();
 }
-#else // DEMO
 
 void sleep_state() {
   delay(500);
 
+  if (sensors_detected != sensors_config){
+    next_state = STATE_CONFIG;
+  }
+  else
   if (accelerometer.isMoving() or debug.moving) {
     next_state = STATE_GPSTEST;
     if (accelerometer.isMoving()) __LOGLN("accelerometer.isMoving(), next_state = STATE_GPSTEST");
     if (debug.moving) __LOGLN("debug.moving, next_state = STATE_GPSTEST");
-  } else {
-    if (not buffer.empty()) {
+  } 
+  else {
+    if (not buffer.empty() and not wififail) {
       next_state = STATE_WIFITEST;
-    } else if (accelerometer.shaken or debug.shaken) {
+    } 
+    else if (accelerometer.isShaken() or debug.shaken) {
       next_state = STATE_CONFIG;
     }
   }
@@ -333,6 +386,9 @@ void config_state() {
   if (not debug.shaken) {
     next_state = STATE_SLEEP;
   }
+  if (demoflag) {
+    next_state = STATE_DEMO;
+  }
 }
 
 void gpstest_state() {
@@ -344,7 +400,10 @@ void gpstest_state() {
       if (gps.ready) __LOGLN("gps.ready, next_state = STATE_COLLECT");
       if (debug.gpsready) __LOGLN("debug.gpsready, next_state = STATE_COLLECT");
     }
-  } else {
+    else
+      delay(500); // to overcome quick looping and WDT timeoutc
+  } 
+  else {
     next_state = STATE_SLEEP;
   }
 }
@@ -360,14 +419,21 @@ void collect_state() {
 }
 
 void wifitest_state() {
-
+  __LOG("in wifi test ");
+  //ETS_GPIO_INTR_DISABLE();
+  
   wifi.start_client();
-
+  __LOG("wifi client started ");
+  // ETS_GPIO_INTR_ENABLE();
   if (wifi.connected or debug.wifi) {
     next_state = STATE_UPLOAD;
   }
+  else
+  {
+    wififail = true;
+  }
 
-  if (accelerometer.isMoving() or debug.moving or buffer.empty() or not wifi.connected) {
+  if (accelerometer.isMoving() or debug.moving or buffer.empty() or wififail) {
     next_state = STATE_SLEEP;
   }
 }
@@ -380,10 +446,21 @@ void upload_state() {
   // Empty datastore
 
   if (buffer.empty()) {
-    next_state = STATE_WIFITEST;
+    next_state = STATE_LOW_POWER;
   }
 }
-#endif // DEMO
+
+void lowpower_state() {
+
+  // Upload action finishes successfully or times out
+  // Create JSON of X records
+  // Send to server
+  // Empty datastore
+
+  if ( accelerometer.isShaken()) {
+    next_state = STATE_SLEEP;
+  }
+}
 
 void reset_state() {
   ESP.reset();
@@ -391,8 +468,7 @@ void reset_state() {
 
 
 // TRANSITIONS
-#ifdef DEMO
-void start_to_demo() {
+void config_to_demo() {
   barometer.begin();
   barometer_task = TickerTask::createPeriodic(&barometer_run, 15000);
   barometer_task->name = "barometer";
@@ -403,7 +479,7 @@ void start_to_demo() {
   particulate_task = TickerTask::createPeriodic(&particulate_run, 60000);
   particulate_task->name = "particulate";
 
-  WiFi.mode(WIFI_AP);
+/*  WiFi.mode(WIFI_AP);
   WiFi.softAPConfig(apIP, apIP, IPAddress(255, 255, 255, 0));
   WiFi.softAP(SSID);
 
@@ -418,16 +494,13 @@ void start_to_demo() {
   Serial.println(" OK");
 
   Serial.print("Initializing web server...");
-  webserver.on("/", website);
-  webserver.on("/sensors.json", sensors);
-  // Android gets http://clients3.google.com/generate_204 and expects 204
-  webserver.on("/generate_204", generate_204);
-  // Other variations get http://www.google.com/blank.html and expect 200
-  webserver.on("/blank.html", generate_200);
-  // Microsoft captive portal handled by onNotFound handler below
-//  webserver.on("/fwlink", website);
-  webserver.onNotFound(website);
-  webserver.begin();
+  wifi.begin();
+  /*wifi.start_ap(SSID);
+  //webserver.on("/", website);
+  wifi.registerExternalPage("/demo", &website);
+  //webserver.on("/sensors.json", sensors);
+  wifi.registerExternalPage("/sensors.json", &sensors);
+  */
   Serial.println(" OK");
 
   Serial.println();
@@ -436,10 +509,12 @@ void start_to_demo() {
   Serial.println("=> And surf to: http://adem.local/");
   Serial.println();
 }
-#else // DEMO
+
+void demo_to_config(){
+  demoflag = false;
+}
 
 void start_to_sleep() {
-
 //  buzzer.start_sound();
   accelerometer.begin();
   accelerometer_task = TickerTask::createPeriodic(&accelerometer_run, 1000);
@@ -462,6 +537,18 @@ void sleep_to_config() {
   debug.shaken = false;
 }
 
+void sleep_to_lowpower(){
+  // bring all sensors to low power state.
+  // wake up is done by interrupt handling
+
+}
+
+void lowpower_to_sleep() {
+  // should not happen. 
+  // wake up will bring us in start state ????!!!!
+
+}
+
 void config_to_sleep() {
 
   // Suspend wifiap task
@@ -476,6 +563,7 @@ void sleep_to_gpstest() {
   gps.begin();
   gps_task = TickerTask::createPeriodic(&gps_run, 1000);
   gps_task->name = "gps";
+  wififail = false; // clear wifi timeout failure
 }
 
 void gpstest_to_sleep() {
@@ -509,14 +597,15 @@ void collect_to_gpstest() {
   barometer.end();
   humidity_task->clear();
   humidity.end();
-  particulate_task->clear();
-  particulate.end();
+//  particulate_task->clear();
+//  particulate.end();
 }
 
 void sleep_to_wifitest() {
 
-  // Resume wificlient task
-
+  // Resume wificlient tas
+  // disable the accelero interrupts while connecting to wifi
+  
 }
 
 void wifitest_to_sleep() {
@@ -528,6 +617,8 @@ void wifitest_to_sleep() {
 }
 
 void wifitest_to_upload() {
+  // TODO KOV enable accelero interrupts
+  
   if (not upload_task) {
     upload_task = TickerTask::createIdle(&upload_run);
   }
@@ -545,7 +636,222 @@ void debug_help() {
   __LOGLN("=>       \"b\" to break mode, \"c\" for continue in break mode.");
   __LOGLN();
 }
-#endif // DEMO
+
+void scan_I2C(){
+   int error = 0;
+  int nDevices = 0;
+  for(int address = 0;address < 127 ; address++) {
+    // The i2c_scanner uses the return value of
+    // the Write.endTransmisstion to see if
+    // a device did acknowledge to the address.
+
+    Wire.beginTransmission(address);
+    error = Wire.endTransmission();
+    if (error == 0) {
+      __LOG("I2C - ");
+      __LOGHEX(address);
+      switch (address){
+      case 0x20:
+        sensors_detected |= 1 << GPS_I2C; 
+        __LOGLN(" GPS I2C");
+        break;
+      case 0x40:
+        sensors_detected |= 1 << HUMIDITY_HTU21D; 
+        __LOGLN(" HUMIDITY");
+        break;
+      case 0x50:
+        sensors_detected |= 1 << BUFFER_MEMORY; 
+        __LOGLN(" I2C MEMORY");
+        break;
+      case 0x68:
+       sensors_detected |= 1 << ACCELERO_MPU6050; 
+        __LOGLN(" ACCELEROMETER");
+        break;
+      case 0x77:
+        sensors_detected |= 1 << BAROMETER_BMP085; 
+        __LOGLN(" BAROMETER");
+        break;
+      default :
+        __LOGLN(" ????? Unknown device");
+      }
+      nDevices++;
+    }
+    else if (error==4) {
+      __LOG("ERROR on address : ");
+      __LOGHEX(address);__LOGLN();
+    } 
+  }
+  if (nDevices == 0) {
+    __LOGLN("No I2C devices found");
+  }
+  else {
+    __LOG("I2C scan signature : "); __LOGHEX(sensors_detected);__LOGLN("");
+    __LOGLN("done");
+  }
+}
+
+void check_I2C(){
+// I2C status check and reset if needed
+  int tmp = Wire.status();
+  if  (tmp != I2C_OK){
+    i2c_status = tmp;
+  }
+  else{
+      i2c_ts = ts;
+  }
+  if ((ts - i2c_ts) > 1000) { // no I2C_OK status for more than 1 sec
+    switch (Wire.status()){
+      case  I2C_SCL_HELD_LOW:
+        __LOG("I2C ::::: SCL :::: CLOCK HELD LOW");
+        break;
+      case I2C_SCL_HELD_LOW_AFTER_READ:
+        __LOG("I2C ::::: SCL :::: CLOCK HELD LOW AFTER READ");
+        break;
+      case I2C_SDA_HELD_LOW:
+        __LOG("I2C ::::: SDA :::: DATA HELD LOW");
+        break;
+      case I2C_SDA_HELD_LOW_AFTER_INIT:
+        __LOG("I2C ::::: SDA :::: DATA HELD LOW AFTER INIT");
+        break;
+      case I2C_OK:
+        i2c_ts = ts;
+        break;
+    }
+    Serial.println("Starting I2C bus recovery");
+    twi_sda = SDA; // comming from pins_arduino.h
+    twi_scl = SCL; // comming from pins_arduino.h
+
+    //try i2c bus recovery at 100kHz = 5uS high, 5uS low
+    pinMode(twi_sda, OUTPUT);//keeping SDA high during recovery
+    digitalWrite(twi_sda, HIGH);
+    pinMode(twi_scl, OUTPUT);
+    for (int i = 0; i < 10; i++) { //9nth cycle acts as NACK
+      digitalWrite(twi_scl, HIGH);
+      delayMicroseconds(5);
+      digitalWrite(twi_scl, LOW);
+      delayMicroseconds(5);
+    }
+
+    //a STOP signal (SDA from low to high while CLK is high)
+    digitalWrite(twi_sda, LOW);
+    delayMicroseconds(5);
+    digitalWrite(twi_scl, HIGH);
+    delayMicroseconds(2);
+    digitalWrite(twi_sda, HIGH);
+    delayMicroseconds(2);
+    //bus status is now : FREE
+
+    Serial.println("bus recovery done, starting scan in 2 secs");
+    //return to power up mode
+    twi_stop();
+    delay(2000);
+    //pins + begin advised in https://github.com/esp8266/Arduino/issues/452
+    Wire.begin();
+    switch (Wire.status()){
+      case  I2C_SCL_HELD_LOW:
+        __LOG("I2C ::::: SCL :::: CLOCK HELD LOW");
+        break;
+      case I2C_SCL_HELD_LOW_AFTER_READ:
+        __LOG("I2C ::::: SCL :::: CLOCK HELD LOW AFTER READ");
+        break;
+      case I2C_SDA_HELD_LOW:
+        __LOG("I2C ::::: SDA :::: DATA HELD LOW");
+        break;
+      case I2C_SDA_HELD_LOW_AFTER_INIT:
+        __LOG("I2C ::::: SDA :::: DATA HELD LOW AFTER INIT");
+        break;
+      case I2C_OK:
+        i2c_ts = ts;
+        break;
+    }
+    __LOGLN("");
+  }
+// I2C status check
+}
+
+void handle_debug_cmd(char c){
+  if (c != '\n' and c != '\r') {
+      __LOG("Key "); __LOG(c); __LOG(" is pressed. ");
+      switch (c) {
+        case 'g':
+          debug.gpsready = not debug.gpsready;
+          __LOG("debug.gpsready is "); __LOGLN(debug.gpsready?"on.":"off.");
+          break;
+        case 'm':
+          debug.moving = not debug.moving;
+          __LOG("debug.moving is "); __LOGLN(debug.moving?"on.":"off.");
+          break;
+        case 'r':
+          __LOGLN("Restarting system.");
+          next_state = STATE_RESET;
+          break;
+        case 's':
+          debug.shaken = not debug.shaken;
+          __LOG("debug.shaken is "); __LOGLN(debug.shaken?"on.":"off.");
+          break;
+        case 'w':
+          debug.wifi = not debug.wifi;
+          __LOG("debug.wifi is "); __LOGLN(debug.wifi?"on.":"off.");
+          break;
+        case 'b':
+            debug.breakmode = not debug.breakmode;
+            debug.breakcont = false;
+            __LOG("debug.break is "); __LOGLN(debug.wifi?"on.":"off. <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<");
+            break;
+        case 'c':
+            if (debug.breakmode ){
+              debug.breakcont = true;
+            }
+            __LOGLN("debug.breakcontinue set ");
+            break;
+          case 'e':
+            __LOGLN("Trying to connect to wifi ");
+            yield();
+            ETS_GPIO_INTR_DISABLE();
+            delay(1000);
+            wifi.start_client();
+            ETS_GPIO_INTR_ENABLE();
+            break; 
+        case 'd':
+            __LOG(" >>> >>> >>> current state is : "); __LOG(states[state]);
+            break;
+        case '0' : // STATE_START
+                  state = STATE_START;next_state = STATE_START;
+                  break;
+        case '1' : //STATE_DEMO,
+                  state = STATE_START;next_state = STATE_START;
+                  break;
+        case '2' : //STATE_SLEEP,
+                  state = STATE_SLEEP;next_state = STATE_SLEEP;
+                  break;
+        case '3' : //STATE_CONFIG,
+                  state = STATE_SLEEP;next_state = STATE_CONFIG;
+                  break;
+        case '4' : //STATE_GPSTEST,
+                  state = STATE_GPSTEST;next_state = STATE_GPSTEST;
+                  break;
+        case '5' : //STATE_COLLECT,
+                  state = STATE_COLLECT;next_state = STATE_COLLECT;
+                  break;
+        case '6' : //STATE_WIFITEST,
+                  state = STATE_WIFITEST;next_state = STATE_WIFITEST;
+                  break;
+        case '7' : //STATE_UPLOAD,
+                  state = STATE_UPLOAD;next_state = STATE_UPLOAD;
+                  break;
+        case '8' : //STATE_RESET,
+                  state = STATE_RESET;next_state = STATE_RESET;
+                  break;
+        case 'h':
+        case '?':
+          __LOG(" >>> >>> >>> current state is : "); __LOG(states[state]);
+          debug_help();
+          break;
+        default:
+          __LOGLN("No action.");
+      }
+  }
+}
 
 void setup() {
   
@@ -564,9 +870,7 @@ void setup() {
 
   __LOGLN();
   __LOGLN("Setup started in DEBUG mode.");
-#ifndef DEMO
   debug_help();
-#endif // DEMO
 
   led.begin();
   led.setcolor(led_state, colors[state]);
@@ -585,24 +889,27 @@ void setup() {
 
 // Main loop takes care of state and transition management
 void loop() {
+  ESP.wdtFeed();
+  ts = millis();
+
+  check_I2C();
+
   if( state == next_state){
     switch(state) {
       case STATE_START:     start_state(); break;
-#ifdef DEMO
       case STATE_DEMO:      demo_state(); break;
-#else // DEMO
       case STATE_SLEEP:     sleep_state(); break;
       case STATE_CONFIG:    config_state(); break;
       case STATE_GPSTEST:   gpstest_state(); break;
       case STATE_COLLECT:   collect_state(); break;
       case STATE_WIFITEST:  wifitest_state(); break;
       case STATE_UPLOAD:    upload_state(); break;
+      case STATE_LOW_POWER: lowpower_state(); break;
       case STATE_RESET:     reset_state(); break;
-#endif // DEMO
       default:              reset_state(); break;
     }
   }
-  ts = millis();
+  
   if (state != next_state)  {
     if (ts - _lst_msg > 1000){
       _lst_msg = ts;
@@ -615,32 +922,27 @@ void loop() {
     //{  
       _lst_msg = 0;
       debug.breakcont = false;  // clear continue flag in break mode
-      __LOGLN();
-    
+      __LOG(" >>> >>> >>> moving to next state : "); __LOG(states[state]);__LOG("  -->  ");__LOG(states[next_state]); __LOGLN("<<< <<< <<<");
       switch(state) {
 
         case STATE_START:
           switch(next_state) {
-#ifdef DEMO
-            case STATE_DEMO:      start_to_demo(); break;
-#else // DEMO
             case STATE_SLEEP:     start_to_sleep(); break;
-#endif // DEMO
             default:              next_state = STATE_RESET;
           }; break;
 
-#ifdef DEMO
         case STATE_DEMO:
           switch(next_state) {
+            case STATE_CONFIG:    demo_to_config(); break;
             default:              next_state = STATE_RESET;
           }; break;
-#else // DEMO
 
         case STATE_SLEEP:
           switch(next_state) {
             case STATE_CONFIG:    sleep_to_config(); break;
             case STATE_GPSTEST:   sleep_to_gpstest(); break;
             case STATE_WIFITEST:  sleep_to_wifitest(); break;
+            case STATE_LOW_POWER: sleep_to_lowpower(); break;
             default:              next_state = STATE_RESET;
           }; break;
 
@@ -675,7 +977,11 @@ void loop() {
             case STATE_WIFITEST:  upload_to_wifitest(); break;
             default:              next_state = STATE_RESET;
           }; break;
-#endif // DEMO
+          case STATE_LOW_POWER:
+          switch(next_state) {
+            case STATE_SLEEP:     lowpower_to_sleep(); break;
+            default:              next_state = STATE_RESET;
+          }; break;
       }
 
       prev_state = state;
@@ -692,57 +998,162 @@ void loop() {
 #ifdef TELNET
     Telnet.handle();
 #endif  
-#ifndef DEMO
+
 #ifdef DEBUG
   if (Serial.available() > 0) {
     char c = Serial.read();
-    if (c != '\n' and c != '\r') {
-      __LOG("Key "); __LOG(c); __LOG(" is pressed. ");
-      switch (c) {
-        case 'g':
-          debug.gpsready = not debug.gpsready;
-          __LOG("debug.gpsready is "); __LOGLN(debug.gpsready?"on.":"off.");
-          break;
-        case 'm':
-          debug.moving = not debug.moving;
-          __LOG("debug.moving is "); __LOGLN(debug.moving?"on.":"off.");
-          break;
-        case 'r':
-          __LOGLN("Restarting system.");
-          next_state = STATE_RESET;
-          break;
-        case 's':
-          debug.shaken = not debug.shaken;
-          __LOG("debug.shaken is "); __LOGLN(debug.shaken?"on.":"off.");
-          break;
-        case 'w':
-          debug.wifi = not debug.wifi;
-          __LOG("debug.wifi is "); __LOGLN(debug.wifi?"on.":"off.");
-          break;
-        case 'b':
-            debug.breakmode = not debug.breakmode;
-            debug.breakcont = false;
-            __LOG("debug.break is "); __LOGLN(debug.wifi?"on.":"off. <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<");
-            break;
-        case 'c':
-            if (debug.breakmode ){
-              debug.breakcont = true;
-            }
-            __LOGLN("debug.breakcontinue set ");
-            break;
-
-        case 'h':
-        case '?':
-          debug_help();
-          break;
-        default:
-          __LOGLN("No action.");
-      }
-    }
+    handle_debug_cmd(c);
   }
 #endif // DEBUG
-#endif // DEMO
 }
+
+#ifdef DEMO
+static const char *demo_html =
+"<!DOCTYPE html>\n"
+"<html>\n"
+"  <head>\n"
+"    <title>ADEM Demo</title>\n"
+"    <meta charset=\"UTF-8\">\n"
+"    <meta name=\"apple-mobile-web-app-capable\" content=\"yes\">\n"
+"    <script type=\"application/javascript\">\n"
+"      var density = 1.5 * Math.pow(10, 12);\n"
+"      var pi = 3.14159627;\n"
+"      var K = 3531.5;\n"
+"      var r1 = 0.15 * Math.pow(10, -6);\n"
+"      var vol1 = (4.0 / 3.0) * pi * Math.pow(r1, 3);\n"
+"      var mass1 = density * vol1;\n"
+"      var r25 = 0.44 * Math.pow(10, -6);\n"
+"      var vol25 = (4.0 / 3.0) * pi * Math.pow(r25, 3);\n"
+"      var mass25 = density * vol25;\n"
+"\n"
+"      function PMcount(PPM) {\n"
+"        var ratioPPM = PPM / 60000 * 10.0;\n"
+"        return 1.1 * Math.pow(ratioPPM, 3) - 3.8 * Math.pow(ratioPPM, 2) + 520 * ratioPPM + 0.62;\n"
+"      }\n"
+"\n"
+"      // Assues density,  shape,  and size of dust  to estimate mass concentration  from particle\n"
+"      // count. This method was described in a 2009 paper by Uva, M., Falcone, R., McClellan, A.,\n"
+"      // and Ostapowicz, E.            http://wireless.ece.drexel.edu/research/sd_air_quality.pdf\n"
+"\n"
+"      // begins PM1 mass concentration algorithm\n"
+"      function PM1mass(PM1) {\n"
+"        return Math.round(PMcount(PM1) * K * mass1 * 100) / 100;\n"
+"     }\n"
+"\n"
+"      function PM25mass(PM25) {\n"
+"        return Math.round(PMcount(PM25) * K * mass25 * 100) / 100;\n"
+"      }\n"
+"\n"
+"      function update_all() {\n"
+"        var request = new XMLHttpRequest();\n"
+"        request.open('GET', '/sensors.json', true);\n"
+"        // This following line is needed to tell the server this is an ajax request\n"
+"        request.setRequestHeader('X-Requested-With', 'XMLHttpRequest');\n"
+"        request.onload = function () {\n"
+"          var json = JSON.parse(this.response);\n"
+"          document.getElementById('bar').innerHTML = json['barometer']['Pressure'];\n"
+"          document.getElementById('tmp').innerHTML = ((json['barometer']['Temperature'] + json['humidity']['Temperature']) / 2).toFixed(2);\n"
+"          document.getElementById('hum').innerHTML = json['humidity']['Humidity'];\n"
+"          document.getElementById('pm1').innerHTML = (json['particulate']['PM1'] / 100).toFixed(2);\n"
+"          document.getElementById('pm2').innerHTML = (json['particulate']['PM2.5'] / 100).toFixed(2);\n"
+"          document.getElementById('pm1c').innerHTML = (PMcount(json['particulate']['PM1']) / 100).toFixed(2);\n"
+"          document.getElementById('pm2c').innerHTML = (PMcount(json['particulate']['PM2.5']) / 100).toFixed(2);\n"
+"          // Count PM2.5 mass together with PM1 mass with its own formula\n"
+"          document.getElementById('pm1m').innerHTML = (PM1mass(json['particulate']['PM1'] - json['particulate']['PM2.5']) + PM25mass(json['particulate']['PM2.5'])).toFixed(2);\n"
+"          document.getElementById('pm2m').innerHTML = (PM25mass(json['particulate']['PM2.5'])).toFixed(2);\n"
+"        };\n"
+"        request.send();\n"
+"      };\n"
+"      setInterval(update_all, 20000);\n"
+"    </script>\n"
+"    <style>\n"
+"      *{ -webkit-box-sizing:border-box; -moz-box-sizing:border-box; box-sizing:border-box }\n"
+"      html,body { height:100%; margin:0 }\n"
+"      body { padding-top:20px; font-family:sans-serif; font-weight:700; color:#30a5e7; font-size:28px; line-height:1.5 }\n"
+"      table.outer { width:100%; height: 100%; }\n"
+"      td.outer { align: center; vertical-align: middle; }\n"
+"      table.inner { width:100%; }\n"
+"      td { display:table-cell; vertical-align:top; width:33%; text-align:right }\n"
+"      td.col2 { border-bottom:1px solid #30a5e7; padding-right:10px }\n"
+"      td.col3 { text-align:left; padding-left:10px }\n"
+"      a.top { border-bottom:1px solid #30a5e7 }\n"
+"      .sub { font-size:.65em }\n"
+"      .top { position:absolute }\n"
+"      svg.top { top:5%; left:6% }\n"
+"      a.top { font-size:.75em; color:#30a5e7; bottom:7%; left:50%; -webkit-transform:translateX(-50%); transform:translateX(-50%); text-decoration:none }\n"
+"      @media(max-height:700px) {\n"
+"        body { font-size:22px }\n"
+"        svg.top { top:3%; width:64px }\n"
+"      }\n"
+"      @media(max-height:450px) {\n"
+"        .top { display:none }\n"
+"      }\n"
+"      @media(max-width:750px) {\n"
+"        svg.top { left:50%; -webkit-transform:translateX(-50%); transform:translateX(-50%) }\n"
+"      }\n"
+"    </style>\n"
+"  </head>\n"
+"  <body onload=\"update_all();\">\n"
+"    <a href=\"http://ik-adem.be/\" target=\"_blank\" class=\"top\">ik-adem.be</a>\n"
+"    <table class=\"outer\"><tr><td class=\"outer\">\n"
+"      <table class=\"inner\">"
+"        <tbody>\n"
+"          <tr><td rowspan=\"2\">&#128684;</td><td class=\"col2\" id=\"pm1\">N/A</div></td> <td class=\"col3\">PM<span class=\"sub\">1.0</span></td></tr>\n"
+"                                          <tr><td class=\"col2\" id=\"pm1c\">N/A</div></td><td class=\"col3\">pc/.01ft³</td></tr>\n"
+"                        <tr><td>&#128168;</td><td class=\"col2\" id=\"pm1m\">N/A</div></td><td class=\"col3\">µg/m³</td></tr>\n"
+"          <tr><td rowspan=\"2\">&#127981;</td><td class=\"col2\" id=\"pm2\">N/A</div></td> <td class=\"col3\">PM<span class=\"sub\">2.5</span></td></tr>\n"
+"                                          <tr><td class=\"col2\" id=\"pm2c\">N/A</div></td><td class=\"col3\">pc/.01ft³</td></tr>\n"
+"                        <tr><td>&#128168;</td><td class=\"col2\" id=\"pm2m\">N/A</div></td><td class=\"col3\">µg/m³</td></tr>\n"
+"                                <tr><td>☀️</td><td class=\"col2\" id=\"tmp\">N/A</div></td> <td class=\"col3\">°C</td></tr>\n"
+"                        <tr><td>&#128167;</td><td class=\"col2\" id=\"hum\">N/A</div></td> <td class=\"col3\">%</td></tr>\n"
+"                          <tr><td>&#9729;</td><td class=\"col2\" id=\"bar\">N/A</div></td> <td class=\"col3\">mbar</td></tr>\n"
+"        </tbody>\n"
+"      </table>\n"
+"    </td></tr></table>\n"
+"    <svg class=\"top\" xmlns=\"http://www.w3.org/2000/svg\" x=\"0\" y=\"0\" width=\"94px\" height=\"97px\" viewBox=\"0 0 94 97\"><path fill=\"none\" stroke=\"#30A5E7\" stroke-width=\"2\" d=\"M59.707,38.168c0,1.609-1.303,2.912-2.91,2.912 s-2.909-1.303-2.909-2.912c0-1.605,1.302-2.908,2.909-2.908S59.707,36.562,59.707,38.168z\"/><path fill=\"none\" stroke=\"#30A5E7\" stroke-width=\"2\" d=\"M46.91,91.997c0,1.609-1.302,2.912-2.91,2.912 s-2.91-1.303-2.91-2.912c0-1.605,1.302-2.908,2.91-2.908S46.91,90.392,46.91,91.997z\"/><path fill=\"none\" stroke=\"#30A5E7\" stroke-width=\"2\" d=\"M67.66,38.711 74.08,42.564 66.034,47.178\"/><path fill=\"none\" stroke=\"#30A5E7\" stroke-width=\"2\" d=\"M47,92 c24.855,0,45-20.145,45-45.002C92,22.146,71.855,2,47,2C22.146,2,2,22.146,2,46.998c0,7.953,2.312,18.233,8.667,25.995 c4.848,5.908,15.083,9.917,25.167,5.25c6.155-2.849,12.924-9.339,15.916-12.503c3.741-3.955,10.948-12.77,13.088-16.424 c7.185-12.273-0.257-23.352-14.627-22.324c-7.94,0.566-12.831,7.312-16.68,16.422c-2.546,6.025-3.522,13.453-2.061,18.061\"/><path fill=\"#FFF\" stroke=\"#30A5E7\" stroke-width=\"2\" stroke-linecap=\"round\" d=\"M35.848,47.939 c0,0-7.844,0.533-11.19-2.15c-1.387-1.112-1.408-2.963-1.123-3.996c0.575-2.083,4.444-2.963,4.444-2.963s-4.574-3.471-3.21-6.623 c0.917-2.121,2.964-2.918,4.728-2.906c4.31,0.028,11.14,6.617,12.1,7.938\"/><path fill=\"none\" stroke=\"#30A5E7\" stroke-width=\"2\" d=\"M35.707,64.168c0,1.609-1.302,2.912-2.91,2.912 s-2.91-1.303-2.91-2.912c0-1.605,1.302-2.908,2.91-2.908S35.707,62.562,35.707,64.168z\"/></svg>\n"
+"  </body>\n"
+"</html>";
+
+boolean isIp(String str) {
+  for (int i = 0; i < str.length(); i++) {
+    int c = str.charAt(i);
+    if (c != '.' && (c < '0' || c > '9')) {
+      return false;
+    }
+  }
+  return true;
+}
+
+void website() {
+  // If we get another request, redirect to http://adem.local/
+  if (!isIp(webserver.hostHeader()) && webserver.hostHeader() != String("adem.local")) {
+//    webserver.sendHeader("Location", String("http://") + toStringIp(webserver.client().localIP()), true);
+    webserver.sendHeader("Location", "http://adem.local/", true);
+    webserver.send ( 302, "text/plain", "Redirecting to http://adem.local/");
+    __LOG("DEBUG: Accessed http://"); __LOG(webserver.hostHeader()); __LOG(webserver.uri()); __LOG(" from "); __LOG(webserver.client().remoteIP()); __LOGLN();
+  } else {
+    webserver.sendHeader("Cache-Control", "no-cache, no-store, must-revalidate");
+    webserver.sendHeader("Pragma", "no-cache");
+    webserver.sendHeader("Expires", "-1");
+    webserver.send(200, "text/html", demo_html);
+  }
+}
+
+void sensors() {
+  StaticJsonBuffer<256> jsonBuffer;
+  JsonObject& root = jsonBuffer.createObject();
+  StaticJsonBuffer<256> jsonBufferBar;
+  root["barometer"] = jsonBufferBar.parseObject(barometer.report());
+  StaticJsonBuffer<256> jsonBufferHum;
+  root["humidity"] = jsonBufferHum.parseObject(humidity.report());
+  StaticJsonBuffer<256> jsonBufferPar;
+  root["particulate"] = jsonBufferPar.parseObject(particulate.report());
+  char data[256];
+  root.printTo(data, sizeof(data));
+  webserver.send(200, "application/json", data);
+}    
+
+#endif
 
 // vim:syntax=cpp
 #ifdef TELNET // Not in PRODUCTION
@@ -803,44 +1214,42 @@ void processCmdRemoteDebug() {
 
     String lastCmd = Telnet.getLastCommand();
     lastCmd.toLowerCase();
-    switch (lastCmd[0]) {
-        case 'g':
-          debug.gpsready = not debug.gpsready;
-          __LOG("debug.gpsready is "); __LOGLN(debug.gpsready?"on.":"off.");
-          break;
-        case 'm':
-          debug.moving = not debug.moving;
-          __LOG("debug.moving is "); __LOGLN(debug.moving?"on.":"off.");
-          break;
-        case 'r':
-          __LOGLN("Restarting system.");
-          next_state = STATE_RESET;
-          break;
-        case 's':
-          debug.shaken = not debug.shaken;
-          __LOG("debug.shaken is "); __LOGLN(debug.shaken?"on.":"off.");
-          break;
-        case 'w':
-          debug.wifi = not debug.wifi;
-          __LOG("debug.wifi is "); __LOGLN(debug.wifi?"on.":"off.");
-          break;
-        case 'b':
-            debug.breakmode = not debug.breakmode;
-            debug.breakcont = false;
-            __LOG("debug.break is "); __LOGLN(debug.wifi?"on.":"off. <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<");
-            break;
-        case 'c':
-            if (debug.breakmode ){
-              debug.breakcont = true;
-            }
-            __LOGLN("debug.breakcontinue set ");
-            break; 
-        case 'h':
-        case '?':
-          debug_help();
-          break;
-        default:
-          __LOGLN("No action.");
-    }
+    handle_debug_cmd(lastCmd[0]) ;
 }
 #endif
+
+/* SDA hangs low
+  Serial.println("Starting I2C bus recovery");
+  delay(2000);
+  //try i2c bus recovery at 100kHz = 5uS high, 5uS low
+  pinMode(SDAPIN, OUTPUT);//keeping SDA high during recovery
+  digitalWrite(SDAPIN, HIGH);
+  pinMode(CLKPIN, OUTPUT);
+  for (int i = 0; i < 10; i++) { //9nth cycle acts as NACK
+    digitalWrite(CLKPIN, HIGH);
+    delayMicroseconds(5);
+    digitalWrite(CLKPIN, LOW);
+    delayMicroseconds(5);
+  }
+
+  //a STOP signal (SDA from low to high while CLK is high)
+  digitalWrite(SDAPIN, LOW);
+  delayMicroseconds(5);
+  digitalWrite(CLKPIN, HIGH);
+  delayMicroseconds(2);
+  digitalWrite(SDAPIN, HIGH);
+  delayMicroseconds(2);
+  //bus status is now : FREE
+
+  Serial.println("bus recovery done, starting scan in 2 secs");
+  //return to power up mode
+  pinMode(SDAPIN, INPUT);
+  pinMode(CLKPIN, INPUT);
+  delay(2000);
+  //pins + begin advised in https://github.com/esp8266/Arduino/issues/452
+  Wire.pins(SDAPIN, CLKPIN); //this changes default values for sda and clock as well
+  Wire.begin(SDAPIN, CLKPIN);
+  //only pins: no signal on clk and sda
+  //only begin: no signal on clk, no signal on sda
+
+  */
