@@ -3,6 +3,10 @@ language: python
 python:
 - '2.7'
 
+env:
+- PROJECT=adem
+- PROJECT=i2c-slave
+
 sudo: false
 
 # Cache PlatformIO packages using Travis CI container-based infrastructure
@@ -14,5 +18,4 @@ install:
 - pip install -U platformio
 
 script:
-- platformio run -d adem
-- platformio run -d i2c-slave
+- platformio run -d $PROJECT
