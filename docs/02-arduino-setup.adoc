@@ -2,10 +2,12 @@
 
 The firmware is written in Arduino.
 
+
 == Installing the ESP8266 Arduino Addon
 
 Follow the SparkFun tutorial on how to install the ESP8266 to your Arduino IDE:
 https://learn.sparkfun.com/tutorials/esp8266-thing-hookup-guide/installing-the-esp8266-arduino-addon
+
 
 == Cloning the ADEM GitHub repository
 
@@ -15,42 +17,46 @@ https://learn.sparkfun.com/tutorials/esp8266-thing-hookup-guide/installing-the-e
 
 - Install git on your PC
 
-    - for Debian/Ubuntu:
+  * For Debian/Ubuntu:
 
     $ sudo apt-get install git
 
-    - for Fedora/RHEL/CentOS:
+  * For Fedora/RHEL/CentOS:
 
     $ sudo yum install git
 
-    - For Windows:
+  * For Windows:
 
-    Download and install from https://git-scm.com/downloads
-    If you are editing code, make sure that your editor or IDE does not modify line-endings (this would make it look like unmodified files have been changed, and/or results in extra newlines under Linux).
-    JetBrains IntelliJ IDEA is an example of a multi-platform IDE which can work with github, and provide structure to the codebase.
+    1. Download and install from https://git-scm.com/downloads
+
+    2. If you are editing code, make sure that your editor or IDE does not modify line-endings (this would make it look like unmodified files have been changed, and/or results in extra newlines under Linux).
+       JetBrains IntelliJ IDEA is an example of a multi-platform IDE which can work with GitHub, and provide structure to the codebase.
 
 - Set your GitHub and e-mailadress
 
-    $ git config --global user.name "John Doe"
-    $ git config --global user.email johndoe@example.com
+  $ git config --global user.name "John Doe"
+  $ git config --global user.email johndoe@example.com
+
 
 === Cloning the repository
 
 You can make a local copy of the ADEM project code by running the following git command:
 
-    $ git clone git@github.com:timelab/ADEM.git
+  $ git clone git@github.com:timelab/ADEM.git
 
 == Contributing code
 
 === Forking
 If you have a github account, you can contribute code to the ADEM project. Go to https://github.com/timelab/ADEM and *fork* the project to your GitHub profile. Then add it as a separate remote (stored in _.git/config_).
 
-    $ git remote add --mirror=fetch yourname https://github.com/yourgitusername/ADEM
+    $ git remote add yourgitusername https://github.com/yourgitusername/ADEM
 
 If you use SSH keys, use:
-    $ git remote add --mirror=fetch yourname git@github.com:yourgitusername/ADEM.git
+
+    $ git remote add yourgitusername git@github.com:yourgitusername/ADEM.git
 
 Update:
+
     $ git remote update
 
 This way you can create pull-requests by modifying your local copy and pushing it to your personal GitHub profile.
@@ -60,6 +66,7 @@ More information regarding the use of Git is available from: http://www.git-scm.
 The forking and contributing aspect is handled on: https://www.git-scm.com/book/en/v2/GitHub-Contributing-to-a-Project
 
 More information regarding the use of GitHub is available from: https://guides.github.com/activities/hello-world/
+
 
 === Git daily use
 
@@ -87,7 +94,7 @@ Now upload (_Push_) it to your online forked Github repo:
 
     $ git push --set-upstream <user> <name of your branch>
 
-Go to https://gitcom.com/timelab/ADEM and click *Compare & pull request*. If it fixes an issue, add _Fixes #issuenumber_ as comment. Click ''Create pull request''
+Go to https://github.com/timelab/ADEM and click *Compare & pull request*. If it fixes an issue, add _Fixes #issuenumber_ as comment. Click ''Create pull request''
 
 
 What has happenend:
@@ -96,7 +103,8 @@ What has happenend:
 
 Get the changes from the online repository and merge them into local files
 
-    $ git pull --rebase
+    $ git pull --rebase origin master
+
 
 == Build the firmware
 
@@ -106,6 +114,7 @@ In order to build project code using Arduino Sketch IDE, you need to ensure that
 
 You will have to overwrite the Arduino "Sketchbook location" with the path to where your ADEM folder is. You can set this under File -> Preferences.
 If you are already using Arduino for other projects, alternatively, you can check out the ADEM repository to a subfolder of the default Sketchbook location.
+
 
 === Using make as alternative to Arduino IDE
 
@@ -167,6 +176,7 @@ The default serial port for monitoring is `/dev/ttyUSB0` and the default baud ra
 FIXME: apparently you can use 'tail' to monitor, if you set the the terminal line settings correctly using stty; ex. stty -F /dev/serial/by-id/usb-1a86_USB2.0-Serial-if00-port0 cs8 74880 ignbrk -brkint -icrnl -imaxbel -opost -onlcr -isig -icanon -iexten -echo -echoe -echok -echoctl -echoke noflsh -ixon -crtscts
 FIXME: untested with ESP8266 (tested with Arduino Nano at different baud rate)
 
+
 ==== Building with DEBUG enabled
 
 We also provide a way to enable debugging for your build.
@@ -180,13 +190,6 @@ This incidentally is also the default compilation flag. However some libraries h
 If you want to build without DEBUG mode, you can simply do:
 
   $ make CFLAGS=
-
-
-==== Building with DEMO mode
-
-There is a demonstration mode that is enabled by doing:
-
-  $ make CFLAGS="-DDEMO"
 
 
 ==== Building, flashing and monitoring
