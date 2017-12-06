@@ -1,19 +1,28 @@
-# Unwanted extensions
+# Unwanted files
+config.h
+
 *~
 *.log
-*.suo
 
-# Unwanted directories
-.clang_complete/
+/Arduino
+/arduino15
+/Build/
+
+# Unwanted Visual Studio Code files
 .gcc-flags.json
+
+*.sln
+*.suo
+*.vcxproj
+*.vcxproj.filters
+
+**/.gitignore
+**/.travis.yml
+**/lib/readme.txt
+
+.build/
+.clang_complete/
 .pioenvs/
 .piolibdeps/
-__vm/
 .vscode/
-Build/
-.build/
-
-# Unwanted files
-Arduino
-arduino15
-config.h
+__vm/
