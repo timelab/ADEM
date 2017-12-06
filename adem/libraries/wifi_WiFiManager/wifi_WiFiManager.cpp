@@ -20,27 +20,34 @@
 
 #include "wifi_WiFiManager.h"
 
-WiFiManagerWifi::WiFiManagerWifi() {
-    myWiFiManager wifimanager;
+WiFiManagerWifi::WiFiManagerWifi() : myWiFiManager() {
+    //myWiFiManager wifimanager;
     sprintf(SSID, "ADEM-%d", ESP.getChipId());
     _initialized = false;
 }
 
 WiFiManagerWifi::~WiFiManagerWifi() {
-    delete &wifimanager;
+    //delete &wifimanager;
 }
 
 void WiFiManagerWifi::begin() {
     Serial.print("Initializing WiFiManager... ");
-    // Set ConfigPortal timeout as AP
-    wifimanager.setConfigPortalTimeout(300);
-    // Set connect timeout for WiFiManager client is sec
-    wifimanager.setConnectTimeout(15);
-    // Only consider APs with signal over 15%
-    wifimanager.setMinimumSignalQuality(15);
+    if (!_initialized){
+        // Set ConfigPortal timeout as AP
+        //wifimanager.setConfigPortalTimeout(300);
+        setConfigPortalTimeout(300);
+        // Set connect timeout for WiFiManager client is sec
+        //wifimanager.setConnectTimeout(15);
+        setConnectTimeout(15);
+        // Only consider APs with signal over 15%
+        //wifimanager.setMinimumSignalQuality(15);
+        setMinimumSignalQuality(15);
+    }
     Serial.println("OK");
     _initialized = true;
 }
+
+
 
 void WiFiManagerWifi::end() {
 }
@@ -75,7 +82,8 @@ void WiFiManagerWifi::start_ap(char SSID[20]) {
 
     // Start ConfigPortal and wait for submit or timeout
     WiFi.begin();
-    if (wifimanager.startConfigPortal(SSID)) {
+    //if (wifimanager.startConfigPortal(SSID)) {
+    if (startConfigPortal(SSID)) {
         connected_once = true;
         // Log that wifi-connection worked
     } else {
@@ -91,9 +99,11 @@ void WiFiManagerWifi::start_client() {
     // Start ConfigPortal and wait for submit or timeout
     ETS_GPIO_INTR_DISABLE(); // stop interrupt comming in
     Serial.println(" interrupts disabled ");
-    wifimanager.setSleepAfterAutoConnect(true);
+    //wifimanager.setSleepAfterAutoConnect(true);
+    setSleepAfterAutoConnect(true);
     Serial.println(" wifi sleep after autoconnect ");
-    if (wifimanager.autoConnect()) {
+    //if (wifimanager.autoConnect()) {
+    if (autoConnect()) {
         connected = true;
         // Log that wifi-connection worked
     } else {
