@@ -11,6 +11,7 @@
 __vm/
 .vscode/
 Build/
+.build/
 
 # Unwanted files
 Arduino

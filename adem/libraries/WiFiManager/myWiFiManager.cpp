@@ -27,6 +27,7 @@ standard wifi pages added to the root
 /*****************************************/
 #include "myWiFiManager.h"
 #include <FS.h> 
+#include "BufferedResponse.h"
 
 myWiFiManagerParameter::myWiFiManagerParameter() {
   _id = NULL;
@@ -548,7 +549,7 @@ void myWiFiManager::handleRoot() {
     return;
   }
 
-  String page = FPSTR(HTTP_HEAD);
+  page = FPSTR(HTTP_HEAD);
   page.replace("{v}", "Options");
   page += FPSTR(HTTP_SCRIPT);
   page += FPSTR(HTTP_STYLE);
@@ -603,7 +604,8 @@ void myWiFiManager::handleRoot() {
 /** Wifi config page handler */
 void myWiFiManager::handleWifi(boolean scan) {
 
-  String page = FPSTR(HTTP_HEAD);
+  
+  page = FPSTR(HTTP_HEAD);
   page.replace("{v}", "Config ESP");
   page += FPSTR(HTTP_SCRIPT);
   page += FPSTR(HTTP_STYLE);
@@ -612,6 +614,7 @@ void myWiFiManager::handleWifi(boolean scan) {
 
   if (scan) {
     DEBUG_WM(F("Scan access points ..."));
+    Serial.printf("client heap size: %u\n", ESP.getFreeHeap());
     int n = WiFi.scanNetworks();
     DEBUG_WM_LN(F(" done"));
     if (n == 0) {
@@ -732,11 +735,12 @@ void myWiFiManager::handleWifi(boolean scan) {
   page += FPSTR(HTTP_SCAN_LINK);
 
   page += FPSTR(HTTP_END);
-
+Serial.printf("client heap size: %u\n", ESP.getFreeHeap());
   server->send(200, "text/html", page);
 
-
+Serial.printf("client heap size: %u\n", ESP.getFreeHeap());
   DEBUG_WM_LN(F("Sent config page"));
+  DEBUG_WM_LN(page.c_str());
 }
 
 /** Handle the WLAN save form and redirect to WLAN config page again */
@@ -819,7 +823,7 @@ void myWiFiManager::handleWifiSave() {
     optionalIPFromString(&_sta_static_sn, sn.c_str());
   }
 
-  String page = FPSTR(HTTP_HEAD);
+  page = FPSTR(HTTP_HEAD);
   page.replace("{v}", "Credentials Saved");
   page += FPSTR(HTTP_SCRIPT);
   page += FPSTR(HTTP_STYLE);
@@ -828,6 +832,7 @@ void myWiFiManager::handleWifiSave() {
   page += FPSTR(HTTP_SAVED);
   page += FPSTR(HTTP_END);
 
+  server->setContentLength(CONTENT_LENGTH_UNKNOWN); // force chunked response to overcome the heap limitations
   server->send(200, "text/html", page);
 
   DEBUG_WM_LN(F("Sent wifi save page"));
@@ -838,7 +843,7 @@ void myWiFiManager::handleWifiSave() {
 /** Parameter config page handler */
 void myWiFiManager::handleParam() {
 
-  String page = FPSTR(HTTP_HEAD);
+  page = FPSTR(HTTP_HEAD);
   page.replace("{v}", "Config ESP");
   page += FPSTR(HTTP_SCRIPT);
   page += FPSTR(HTTP_STYLE);
@@ -882,11 +887,12 @@ void myWiFiManager::handleParam() {
   page += FPSTR(HTTP_FORM_END);
   
   page += FPSTR(HTTP_END);
-
+  server->setContentLength(CONTENT_LENGTH_UNKNOWN); // force chunked response to overcome the heap limitations
   server->send(200, "text/html", page);
 
-
+  
   DEBUG_WM_LN(F("Sent config page"));
+  Serial.println(page);
 }
 
 /** Handle the parameter save button */
@@ -915,7 +921,7 @@ void myWiFiManager::handleParamSave() {
   {
     ///todo call save json
   }
-  String page = FPSTR(HTTP_HEAD);
+  page = FPSTR(HTTP_HEAD);
   page.replace("{v}", "Parameters Saved");
   page += FPSTR(HTTP_SCRIPT);
   page += FPSTR(HTTP_STYLE);
@@ -929,7 +935,7 @@ void myWiFiManager::handleParamSave() {
   page.replace("{i}","Parameters");
   page += FPSTR(HTTP_OK);
   page += FPSTR(HTTP_END);
-
+  server->setContentLength(CONTENT_LENGTH_UNKNOWN); // force chunked response to overcome the heap limitations
   server->send(200, "text/html", page);
 
   DEBUG_WM_LN(F("Sent parameter save page"));
@@ -940,7 +946,7 @@ void myWiFiManager::handleParamSave() {
 /** Handle the clear page */
 void myWiFiManager::handleDemo() {
   
-  String page = FPSTR(HTTP_HEAD);
+  page = FPSTR(HTTP_HEAD);
   page.replace("{v}", "Demo");
   page += FPSTR(HTTP_SCRIPT);
   page += FPSTR(HTTP_STYLE);
@@ -950,11 +956,11 @@ void myWiFiManager::handleDemo() {
   page += F("<dt>Demo Mode selected</dt>");
   page += F("</dl>");
   page += FPSTR(HTTP_END);
-
+  server->setContentLength(CONTENT_LENGTH_UNKNOWN); // force chunked response to overcome the heap limitations
   server->send(200, "text/html", page);
 
   DEBUG_WM_LN(F("Sent Demo page"));
-
+  Serial.println(page);
 }
 
 /** Handle the custom page */
@@ -962,7 +968,7 @@ void myWiFiManager::handleCustom() {
 
   DEBUG_WM_LN(F("Handle Custom "));
 //// TODO make custom parameter input based on wifi page  
-  String page = FPSTR(HTTP_HEAD);
+  page = FPSTR(HTTP_HEAD);
   page.replace("{v}", "Custom parameters");
   page += FPSTR(HTTP_SCRIPT);
   page += FPSTR(HTTP_STYLE);
@@ -1004,10 +1010,11 @@ void myWiFiManager::handleCustom() {
   page += FPSTR(HTTP_FORM_END);
   page += FPSTR(HTTP_END);
   Serial.println(page);
+  server->setContentLength(CONTENT_LENGTH_UNKNOWN); // force chunked response to overcome the heap limitations
   server->send(200, "text/html", page);
 
   DEBUG_WM_LN(F("Sent custom page"));
-
+  Serial.println(page);
 }
 /** Handle the custom page */
 void myWiFiManager::handleCustomSave() {
@@ -1044,7 +1051,7 @@ void myWiFiManager::handleCustomSave() {
   //SAVE/connect here
   DEBUG_WM(F("value "));
   DEBUG_WM_LN( server->arg("config").c_str());
-  String page = FPSTR(HTTP_HEAD);
+  page = FPSTR(HTTP_HEAD);
   page.replace("{v}", "Custom Save");
   page += FPSTR(HTTP_SCRIPT);
   page += FPSTR(HTTP_STYLE);
@@ -1055,6 +1062,7 @@ void myWiFiManager::handleCustomSave() {
   page += F("</dl>");
   page += FPSTR(HTTP_OK);
   page += FPSTR(HTTP_END);
+  server->setContentLength(CONTENT_LENGTH_UNKNOWN); // force chunked response to overcome the heap limitations
   server->send(200, "text/html", page);
   DEBUG_WM_LN(F("Sent wifi save page"));
 
@@ -1064,7 +1072,7 @@ void myWiFiManager::handleCustomSave() {
 void myWiFiManager::handleClear() {
   //clean FS, for testing
   SPIFFS.format();
-  String page = FPSTR(HTTP_HEAD);
+  page = FPSTR(HTTP_HEAD);
   page.replace("{v}", "Clear");
   page += FPSTR(HTTP_SCRIPT);
   page += FPSTR(HTTP_STYLE);
@@ -1079,7 +1087,7 @@ void myWiFiManager::handleClear() {
   page += F("</dl>");
   page += FPSTR(HTTP_OK);
   page += FPSTR(HTTP_END);
-
+  server->setContentLength(CONTENT_LENGTH_UNKNOWN); // force chunked response to overcome the heap limitations
   server->send(200, "text/html", page);
 
   DEBUG_WM_LN(F("Sent Clear page"));
@@ -1088,8 +1096,9 @@ void myWiFiManager::handleClear() {
 /** Handle the info page */
 void myWiFiManager::handleInfo() {
   DEBUG_WM_LN(F("Info"));
+  BufferedResponse response((ESP8266WebServer &) *server, "text/html", 200, 128);
 
-  String page = FPSTR(HTTP_HEAD);
+  page = FPSTR(HTTP_HEAD);
   page.replace("{v}", "Info");
   page += FPSTR(HTTP_SCRIPT);
   page += FPSTR(HTTP_STYLE);
@@ -1125,17 +1134,22 @@ void myWiFiManager::handleInfo() {
   page += F("</dl>");
   page += FPSTR(HTTP_OK);
   page += FPSTR(HTTP_END);
-
-  server->send(200, "text/html", page);
+  Serial.println(page);
+  //server->setContentLength(CONTENT_LENGTH_UNKNOWN); // force chunked response to overcome the heap limitations  
+  //server->send(200, "text/html", page);
+ 
+  response.print(page);
+  response.flush();
 
   DEBUG_WM_LN(F("Sent info page"));
+  Serial.println(page);
 }
 
 /** Handle the reset page */
 void myWiFiManager::handleReset() {
   DEBUG_WM_LN(F("Reset"));
 
-  String page = FPSTR(HTTP_HEAD);
+  page = FPSTR(HTTP_HEAD);
   page.replace("{v}", "Reset");
   page += FPSTR(HTTP_SCRIPT);
   page += FPSTR(HTTP_STYLE);
@@ -1143,9 +1157,11 @@ void myWiFiManager::handleReset() {
   page += FPSTR(HTTP_HEAD_END);
   page += F("Module will reset in a few seconds.");
   page += FPSTR(HTTP_END);
+  server->setContentLength(CONTENT_LENGTH_UNKNOWN); // force chunked response to overcome the heap limitations  
   server->send(200, "text/html", page);
 
   DEBUG_WM_LN(F("Sent reset page"));
+  Serial.println(page);
   delay(5000);
   ESP.reset();
   delay(2000);
@@ -1177,12 +1193,25 @@ void myWiFiManager::handleNotFound() {
       if (uri.endsWith(_params[i]->getID())) {
         if (uri.equals("/"+ String(_params[i]->getID())))
         {
-          DEBUG_WM_LN( "call parameter external function ");
-          String page = _params[i]->_setup();
-          if(String(_params[i]->getID()).endsWith("json"))
+          DEBUG_WM( "call parameter external setup function ");
+          page = _params[i]->_setup();
+          DEBUG_WM_LN( "--> OK");
+          DEBUG_WM("setup function returned : ");
+          if(String(_params[i]->getID()).endsWith("json")){
+            DEBUG_WM_LN("json data ");
+            Serial.println(page);
+            server->setContentLength(CONTENT_LENGTH_UNKNOWN); // force chunked response to overcome the heap limitations  
             server->send(200, "application/json", page);
-          else
-            server->send(200,"text/html",page);
+          }
+          else{
+            DEBUG_WM_LN("html page ");
+            Serial.println(page);
+            BufferedResponse response((ESP8266WebServer &) *server, "text/html", 200, 128);
+            response.print(page);
+            response.flush();
+            // server->setContentLength(CONTENT_LENGTH_UNKNOWN); // force chunked response to overcome the heap limitations
+            // server->send(200,"text/html",page);
+          }
           return;
         }
         if (uri.equals("/save "+ String(_params[i]->getID())))
@@ -1190,7 +1219,7 @@ void myWiFiManager::handleNotFound() {
           DEBUG_WM_LN( "call parameter custom save function ");
           if ( _params[i]->_actioncallback != NULL)
             _params[i]->_actioncallback();
-          String page = FPSTR(HTTP_HEAD);
+          page = FPSTR(HTTP_HEAD);
           page.replace("{v}", "Custom Save");
           page += FPSTR(HTTP_SCRIPT);
           page += FPSTR(HTTP_STYLE);
@@ -1205,7 +1234,7 @@ void myWiFiManager::handleNotFound() {
           page += " saved </dt></dl>";
           page += FPSTR(HTTP_OK);
           page += FPSTR(HTTP_END);
-          
+          server->setContentLength(CONTENT_LENGTH_UNKNOWN); // force chunked response to overcome the heap limitations  
           server->send(200, "text/html", page);
 
           DEBUG_WM_LN(F("Sent Custom save page"));
