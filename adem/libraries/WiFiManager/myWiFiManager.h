@@ -76,7 +76,8 @@ class myWiFiManagerParameter {
     bool        isExternal();
   private:
     myWiFiManagerParameter();
-  
+    ~myWiFiManagerParameter();
+    
     const char *_id;
     const char *_placeholder;
     char       *_value;
