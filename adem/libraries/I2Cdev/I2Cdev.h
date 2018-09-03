@@ -101,6 +101,13 @@ THE SOFTWARE.
 
 #define MAX_RETRY 4
 
+#ifdef ESP8266
+#define min _min
+#define max _max
+#endif
+
+#define BUFFER_LENGTH 64
+
 class I2Cdev {
     public:
         I2Cdev();
