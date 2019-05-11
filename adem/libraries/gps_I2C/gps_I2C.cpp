@@ -202,12 +202,12 @@ int8_t I2CGps::readBytes(uint8_t devAddr, uint8_t regAddr, uint8_t length, uint8
         Serial.print(" requestfrom ");
     #endif
 
-    int8_t receiv_count = Wire.requestFrom(devAddr, (uint8_t)min(length , BUFFER_LENGTH));
+    int8_t receiv_count = Wire.requestFrom(devAddr, (uint8_t)min((int)length , BUFFER_LENGTH));
     #ifdef I2CDEV_SERIAL_DEBUG
         Serial.print(receiv_count,DEC);
         Serial.print( " received ");
     #endif
-    if (receiv_count >= min(length,BUFFER_LENGTH)) {
+    if (receiv_count >= min((int)length,BUFFER_LENGTH)) {
       for (; Wire.available(); count++) {
           data[count] = Wire.read();
           #ifdef I2CDEV_SERIAL_DEBUG
