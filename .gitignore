@@ -26,3 +26,4 @@ config.h
 .piolibdeps/
 .vscode/
 __vm/
+adem/platformio.ini
