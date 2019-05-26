@@ -175,16 +175,16 @@ void MPU6050Sensor::read() {
 bool MPU6050Sensor::isMoving()
 {
     long now = measuredData._timestamp;
-    if ((now - _movingTimestamp) > notmovingDelay) 
+    if ((now - (long) _movingTimestamp) > notmovingDelay) 
         return false;
     else
-        if (now > _movingTimestamp)
+        if (now > (long) _movingTimestamp)
             return true;
         else // we have wrapped around (can it happen ?)
         {
             // quick and dirty fix. 
             // if we wrapped around assume lastmoving = now
-            _movingTimestamp = now;
+            _movingTimestamp = (unsigned long)now;
         }
 }
 
