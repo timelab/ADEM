@@ -226,12 +226,12 @@ int8_t I2Cdev::readBytes(uint8_t devAddr, uint8_t regAddr, uint8_t length, uint8
             // so if user requests more than BUFFER_LENGTH bytes, we have to do it in
             // smaller chunks instead of all at once
            
-            for (uint8_t k = 0; k < length; k += min(length, BUFFER_LENGTH)) {
+            for (uint8_t k = 0; k < length; k += min((int)length, BUFFER_LENGTH)) {
                 Wire.beginTransmission(devAddr);
                 Wire.send(regAddr);
                 Wire.endTransmission();
                 Wire.beginTransmission(devAddr);
-                Wire.requestFrom(devAddr, (uint8_t)min(length - k, BUFFER_LENGTH));
+                Wire.requestFrom(devAddr, (uint8_t)min((int)length - k, BUFFER_LENGTH));
 
                 for (; Wire.available() && (timeout == 0 || millis() - t1 < timeout); count++) {
                     data[count] = Wire.receive();
@@ -250,15 +250,15 @@ int8_t I2Cdev::readBytes(uint8_t devAddr, uint8_t regAddr, uint8_t length, uint8
             // I2C/TWI subsystem uses internal buffer that breaks with large data requests
             // so if user requests more than BUFFER_LENGTH bytes, we have to do it in
             // smaller chunks instead of all at once
-            for (uint8_t k = 0; k < length; k += min(length, BUFFER_LENGTH)) {
+            for (uint8_t k = 0; k < length; k += min((int)length, BUFFER_LENGTH)) {
                 Wire.beginTransmission(devAddr);
                 Wire.write(regAddr);
                 Wire.endTransmission();
                 for(int retry_cnt=0; retry_cnt < MAX_RETRY; retry_cnt++)
                 {
                     Wire.beginTransmission(devAddr);
-                    uint8_t receive_cnt = Wire.requestFrom(devAddr, (uint8_t)min(length - k, BUFFER_LENGTH));
-                    if (receive_cnt == (uint8_t)min(length - k, BUFFER_LENGTH)){
+                    uint8_t receive_cnt = Wire.requestFrom(devAddr, (uint8_t)min((int)length - k, BUFFER_LENGTH));
+                    if (receive_cnt == (uint8_t)min((int)length - k, BUFFER_LENGTH)){
                         for (; Wire.available() && (timeout == 0 || millis() - t1 < timeout); count++) {
                             data[count] = Wire.read();
                             #ifdef I2CDEV_SERIAL_DEBUG
@@ -294,14 +294,14 @@ int8_t I2Cdev::readBytes(uint8_t devAddr, uint8_t regAddr, uint8_t length, uint8
                     Wire.write(regAddr);
                     Wire.endTransmission();
 //                    Wire.beginTransmission(devAddr);
-                    uint8_t receive_cnt = Wire.requestFrom(devAddr, (uint8_t)min(length - k, BUFFER_LENGTH));
+                    uint8_t receive_cnt = Wire.requestFrom(devAddr, (uint8_t)min((int)length - k, BUFFER_LENGTH));
                     #ifdef I2CDEV_SERIAL_DEBUG
                     Serial.print("received ");
                     Serial.print(receive_cnt);
                     Serial.print(" of ");
                     Serial.print(length);
                     #endif
-                    if (receive_cnt >= (uint8_t)min(length - k, BUFFER_LENGTH)){
+                    if (receive_cnt >= (uint8_t)min((int)length - k, BUFFER_LENGTH)){
                         #ifdef I2CDEV_SERIAL_DEBUG
                         Serial.print(" read data ");
                         #endif
@@ -384,7 +384,7 @@ int8_t I2Cdev::readWords(uint8_t devAddr, uint8_t regAddr, uint8_t length, uint1
             // I2C/TWI subsystem uses internal buffer that breaks with large data requests
             // so if user requests more than BUFFER_LENGTH bytes, we have to do it in
             // smaller chunks instead of all at once
-            for (uint8_t k = 0; k < length * 2; k += min(length * 2, BUFFER_LENGTH)) {
+            for (uint8_t k = 0; k < length * 2; k += min((int)length * 2, BUFFER_LENGTH)) {
                 Wire.beginTransmission(devAddr);
                 Wire.send(regAddr);
                 Wire.endTransmission();
@@ -417,7 +417,7 @@ int8_t I2Cdev::readWords(uint8_t devAddr, uint8_t regAddr, uint8_t length, uint1
             // I2C/TWI subsystem uses internal buffer that breaks with large data requests
             // so if user requests more than BUFFER_LENGTH bytes, we have to do it in
             // smaller chunks instead of all at once
-            for (uint8_t k = 0; k < length * 2; k += min(length * 2, BUFFER_LENGTH)) {
+            for (uint8_t k = 0; k < length * 2; k += min((int)length * 2, BUFFER_LENGTH)) {
                 Wire.beginTransmission(devAddr);
                 Wire.write(regAddr);
                 Wire.endTransmission();
@@ -450,7 +450,7 @@ int8_t I2Cdev::readWords(uint8_t devAddr, uint8_t regAddr, uint8_t length, uint1
             // I2C/TWI subsystem uses internal buffer that breaks with large data requests
             // so if user requests more than BUFFER_LENGTH bytes, we have to do it in
             // smaller chunks instead of all at once
-            for (uint8_t k = 0; k < length * 2; k += min(length * 2, BUFFER_LENGTH)) {
+            for (uint8_t k = 0; k < length * 2; k += min((int)length * 2, BUFFER_LENGTH)) {
                 Wire.beginTransmission(devAddr);
                 Wire.write(regAddr);
                 Wire.endTransmission();
