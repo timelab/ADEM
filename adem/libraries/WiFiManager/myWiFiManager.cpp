@@ -118,6 +118,10 @@ myWiFiManagerParameter::myWiFiManagerParameter(const char *id, String(* setupfun
   _actioncallback = NULL;
 }
 
+myWiFiManagerParameter::~myWiFiManagerParameter(){
+  delete[] _value;
+}
+
 const char* myWiFiManagerParameter::getValue() {
   return _value;
 }
@@ -150,11 +154,14 @@ myWiFiManager::myWiFiManager() {
       DEBUG_WM("reading config file");
       File configFile = SPIFFS.open("/config.json", "r");
       if (configFile) {
-        DEBUG_WM("....opened config file");
+        DEBUG_WM("....opened config file ");
+        DEBUG_WM(ESP.getFreeHeap());
+        DEBUG_WM(" --> ");
         size_t size = configFile.size();
         // Allocate a buffer to store contents of the file.
         std::unique_ptr<char[]> buf(new char[size]);
-
+        DEBUG_WM(ESP.getFreeHeap());
+        
         configFile.readBytes(buf.get(), size);
         DynamicJsonBuffer jsonBuffer;
         JsonObject& json = jsonBuffer.parseObject(buf.get());
@@ -184,11 +191,15 @@ myWiFiManager::myWiFiManager() {
         } else {
           DEBUG_WM_LN("failed to load json config");
         }
+        //delete buf; // get rid of the temporary buffer
       }
     }
   } else {
     DEBUG_WM_LN("failed to mount FS");
   }
+  DEBUG_WM("Free heap : ");
+  DEBUG_WM_LN(ESP.getFreeHeap());
+        
 }
 
 void myWiFiManager::addParameter(myWiFiManagerParameter *p) {
