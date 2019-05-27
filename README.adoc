@@ -3,7 +3,7 @@
 
 image::https://api.travis-ci.org/timelab/ADEM.svg[alt="Build Status", link="https://travis-ci.org/timelab/ADEM", align="left", float]
 
-The http://www.timelab.org/[Timelab] ADEM project enables cyclists to measure particulate matter (PM~1~ and PM~2.5~). The quality based on these measurements are displayed on the device, temporarily stored and sent via WiFi to a central data collection service.
+The http://www.timelab.org/[Timelab] ADEM project enables cyclists to measure particulate matter (PM~1~ and PM~2.5~). The air quality estimate based on these measurements is displayed on the device, temporarily stored and sent via WiFi to a central data collection service.
 
 The aim of this project is to create a low-cost open-source DIY hardware and firmware kit that is modular and adjustable, can be locally reproduced and repaired.
 

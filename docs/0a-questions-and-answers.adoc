@@ -66,3 +66,7 @@ We already established that sensor-records will be stored in memory in binary fo
 This ensures efficient use of scarce memory, while retaining augmented information to the back-end.
 
 image::http://timelab.github.io/ADEM-Logos/svg/adem_logo-txt_stroke.svg[alt="ADEM logo", link="http://ik-adem.be/", align="right", float]
+
+ == Will the project make use of the newer and faster ESP32 ?
+
+ The ESP8266 has its limits. We have ran into problems with the amount of RAM and the available number of I/O pins. In the current stage of the project we are using a secondary processor (AVR) as a serial-to-I2C bridge for the GPS. This could probably be eliminated when switching to ESP32
